@@ -1,33 +1,33 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
 
-const User = sequelize.define('User', {
-    userID:{
+const CreditCard = sequelize.define('CreditCard', {
+    creditCardID: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
     },
+    creditSerialNumber: {
+        type: DataTypes.STRING,
+        validate: {
+            len:[0, 30],
+        },
+    },
     username:{
         type: DataTypes.STRING,
-        allowNullValues: true,
         validate: {
-            len: [0, 30]
+            len:[0, 30],
         },
     },
-    password:{
+    bankName:{
         type: DataTypes.STRING,
-        allowNullValues: true,
         validate: {
-            len: [0, 100]
+            len:[0, 50],
         },
     },
-    role:{
-        type: DataTypes.STRING,
-        allowNullValues: true,
-        validate: {
-            len: [0, 20]
-        },
-    }
+    customerID:{
+        type: DataTypes.INTEGER,
+    },
 });
 
-module.exports = User;
+module.exports = CreditCard;
