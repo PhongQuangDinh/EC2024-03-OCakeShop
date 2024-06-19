@@ -35,6 +35,10 @@ const Cart = sequelize.define('Cart', {
     customerID:{
         type: DataTypes.INTEGER,
     },
+},
+{
+    tableName: 'Cart',
+    timestamps: false
 });
 
 module.exports = Cart;

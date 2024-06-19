@@ -16,6 +16,10 @@ const CakeRecipes = sequelize.define('CakeRecipes', {
     ingredientID:{
         type: DataTypes.INTEGER,
     },
+},
+{
+    tableName: 'CakeRecipes',
+    timestamps: false
 });
 
 module.exports = CakeRecipes;

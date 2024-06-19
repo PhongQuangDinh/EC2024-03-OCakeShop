@@ -25,6 +25,10 @@ const OrderCakeDetail = sequelize.define('OrderCakeDetail', {
     orderCakeID:{
         type: DataTypes.INTEGER,
     }
+},
+{
+    tableName: 'OrderCakeDetail',
+    timestamps: false
 });
 
 

@@ -31,6 +31,10 @@ const Customer = sequelize.define('Customer', {
     userID:{
         type: DataTypes.INTEGER,
     },
+},
+{
+    tableName: 'Customer',
+    timestamps: false
 });
 
 module.exports = Customer;

@@ -34,6 +34,10 @@ const Ingredient = sequelize.define('Ingredient', {
     expirationDate: {
         type: DataTypes.DATE,
     },
+},
+{
+    tableName: 'Ingredient',
+    timestamps: false
 });
 
 module.exports = Ingredient;

@@ -13,6 +13,10 @@ const CakeImage = sequelize.define('CakeImage', {
         },
         primaryKey: true,
     },
+},
+{
+    tableName: 'CakeImage',
+    timestamps: false
 });
 
 module.exports = CakeImage;

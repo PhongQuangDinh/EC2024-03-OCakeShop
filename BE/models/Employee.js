@@ -34,6 +34,10 @@ const Employee = sequelize.define('Employee', {
     userID:{
         type: DataTypes.INTEGER,
     },
+},
+{
+    tableName: 'Employee',
+    timestamps: false
 });
 
 module.exports = Employee;

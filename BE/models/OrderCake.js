@@ -40,6 +40,10 @@ const OrderCake = sequelize.define('OrderCake', {
             len:[0, 50],
         },
     },
+},
+{
+    tableName: 'OrderCake',
+    timestamps: false
 });
 
 

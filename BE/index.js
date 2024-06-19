@@ -9,9 +9,9 @@ const port = 3000;
 app.use(morgan('combined'));
 app.use(express.json());
 
-// app.get('/', (req, res) => {
-//     res.send('Hello World!');
-// });
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
 
 router(app);
 
@@ -27,4 +27,7 @@ sequelize.authenticate()
   })
   .catch(err => {
     console.error('Unable to connect to the database:', err);
+  })
+  .finally(()=>{
+    console.log('Waiting...');
   });

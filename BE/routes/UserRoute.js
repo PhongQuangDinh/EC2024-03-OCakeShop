@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../models/User');
 
-router.get('/',(req, res, next) => {
-    res.status(200).send('User Route');
-});
+router.get('/', async (req, res, next) => {
+    try{
+        const user = await User.findAll();
+        res.status(200).json(user);
+    }
+    catch (err) {`A problem is ${err}$`}});
 
 module.exports = router;

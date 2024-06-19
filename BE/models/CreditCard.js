@@ -28,6 +28,10 @@ const CreditCard = sequelize.define('CreditCard', {
     customerID:{
         type: DataTypes.INTEGER,
     },
+},
+{
+    tableName: 'CreditCard',
+    timestamps: false
 });
 
 module.exports = CreditCard;

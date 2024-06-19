@@ -20,6 +20,10 @@ const Payment = sequelize.define('Payment', {
     customerID:{
         type: DataTypes.INTEGER,
     },
+},
+{
+    tableName: 'Payment',
+    timestamps: false
 });
 
 module.exports = Payment;

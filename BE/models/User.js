@@ -1,5 +1,6 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
+const bcrypt = require('bcrypt');
 
 const User = sequelize.define('User', {
     userID:{
@@ -24,10 +25,26 @@ const User = sequelize.define('User', {
     role:{
         type: DataTypes.STRING,
         allowNullValues: true,
+        defaultValue: 'khách hàng',
         validate: {
             len: [0, 20]
         },
-    }
-});
+    },
+},
+    {
+        tableName: 'User',
+        timestamps: false,
+        hooks: {
+            beforeCreate: async (user) => {
+                user.password = await bcrypt.hash(user.password, 10);
+            },
+            beforeUpdate: async (user) => {
+                if (user.changed('password')) {
+                    user.password = await bcrypt.hash(user.password, 10);
+                }
+            }
+        }
+    });
+
 
 module.exports = User;

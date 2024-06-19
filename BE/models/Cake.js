@@ -28,6 +28,10 @@ const Cake = sequelize.define('Cake', {
     cakeSizeID:{
         type: DataTypes.INTEGER,
     },
+},
+{
+    tableName: 'Cake',
+    timestamps: false
 });
 
 module.exports = Cake;
