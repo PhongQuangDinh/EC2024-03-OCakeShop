@@ -1,6 +1,8 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
 const bcrypt = require('bcrypt');
+const Employee = require('../models/Employee');
+const Customer = require('../models/Customer');
 
 const User = sequelize.define('User', {
     userID:{
@@ -46,5 +48,11 @@ const User = sequelize.define('User', {
         }
     });
 
+
+User.hasOne(Employee, {foreignKey: 'userID'});
+User.belongsTo(Employee, {foreignKey: 'userID'});
+
+User.hasOne(Customer, {foreignKey: 'userID'});
+User.belongsTo(Customer, {foreignKey: 'userID'});
 
 module.exports = User;

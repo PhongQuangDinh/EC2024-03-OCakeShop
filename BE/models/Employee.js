@@ -33,6 +33,10 @@ const Employee = sequelize.define('Employee', {
     },
     userID:{
         type: DataTypes.INTEGER,
+        references: {
+            model: 'User',
+            key: 'userID',
+        }
     },
 },
 {

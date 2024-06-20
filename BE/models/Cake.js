@@ -1,5 +1,6 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
+const CakeImage = require('./CakeImage');
 
 const Cake = sequelize.define('Cake', {
     cakeID: {
@@ -33,5 +34,8 @@ const Cake = sequelize.define('Cake', {
     tableName: 'Cake',
     timestamps: false
 });
+
+Cake.hasMany(CakeImage, {foreignKey: 'cakeID'});
+Cake.belongsTo(CakeImage, {foreign:'cakeID'});
 
 module.exports = Cake;

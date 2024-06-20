@@ -7,6 +7,7 @@ router.get('/', async (req, res, next) => {
         const user = await User.findAll();
         res.status(200).json(user);
     }
-    catch (err) {`A problem is ${err}$`}});
+    catch (err) {next(err)}
+});
 
 module.exports = router;

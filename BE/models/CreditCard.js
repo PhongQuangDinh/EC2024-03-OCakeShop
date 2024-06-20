@@ -27,6 +27,10 @@ const CreditCard = sequelize.define('CreditCard', {
     },
     customerID:{
         type: DataTypes.INTEGER,
+        references: {
+            model: 'Customer',
+            as: 'customerID'
+        }
     },
 },
 {
