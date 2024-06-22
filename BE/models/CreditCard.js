@@ -47,9 +47,8 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class CreditCard extends Model {
       static associate(models) {
-        // CreditCard.belongsToMany(models.Genre, { through: models.GenreCreditCard, foreignKey: 'CreditCard' });
-        // CreditCard.hasMany(models.CreditCardTrailer, { foreignKey: 'CreditCard'})
-        // CreditCard.belongsToMany(models.Award, { through: models.AwardCreditCard, foreignKey: 'CreditCard_id' });
+        CreditCard.belongsTo(models.Customer, { foreignKey: 'customerID'});
+        CreditCard.hasMany(models.Payment, { foreignKey: 'creditCardID' });
       }
     }
   

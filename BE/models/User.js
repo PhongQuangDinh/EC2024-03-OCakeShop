@@ -48,11 +48,7 @@
 //         }
 //     });
 
-// User.hasOne(Customer, {foreignKey: 'userID', as: 'customer'});
-// User.hasOne(Employee, {foreignKey: 'userID', as: 'employee'});
 
-// Employee.belongsTo(User, { foreignKey: 'userID', as: 'user' });
-// Customer.belongsTo(User, { foreignKey: 'userID', as: 'user' });
 
 // module.exports = User;
 
@@ -60,12 +56,12 @@
 
 const { Model } = require('sequelize');
 const bcrypt = require('bcrypt');
+
 module.exports = (sequelize, DataTypes) => {
     class User extends Model {
       static associate(models) {
-        // User.belongsToMany(models.Genre, { through: models.GenreUser, foreignKey: 'User' });
-        // User.hasMany(models.UserTrailer, { foreignKey: 'User'})
-        // User.belongsToMany(models.Award, { through: models.AwardUser, foreignKey: 'User_id' });
+        User.hasOne(models.Customer, {foreignKey: 'userID'});
+        User.hasOne(models.Employee, {foreignKey: 'userID'});
       }
     }
   

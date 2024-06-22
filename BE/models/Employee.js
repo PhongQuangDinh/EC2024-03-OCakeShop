@@ -47,9 +47,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Employee extends Model {
       static associate(models) {
-        // Employee.belongsToMany(models.Genre, { through: models.GenreEmployee, foreignKey: 'Employee' });
-        // Employee.hasMany(models.EmployeeTrailer, { foreignKey: 'Employee'})
-        // Employee.belongsToMany(models.Award, { through: models.AwardEmployee, foreignKey: 'Employee_id' });
+        Employee.belongsTo(models.User, { foreignKey: 'userID'});
       }
     }
   

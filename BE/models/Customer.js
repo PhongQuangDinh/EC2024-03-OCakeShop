@@ -52,9 +52,8 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Customer extends Model {
       static associate(models) {
-        // Customer.belongsToMany(models.Genre, { through: models.GenreCustomer, foreignKey: 'Customer' });
-        // Customer.hasMany(models.CustomerTrailer, { foreignKey: 'Customer'})
-        // Customer.belongsToMany(models.Award, { through: models.AwardCustomer, foreignKey: 'Customer_id' });
+        Customer.belongsTo(models.User, { foreignKey: 'userID', as: 'user' });
+        Customer.belongsTo(models.CreditCard, { foreignKey: 'customerID'});
       }
     }
   

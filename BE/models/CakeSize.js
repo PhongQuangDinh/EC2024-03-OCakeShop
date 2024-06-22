@@ -3,9 +3,8 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class CakeSize extends Model {
       static associate(models) {
-        // CakeSize.belongsToMany(models.Genre, { through: models.GenreCakeSize, foreignKey: 'CakeSize' });
-        // CakeSize.hasMany(models.CakeSizeTrailer, { foreignKey: 'CakeSize'})
-        // CakeSize.belongsToMany(models.Award, { through: models.AwardCakeSize, foreignKey: 'CakeSize_id' });
+        CakeSize.hasMany(models.Cake, { foreignKey: 'cakeSizeID'})
+        CakeSize.hasMany(models.CakeRecipes, { foreignKey: 'cakeSizeID'})
       }
     }
   
