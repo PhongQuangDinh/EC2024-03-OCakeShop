@@ -1,5 +1,6 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
+const OrderCakeDetail = require('./OrderCakeDetail');
 
 const Cart = sequelize.define('Cart', {
     cartID: {
@@ -29,10 +30,10 @@ const Cart = sequelize.define('Cart', {
             len:[0, 50]
         },
     },
-    cakeID:{
+    customerID:{
         type: DataTypes.INTEGER,
     },
-    customerID:{
+    cakeID:{
         type: DataTypes.INTEGER,
     },
 },
@@ -40,5 +41,8 @@ const Cart = sequelize.define('Cart', {
     tableName: 'Cart',
     timestamps: false
 });
+
+Cart.hasMany(OrderCakeDetail, { foreignKey: 'cartID', as: 'cart' });
+OrderCakeDetail.belongsTo(Cart, { foreignKey: 'cartID', as: 'orderCakeDetail' });
 
 module.exports = Cart;

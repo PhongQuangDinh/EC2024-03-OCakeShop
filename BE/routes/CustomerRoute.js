@@ -6,20 +6,25 @@ const CreditCard = require('../models/CreditCard');
 
 router.get('/myinfor/:id', async (req, res, next) => {
     try{
-        const user = await User.findByPk(req.params.id, {
+        const user = await User.findOne({
+            where: {userID: req.params.id},
             include: [
                 {
                     model: Customer,
-                    as: 'Customer',
+                    as: 'customer',
+                    required: false,
                     include: [
                         {
                             model: CreditCard,
-                            as: 'CreditCard',
+                            as: 'creditCard',
+                            required: false,
                         }
                     ]
                 }
             ]
         });
+
+        console.log("HELP");
 
         if(!user){
             return res.status(404).json({
@@ -27,7 +32,7 @@ router.get('/myinfor/:id', async (req, res, next) => {
             });
         }
         
-        res.status(200).json(user.Customer);
+        res.status(200).json(user);
     }
     catch (err) {next(err)};
 });

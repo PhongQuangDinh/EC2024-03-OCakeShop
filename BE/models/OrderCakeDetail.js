@@ -1,10 +1,11 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
 
+
 const OrderCakeDetail = sequelize.define('OrderCakeDetail', {
     orderCakeDetailID:{
         type: DataTypes.INTEGER,
-        autoIncrement: true,
+        // autoIncrement: true,
         primaryKey: true,
     },
     bakingStatus:{
@@ -30,6 +31,7 @@ const OrderCakeDetail = sequelize.define('OrderCakeDetail', {
     tableName: 'OrderCakeDetail',
     timestamps: false
 });
+
 
 
 module.exports = OrderCakeDetail;

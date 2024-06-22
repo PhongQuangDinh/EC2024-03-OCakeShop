@@ -1,14 +1,11 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
+const Cake = require('./Cake');
 
 const CakeImage = sequelize.define('CakeImage', {
     cakeID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        references: {
-            model: 'Cake',
-            key: 'cakeID',
-        }
     },
     imagePath:{
         type: DataTypes.STRING,

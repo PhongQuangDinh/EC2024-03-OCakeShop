@@ -1,5 +1,6 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
+const Payment = require('./Payment');
 
 const CreditCard = sequelize.define('CreditCard', {
     creditCardID: {
@@ -27,15 +28,14 @@ const CreditCard = sequelize.define('CreditCard', {
     },
     customerID:{
         type: DataTypes.INTEGER,
-        references: {
-            model: 'Customer',
-            as: 'customerID'
-        }
     },
 },
 {
     tableName: 'CreditCard',
     timestamps: false
 });
+
+CreditCard.hasMany(Payment, { foreignKey: 'creditCardID', as: 'payment' });
+Payment.belongsTo(CreditCard, { foreignKey: 'creditCardID', as: 'creditCard' });
 
 module.exports = CreditCard;

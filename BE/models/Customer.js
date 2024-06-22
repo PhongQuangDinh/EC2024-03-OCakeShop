@@ -1,7 +1,7 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
-const CreditCard = require('./CreditCard');
 const Cart = require('./Cart');
+const CreditCard = require('./CreditCard');
 
 const Customer = sequelize.define('Customer', {
     customerID: {
@@ -32,10 +32,6 @@ const Customer = sequelize.define('Customer', {
     },
     userID:{
         type: DataTypes.INTEGER,
-        references: {
-            model: 'User',
-            key: 'userID',
-        }
     },
 },
 {
@@ -43,10 +39,10 @@ const Customer = sequelize.define('Customer', {
     timestamps: false
 });
 
-Customer.hasOne(CreditCard, {foreignKey: 'customerID'});
-Customer.belongsTo(CreditCard, {foreignKey: 'customerID'});
+Customer.hasMany(CreditCard, { foreignKey: 'customerID', as: 'creditCard' });
+Customer.hasMany(Cart, { foreignKey: 'customerID', as: 'cart' });
 
-Customer.hasMany(Cart, {foreignKey: 'customerID'});
-Customer.belongsTo(Cart, {foreignKey: 'customerID'});
+CreditCard.belongsTo(Customer, { foreignKey: 'customerID', as: 'customer' });
+Cart.belongsTo(Customer, { foreignKey: 'customerID', as: 'customer' });
 
 module.exports = Customer;

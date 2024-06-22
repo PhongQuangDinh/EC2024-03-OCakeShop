@@ -4,7 +4,7 @@ const sequelize = require('../config/database');
 const Payment = sequelize.define('Payment', {
     paymentID: {
         type: DataTypes.INTEGER,
-        autoIncrement: true,
+        // autoIncrement: true,
         primaryKey: true,
     },
     amount:{
@@ -17,7 +17,7 @@ const Payment = sequelize.define('Payment', {
     orderCakeID:{
         type: DataTypes.INTEGER,
     },
-    customerID:{
+    creditCardID:{
         type: DataTypes.INTEGER,
     },
 },

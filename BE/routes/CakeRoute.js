@@ -10,7 +10,7 @@ router.get('/', async (req, res, next) => {
                 include: [
                     {
                         model: CakeImage,
-                        as: 'CakeImage',
+                        as: 'cakeImages',
                         required: false,
                     }
                 ]

@@ -7,7 +7,7 @@ const Customer = require('../models/Customer');
 const User = sequelize.define('User', {
     userID:{
         type: DataTypes.INTEGER,
-        autoIncrement: true,
+        // autoIncrement: true,
         primaryKey: true,
     },
     username:{
@@ -48,11 +48,10 @@ const User = sequelize.define('User', {
         }
     });
 
+User.hasOne(Customer, {foreignKey: 'userID', as: 'customer'});
+User.hasOne(Employee, {foreignKey: 'userID', as: 'employee'});
 
-User.hasOne(Employee, {foreignKey: 'userID'});
-User.belongsTo(Employee, {foreignKey: 'userID'});
-
-User.hasOne(Customer, {foreignKey: 'userID'});
-User.belongsTo(Customer, {foreignKey: 'userID'});
+Employee.belongsTo(User, { foreignKey: 'userID', as: 'user' });
+Customer.belongsTo(User, { foreignKey: 'userID', as: 'user' });
 
 module.exports = User;

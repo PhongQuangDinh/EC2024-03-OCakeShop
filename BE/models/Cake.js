@@ -1,11 +1,11 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../config/database');
 const CakeImage = require('./CakeImage');
+const Cart = require('./Cart');
 
 const Cake = sequelize.define('Cake', {
     cakeID: {
         type: DataTypes.INTEGER,
-        autoIncrement: true,
         primaryKey: true,
     },
     priceCake:{
@@ -35,7 +35,10 @@ const Cake = sequelize.define('Cake', {
     timestamps: false
 });
 
-Cake.hasMany(CakeImage, {foreignKey: 'cakeID'});
-Cake.belongsTo(CakeImage, {foreign:'cakeID'});
+Cake.hasOne(Cart, { foreignKey: 'cakeID', as: 'cart' });
+Cake.hasMany(CakeImage, { foreignKey: 'cakeID', as: 'cakeImages' });
+
+CakeImage.belongsTo(Cake, { foreignKey: 'cakeID', as: 'cake' });
+Cart.belongsTo(Cake, { foreignKey: 'cakeID', as: 'cake' });
 
 module.exports = Cake;
