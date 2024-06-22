@@ -1,0 +1,18 @@
+{
+  "development": {
+    "username": "avnadmin",
+    "password": "AVNS_9gV6-3T192F0fSu44h_",
+    "database": "EC2024_03_OCAKE",
+    "host": "ec2024-03-ocake-dinhquangphong365.g.aivencloud.com",
+    "port": 19330,
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "avnadmin",
+    "password": "AVNS_9gV6-3T192F0fSu44h_",
+    "database": "EC2024_03_OCAKE",
+    "host": "ec2024-03-ocake-dinhquangphong365.g.aivencloud.com",
+    "port": 19330,
+    "dialect": "mysql"
+  }
+}

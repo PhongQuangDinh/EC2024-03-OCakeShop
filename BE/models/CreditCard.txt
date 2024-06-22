@@ -1,0 +1,41 @@
+// const {DataTypes} = require('sequelize');
+// const sequelize = require('../db/dbConfig');
+// const Payment = require('./Payment');
+
+// const CreditCard = sequelize.define('CreditCard', {
+//     creditCardID: {
+//         type: DataTypes.INTEGER,
+//         autoIncrement: true,
+//         primaryKey: true,
+//     },
+//     creditSerialNumber: {
+//         type: DataTypes.STRING,
+//         validate: {
+//             len:[0, 30],
+//         },
+//     },
+//     username:{
+//         type: DataTypes.STRING,
+//         validate: {
+//             len:[0, 30],
+//         },
+//     },
+//     bankName:{
+//         type: DataTypes.STRING,
+//         validate: {
+//             len:[0, 50],
+//         },
+//     },
+//     customerID:{
+//         type: DataTypes.INTEGER,
+//     },
+// },
+// {
+//     tableName: 'CreditCard',
+//     timestamps: false
+// });
+
+// CreditCard.hasMany(Payment, { foreignKey: 'creditCardID', as: 'payment' });
+// Payment.belongsTo(CreditCard, { foreignKey: 'creditCardID', as: 'creditCard' });
+
+// module.exports = CreditCard;

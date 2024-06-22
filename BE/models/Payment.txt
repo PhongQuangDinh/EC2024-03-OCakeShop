@@ -1,0 +1,29 @@
+// const {DataTypes} = require('sequelize');
+// const sequelize = require('../db/dbConfig');
+
+// const Payment = sequelize.define('Payment', {
+//     paymentID: {
+//         type: DataTypes.INTEGER,
+//         // autoIncrement: true,
+//         primaryKey: true,
+//     },
+//     amount:{
+//         type: DataTypes.FLOAT,
+//     },
+//     paymentTime:{
+//         type: DataTypes.DATE,
+//         defaultValue: DataTypes.NOW,
+//     },
+//     orderCakeID:{
+//         type: DataTypes.INTEGER,
+//     },
+//     creditCardID:{
+//         type: DataTypes.INTEGER,
+//     },
+// },
+// {
+//     tableName: 'Payment',
+//     timestamps: false
+// });
+
+// module.exports = Payment;

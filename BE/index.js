@@ -1,12 +1,12 @@
+const PORT = process.env.PORT || 8080;
 const express = require('express');
 const router = require('./routes/router');
-const sequelize = require('./config/database');
-const morgan = require('morgan');
+const sequelize = require('./db/dbConfig');
+// const morgan = require('morgan');
 
 const app = express();
-const port = 3000;
 
-app.use(morgan('combined'));
+// app.use(morgan('combined'));
 app.use(express.json());
 
 // app.get('/', (req, res) => {
@@ -14,20 +14,23 @@ app.use(express.json());
 // });
 
 router(app);
+app.listen(PORT, () => {
+  console.log(`Server is running on http://0.0.0.0:${PORT}`);
+});
 
-sequelize.authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-    return sequelize.sync();
-  })
-  .then(() => {
-    app.listen(port, () => {
-      console.log(`Server is running on http://0.0.0.0:${port}`);
-    });
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  })
-  .finally(()=>{
-    console.log('Waiting...');
-  });
+// sequelize.authenticate()
+//   .then(() => {
+//     console.log('Connection has been established successfully.');
+//     return sequelize.sync();
+//   })
+//   .then(() => {
+//     app.listen(PORT, () => {
+//       console.log(`Server is running on http://0.0.0.0:${PORT}`);
+//     });
+//   })
+//   .catch(err => {
+//     console.error('Unable to connect to the database:', err);
+//   })
+//   .finally(()=>{
+//     console.log('Waiting...');
+//   });
