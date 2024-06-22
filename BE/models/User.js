@@ -59,11 +59,56 @@ const bcrypt = require('bcrypt');
 
 module.exports = (sequelize, DataTypes) => {
     class User extends Model {
-      static associate(models) {
+        static associate(models) {
         User.hasOne(models.Customer, {foreignKey: 'userID'});
         User.hasOne(models.Employee, {foreignKey: 'userID'});
-      }
+        }
+        static async createUser(user){
+            try {
+                const newUser = await User.create(user);
+                return newUser;
+            } catch (error) {
+                throw new Error(`Error create user`);
+            }
+        }
+
+        static async getAllUser(){
+            try {
+                const allUser = await User.findAll()
+                return allUser;
+            } catch (error) {
+                throw new Error(`Error retrieving user`);
+            }
+        }
+
+        static async updateUser(userID, newData){
+            try {
+                const [updateNewRowsCount] = await User.update(newData,{
+                    where: {userID: userID}
+                });
+                return updateNewRowsCount > 0;
+            } catch (error) {
+                throw new Error(`Error update user`);
+            }
+        }
+        static async deleteUser(userID){
+            try {
+                const userDelete = await User.findOne({
+                    where: {userID: userID}
+                })
+                if(!userDelete){
+                    console.log('User not found');
+                }
+                const isDelete = await User.destroy({
+                    where: {userID: userID}
+                })
+                return isDelete > 0;
+            } catch (error) {
+                throw new Error(`Error delete user`);
+            }
+        }
     }
+    
   
     User.init(
       {
@@ -111,7 +156,7 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
       }
-    );
+    )
   
     return User;
   };
