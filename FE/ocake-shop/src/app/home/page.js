@@ -1,4 +1,4 @@
-import Landing from "@/modules/Landing/landing";
+import HomePage from "@/modules/Home/home";
 import Head from "next/head";
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <Landing />
+        <HomePage />
       </main>
     </div>
   );
