@@ -1,24 +1,28 @@
-const express = require('express');
+// routes/cakes.js
+const express = require("express");
 const router = express.Router();
-const Cake = require('../models/Cake');
-const CakeImage = require('../models/CakeImage');
+const { Cake, CakeImage, ImageDetail } = require("../models/associations");
 
-router.get('/', async (req, res, next) => {
-    try{
-        const cake = await Cake.findAll(
+router.get("/", async (req, res, next) => {
+  try {
+    const cakes = await Cake.findAll({
+      include: [
+        {
+          model: CakeImage,
+          as: "cakeImages",
+          include: [
             {
-                include: [
-                    {
-                        model: CakeImage,
-                        as: 'cakeImages',
-                        required: false,
-                    }
-                ]
-            }
-        );
-        res.status(200).json(cake);
-    }
-    catch (err) {next(err)}
+              model: ImageDetail,
+              as: "imageDetail",
+            },
+          ],
+        },
+      ],
+    });
+    res.status(200).json(cakes);
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;

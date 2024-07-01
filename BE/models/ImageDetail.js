@@ -2,7 +2,7 @@
 // const sequelize = require('../db/dbConfig');
 // const Cake = require('./Cake');
 
-// const CakeImage = sequelize.define('CakeImage', {
+// const ImageDetail = sequelize.define('ImageDetail', {
 //     cakeID: {
 //         type: DataTypes.INTEGER,
 //         primaryKey: true,
@@ -16,46 +16,34 @@
 //     },
 // },
 // {
-//     tableName: 'CakeImage',
+//     tableName: 'ImageDetail',
 //     timestamps: false
 // });
 
-// module.exports = CakeImage;
+// module.exports = ImageDetail;
 
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class CakeImage extends Model {
-    static associate(models) {
-      CakeImage.belongsTo(models.Cake, { foreignKey: "cakeID" });
-      CakeImage.belongsTo(models.ImageDetail, {
-        foreignKey: "imageID",
-        as: "imageDetail",
-      });
-    }
-  }
+  class ImageDetail extends Model {}
 
-  CakeImage.init(
+  ImageDetail.init(
     {
-      cakeID: {
+      imageID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
       },
       imagePath: {
         type: DataTypes.STRING,
-        validated: {
-          len: [0, 255],
-        },
-        primaryKey: true,
       },
     },
     {
       sequelize,
-      modelName: "CakeImage",
-      tableName: "CakeImage",
+      modelName: "ImageDetail",
+      tableName: "ImageDetail",
       timestamps: false,
     }
   );
 
-  return CakeImage;
+  return ImageDetail;
 };

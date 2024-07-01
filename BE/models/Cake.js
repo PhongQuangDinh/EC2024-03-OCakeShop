@@ -51,6 +51,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Cake.hasMany(models.CakeImage, {
         foreignKey: "cakeID",
+        as: "cakeImages",
       });
     }
   }
@@ -62,26 +63,20 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         primaryKey: true,
       },
+      cakeSizeID: {
+        type: DataTypes.INTEGER,
+      },
+      cakeFillingID: {
+        type: DataTypes.INTEGER,
+      },
       priceCake: {
         type: DataTypes.INTEGER,
       },
       purpose: {
         type: DataTypes.STRING,
-        validated: {
-          len: [0, 100],
-        },
       },
-      poster_path: {
+      description: {
         type: DataTypes.STRING,
-        validated: {
-          len: [0, 255],
-        },
-      },
-      cakeFillingID: {
-        type: DataTypes.INTEGER,
-      },
-      cakeSizeID: {
-        type: DataTypes.INTEGER,
       },
     },
     {
