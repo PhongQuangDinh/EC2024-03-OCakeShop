@@ -1,7 +1,5 @@
-import Landing from "@/modules/Landing/landing";
 import SelectCake from "@/modules/SelectCake/selectCake";
 import Head from "next/head";
-import Payment from "@/modules/Payment/payment";
 
 export default function Home() {
   return (
@@ -12,7 +10,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <Landing />
+        <SelectCake />
       </main>
     </div>
   );
