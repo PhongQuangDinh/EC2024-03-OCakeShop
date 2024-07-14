@@ -18,7 +18,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <SignUp />
+        <CartPage />
         
         <button onClick={() => setShowSignIn(!showSignIn)}>
           {showSignIn ? "Hide Sign In" : "Show Sign In"}
@@ -32,4 +32,4 @@ export default function Home() {
       </main>
     </div>
   );
-}
+} 
