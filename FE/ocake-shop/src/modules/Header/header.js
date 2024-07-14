@@ -134,7 +134,8 @@ const NavItem = ({
         <Typography
           component="h1"
           sx={{
-            color: "#fff",
+            // color: "#fff",
+            color: "#000",
             "&:hover": { color: "var(--palette-03)" },
           }}
         >
@@ -160,7 +161,8 @@ const AppBarDesktop = styled(AppBar, {
   justifyContent: "space-between",
   gap: "4rem",
   boxShadow: trigger ? "4px 4px 25px rgba(0, 0, 0, 0.6)" : "none",
-  backgroundColor: "transparent",
+  // backgroundColor: "transparent",
+  backgroundColor: "#FBF0D4",
   zIndex: prior ? "10001" : "10002",
   padding: "0 3rem",
   [theme.breakpoints.down("sm")]: {
