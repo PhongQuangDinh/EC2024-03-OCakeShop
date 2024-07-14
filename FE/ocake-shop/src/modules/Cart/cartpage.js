@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react';
 import { Box, Typography, Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import Layout from '../layout';
@@ -81,8 +82,9 @@ const CartPage = () => {
 
   return (
     <Layout>
-      <Box sx={{ background: 'linear-gradient(30deg, #E71F4D 0%, #f6e187 100%)', minHeight: '100vh', padding: '20px' }}>
-        <Typography variant="h4" align="left" gutterBottom sx={{ marginTop: '70px', marginLeft: '300px' }}>Ocake Shop | Giỏ hàng</Typography>
+      <Box sx={{ background: '#E5E5E5', minHeight: '100vh', padding: '0px' }}>
+        <Box sx={{ height: '90px', backgroundColor: '#FBF0D4' }} /> {/* Viền màu vàng trên đầu */}
+        <Typography variant="h4" align="left" gutterBottom sx={{ marginTop: '30px', marginLeft: '320px', color: '#E82552', fontWeight: 'bold' }}>Ocake Shop | Giỏ hàng</Typography>
         <TableContainer component={Paper} sx={{ margin: 'auto', maxWidth: '1200px', marginTop: '30px' }}>
           <Table>
             <TableHead>
@@ -139,7 +141,7 @@ const CartPage = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginTop: '40px', maxWidth: '900px', margin: '40px auto' }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginTop: '40px', maxWidth: '1170px', margin: '40px auto' }}>
           <Box display="flex" alignItems="center">
             <Checkbox 
               indeterminate={selectedItems.length > 0 && selectedItems.length < rows.length}
@@ -151,7 +153,7 @@ const CartPage = () => {
           <Typography variant="h6">Tổng thanh toán: {calculateTotal().toLocaleString()} VND</Typography>
           <Button variant="contained" 
                   sx={{ 
-                        marginRight: '30px',
+                        marginRight: '100px',
                         backgroundColor: "#FFDFE7", 
                         color: "#000000", 
                         border: "1px solid #e82652", 
