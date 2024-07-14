@@ -77,6 +77,7 @@ const ShopInfo = [
 
 const Root = styled("div")(({ theme }) => ({
   marginTop: "0",
+  borderTop: "solid 1px #000",
   [theme.breakpoints.down("md")]: {
     marginTop: "0",
   },

@@ -20,14 +20,13 @@ import {
   SearchOutlined,
   KeyboardArrowUp,
   LogoutOutlined,
-  Diamond,
   UploadFileOutlined,
 } from "@mui/icons-material";
 
 import logo from "../../app/icon.png";
 
 const homeData = [
-  { title: "Trang chủ", link: "/" },
+  { title: "Trang chủ", link: "/home" },
   { title: "Thông tin shop", link: "/premium" },
   { title: "Đơn mua", link: "/allpodcasts" },
 ];
@@ -38,7 +37,7 @@ const NavBar = () => {
   const [prior, setPrior] = useState(false);
   const trigger = useScrollTrigger({
     disableHysteresis: true,
-    threshold: 200,
+    threshold: 50,
   });
 
   useEffect(() => {
@@ -152,7 +151,9 @@ const AppBarDesktop = styled(AppBar, {
   position: "fixed",
   width: "100%",
   transition: "all .4s ease-in-out",
-  background: "transparent",
+  background: trigger
+    ? "linear-gradient(30deg, #EF8F6E 0%, #f6e187 100%)"
+    : "transparent",
   display: "flex",
   flexDirection: "row",
   alignItems: "center",
@@ -180,8 +181,8 @@ const StyledNavContainer = styled(Box)(({ theme }) => ({
 }));
 
 const ScrollTop = styled(IconButton)(() => ({
-  color: "var(--palette-06)",
-  backgroundColor: "#fff",
+  color: "#fff",
+  backgroundColor: "#e82451",
   position: "fixed",
   bottom: 25,
   right: 25,
@@ -191,7 +192,7 @@ const ScrollTop = styled(IconButton)(() => ({
   border: "2px solid transparent",
   "&:hover": {
     color: "#fff",
-    backgroundColor: "#000",
+    backgroundColor: "#f1858f",
   },
 }));
 
