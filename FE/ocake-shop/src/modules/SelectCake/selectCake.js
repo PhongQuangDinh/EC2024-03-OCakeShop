@@ -2,9 +2,8 @@
 import { Box, Typography, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import Layout from "../layout";
 import Image from "next/image";
-import logo from "./../../app/icon.png";
+import logo from "./../../app/image/logo.png";
 import React, { useState } from 'react';
-import Select from '@mui/material/Select';
 
 const SelectCake = () => {
 
@@ -38,7 +37,7 @@ const SelectCake = () => {
           padding: "90px",
           paddingLeft: "200px"
           }}>
-           <Image priority src={logo} alt="logo" width={100} />
+           {/* <Image priority src={logo} alt="logo" width={100} /> */}
            <Typography sx={{
               display:"flex",
               alignItems: "center",
@@ -55,7 +54,6 @@ const SelectCake = () => {
       <Box
         sx={{
           background: "#E5E5E5",
-          height: "100vh",
           alignItems: "center",
           flexDirection: "column",
           fontFamily: "Monospace, sans-serif",
@@ -69,17 +67,19 @@ const SelectCake = () => {
             justifyContent: "center",
           }}
         >
-          <Image priority src={logo} alt="logo" width={100} />
+          <Image priority src={logo} alt="logo" width={600} />
         </Box>
         <Box sx={{
           background: "#fff",
-          height: "35vh",
           width: "90%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           alignContent: "center",
           flexDirection: "column",
+          paddingTop: "40px",
+          paddingBottom: "40px",
+          marginBottom: "50px"
         }}>
           <Box sx={{}}>
             <Box sx={{
