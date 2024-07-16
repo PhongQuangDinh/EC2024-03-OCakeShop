@@ -511,7 +511,6 @@ const Payment = () => {
               <Button
                 variant="contained"
                 sx={{
-                  width: "10%",
                   marginBottom: 2,
                   backgroundColor: "#FFDFE7",
                   color: "#000000",
@@ -529,7 +528,6 @@ const Payment = () => {
               <Button
                 variant="contained"
                 sx={{
-                  width: "10%",
                   marginBottom: 2,
                   backgroundColor: "#FFDFE7",
                   color: "#000000",
