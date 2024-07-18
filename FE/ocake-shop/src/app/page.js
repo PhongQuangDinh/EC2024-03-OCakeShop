@@ -4,6 +4,8 @@ import Landing from "@/modules/Landing/landing";
 import SignIn from "@/modules/SignIn/signin";
 import SignUp from "@/modules/SignUp/signup";
 import CartPage from "@/modules/Cart/cartpage";
+import ConfirmationPage from "@/modules/ConfirmDelivery/confirm";
+import InventoryPage from "@/modules/Inventory/inventory";
 import Head from "next/head";
 
 export default function Home() {
@@ -18,7 +20,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <CartPage />
+        <ConfirmationPage />
         
         <button onClick={() => setShowSignIn(!showSignIn)}>
           {showSignIn ? "Hide Sign In" : "Show Sign In"}
