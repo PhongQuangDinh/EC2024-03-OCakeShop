@@ -142,7 +142,7 @@ const Payment = () => {
             background: "#fff",
             gap: "20px",
             // fontSize: "20px",
-            marginTop: "5%",
+            marginTop: "100px",
           }}
         >
           <Box
