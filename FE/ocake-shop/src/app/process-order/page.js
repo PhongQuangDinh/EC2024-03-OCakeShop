@@ -1,8 +1,9 @@
-import HomePage from "@/modules/Home/home";
+import Checkout from "@/modules/Checkout/Checkout";
+import ProcessOrder from "@/modules/Order/ProcessOrder";
 import Head from "next/head";
 
 export const metadata = {
-  title: "Home",
+  title: "Process Order",
 };
 
 export default function Home() {
@@ -13,7 +14,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <HomePage />
+        <ProcessOrder />
       </main>
     </div>
   );
