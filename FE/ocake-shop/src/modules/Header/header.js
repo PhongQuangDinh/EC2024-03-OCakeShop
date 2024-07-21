@@ -23,7 +23,7 @@ import {
   UploadFileOutlined,
 } from "@mui/icons-material";
 
-import logo from "../../app/icon.png";
+import logo from "./../../app/image/logo.png";
 
 const homeData = [
   { title: "Trang chủ", link: "/home" },

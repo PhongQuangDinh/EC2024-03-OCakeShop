@@ -1,5 +1,5 @@
 const userRouter = require('./UserRoute');
-const authenticationRouter = require('./AuthenticationRoute');
+const authenticationRouter = require('./authenticationRoute');
 const customerRouter = require('./CustomerRoute');
 const cakeRouter = require('./CakeRoute');
 

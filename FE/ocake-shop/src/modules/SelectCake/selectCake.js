@@ -1,10 +1,9 @@
 "use client"
-import { Box, Typography, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Box, Typography, TextField, FormControl, InputLabel, Select, MenuItem, Button } from "@mui/material";
 import Layout from "../layout";
 import Image from "next/image";
-import logo from "./../../app/icon.png";
+import logo from "./../../app/image/logo.png";
 import React, { useState } from 'react';
-import Select from '@mui/material/Select';
 
 const SelectCake = () => {
 
@@ -24,6 +23,8 @@ const SelectCake = () => {
     setSelectedFilling(event.target.value);
   }
 
+  const priceCake = 130000;
+
   return (
     <Layout>
       <Box sx={{ 
@@ -38,7 +39,6 @@ const SelectCake = () => {
           padding: "90px",
           paddingLeft: "200px"
           }}>
-           <Image priority src={logo} alt="logo" width={100} />
            <Typography sx={{
               display:"flex",
               alignItems: "center",
@@ -55,7 +55,6 @@ const SelectCake = () => {
       <Box
         sx={{
           background: "#E5E5E5",
-          height: "100vh",
           alignItems: "center",
           flexDirection: "column",
           fontFamily: "Monospace, sans-serif",
@@ -69,17 +68,19 @@ const SelectCake = () => {
             justifyContent: "center",
           }}
         >
-          <Image priority src={logo} alt="logo" width={100} />
+          <Image priority src={logo} alt="logo" width={600} />
         </Box>
         <Box sx={{
           background: "#fff",
-          height: "35vh",
           width: "90%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           alignContent: "center",
           flexDirection: "column",
+          paddingTop: "40px",
+          paddingBottom: "40px",
+          marginBottom: "50px"
         }}>
           <Box sx={{}}>
             <Box sx={{
@@ -225,6 +226,48 @@ const SelectCake = () => {
                 </Select>
               </FormControl>
             </Box>
+            
+          </Box>
+          <Box sx={{
+              marginTop: "30px",
+              alignContent: 'center',
+              display: "flex",
+              gap: "10px"
+            }}>
+              <Typography sx={{
+                fontSize: "30px",
+                fontWeight: "bold"
+              }}>
+                Giá
+              </Typography>
+              <Typography sx={{
+                fontSize: "30px",
+                fontWeight: "bold",
+                color: "#FF0000"
+              }}>
+                {priceCake}
+              </Typography>
+            </Box>
+          <Box sx={{
+            marginTop: "30px",
+          }}>
+            <Button
+                  variant="contained"
+                  sx={{
+                    marginBottom: 2,
+                    backgroundColor: "#FFDFE7",
+                    color: "#000000",
+                    border: "1px solid #e82652",
+                    "&:hover": {
+                      backgroundColor: "#FFC0CB",
+                      color: "#000000",
+                    },
+                    fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
+                    outline: "none",
+                  }}
+                >
+                  Thêm vào giỏ
+                </Button>
           </Box>
         </Box>
       </Box>

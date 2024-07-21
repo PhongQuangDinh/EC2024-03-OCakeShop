@@ -1,19 +1,20 @@
-import HomePage from "@/modules/Home/home";
+import PurchaseOrderProcess from "@/modules/PurchaseOrderProcess/PurchaseOrderProcess";
 import Head from "next/head";
 
 export const metadata = {
-  title: "Home",
+  title: "PurchaseOrderProcess",
 };
 
 export default function Home() {
   return (
     <div>
       <Head>
+        <title>OCake Shop</title>
         <link rel="icon" href="/icon.png" />
       </Head>
 
       <main>
-        <HomePage />
+        <PurchaseOrderProcess />
       </main>
     </div>
   );

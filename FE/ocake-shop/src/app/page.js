@@ -1,12 +1,13 @@
 "use client"; 
 import { useState } from "react";
-import Landing from "@/modules/Landing/landing";
-import SelectCake from "@/modules/SelectCake/selectCake";
 import SignIn from "@/modules/SignIn/signin";
 import SignUp from "@/modules/SignUp/signup";
 import CartPage from "@/modules/Cart/cartpage";
 import Head from "next/head";
-import Payment from "@/modules/Payment/payment";
+
+export const metadata = {
+  title: "OCake Shop",
+};
 
 export default function Home() {
   const [showSignIn, setShowSignIn] = useState(false);
@@ -15,7 +16,6 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>OCake Shop</title>
         <link rel="icon" href="/icon.png" />
       </Head>
 
