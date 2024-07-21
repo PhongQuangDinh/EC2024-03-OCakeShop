@@ -20,15 +20,15 @@ const AddIngredient = () => {
     <Layout>
       <Box sx={{
         background: "#fff",
-        height: "175px",
-        gap: "20px"
+        // height: "175px",
+        gap: "20px",
+        marginTop: "100px",
       }}
       >  
         <Box sx={{
           display: "flex", 
           alignItems: "center",
-          padding: "90px",
-          paddingLeft: "200px"
+          marginLeft: "200px",
           }}>
            {/* <Image priority src={logo} alt="logo" width={100} /> */}
            <Typography sx={{
