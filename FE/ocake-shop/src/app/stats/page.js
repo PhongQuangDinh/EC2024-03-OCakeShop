@@ -1,8 +1,8 @@
-import ProcessOrder from "@/modules/Order/ProcessOrder";
+import StatisticsPage from "@/modules/Stats/Stats";
 import Head from "next/head";
 
 export const metadata = {
-  title: "Process Order",
+  title: "Statistics",
 };
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <ProcessOrder />
+        <StatisticsPage />
       </main>
     </div>
   );
