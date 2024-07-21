@@ -29,20 +29,20 @@ const Profile = () => {
     <Layout>
       <Box sx={{
         background: "#fff",
-        height: "165px",
-        gap: "20px"
-      }}>
+        gap: "20px",
+        marginTop: "100px",
+      }}
+      >
         <Box sx={{
-          background: "white",
           display: "flex",
-          paddingTop: "100px",
-          paddingLeft: "200px",
+          alignItems: "center",
+          marginLeft: "200px",
         }}>
           <Typography sx={{
             display: "flex",
             alignItems: "center",
             color: "#E82552",
-            fontSize: "30px",
+            fontSize: "40px",
             fontWeight: "bold",
             fontFamily: "Montserrat, sans-serif",
           }}
@@ -280,15 +280,15 @@ const Profile = () => {
               width: "150px",
               background: "#FFDFE7",
               color: "black",
-            }} 
-            variant="contained" color="primary" onClick={handleSave}> Lưu thay đổi </Button>
-            
+            }}
+              variant="contained" color="primary" onClick={handleSave}> Lưu thay đổi </Button>
+
             <Button sx={{
               width: "150px",
               background: "#FFDFE7",
               color: "black",
-            }} 
-            variant="contained" color="primary" onClick={handleCancel}> Hủy </Button>
+            }}
+              variant="contained" color="primary" onClick={handleCancel}> Hủy </Button>
           </Box>
         </Box>
       </Box>
