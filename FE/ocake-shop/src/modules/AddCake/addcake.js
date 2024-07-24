@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from 'react';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, TextField, Button, Select, MenuItem } from '@mui/material';
 import Layout from '../layout';
 
 const AddCakePage = () => {
@@ -9,6 +9,57 @@ const AddCakePage = () => {
   const [filling, setFilling] = useState('');
   const [price, setPrice] = useState('');
   const [image, setImage] = useState(null);
+
+  // State để lưu trữ danh sách kích thước và nhân bánh
+  const [cakeSizes, setCakeSizes] = useState([]);
+  const [cakeFillings, setCakeFillings] = useState([]);
+
+  // Dữ liệu mặc định cho kích thước và nhân bánh
+  const defaultSizes = [
+    { cakeSizeID: 1, title: "16" },
+    { cakeSizeID: 2, title: "18" },
+    { cakeSizeID: 3, title: "20" },
+    { cakeSizeID: 4, title: "22" },
+    { cakeSizeID: 5, title: "24" },
+  ];
+
+  const defaultFillings = [
+    { cakeFillingID: 1, title: "Cafe" },
+    { cakeFillingID: 2, title: "Phô mai" },
+    { cakeFillingID: 3, title: "Matcha" },
+    { cakeFillingID: 4, title: "Vani" },
+    { cakeFillingID: 5, title: "Dâu" },
+    { cakeFillingID: 6, title: "Dứa" },
+    { cakeFillingID: 7, title: "Chocolate" },
+  ];
+
+  // Fetch dữ liệu kích thước và nhân bánh từ server
+  useEffect(() => {
+    const fetchCakeSizes = async () => {
+      try {
+        const response = await fetch('/api/cakesizes'); // Đổi endpoint nếu cần
+        const data = await response.json();
+        setCakeSizes(data.length ? data : defaultSizes); // Sử dụng dữ liệu mặc định nếu không lấy được
+      } catch (error) {
+        console.error('Error fetching cake sizes:', error);
+        setCakeSizes(defaultSizes); // Sử dụng dữ liệu mặc định khi có lỗi
+      }
+    };
+
+    const fetchCakeFillings = async () => {
+      try {
+        const response = await fetch('/api/cakefillings'); // Đổi endpoint nếu cần
+        const data = await response.json();
+        setCakeFillings(data.length ? data : defaultFillings); // Sử dụng dữ liệu mặc định nếu không lấy được
+      } catch (error) {
+        console.error('Error fetching cake fillings:', error);
+        setCakeFillings(defaultFillings); // Sử dụng dữ liệu mặc định khi có lỗi
+      }
+    };
+
+    fetchCakeSizes();
+    fetchCakeFillings();
+  }, []);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -52,23 +103,123 @@ const AddCakePage = () => {
             fullWidth
             margin="normal"
             required
+            sx={{ 
+              marginBottom: 2, 
+              width: "100%",
+              "& .MuiOutlinedInput-root": { 
+                "& fieldset": {
+                  borderColor: "#e82652", 
+                },
+                "&:hover fieldset": { 
+                  borderColor: "#FFC0CB", 
+                },
+                "& input": { 
+                  color: "#000000",
+                  fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho input
+                },
+                "&:hover input": { 
+                  color: "#000000",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#e82652",
+                },
+              },
+              "& .MuiOutlinedInput-root.Mui-focused": {
+                outline: "none",
+              },
+              "& label.Mui-focused": {
+                color: "#e82652",
+                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+              },
+            }}
           />
-          <TextField
-            label="Kích thước"
+
+          {/* ComboBox cho kích thước bánh */}
+          <Select
             value={size}
             onChange={(e) => setSize(e.target.value)}
+            displayEmpty
             fullWidth
             margin="normal"
             required
-          />
-          <TextField
-            label="Nhân bánh"
+            sx={{ 
+              marginBottom: 2, 
+              width: "100%",
+              "& .MuiOutlinedInput-notchedOutline": { // Thay đổi đường viền bên ngoài
+                borderColor: "#e82652", // Màu hồng
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#FFC0CB", // Màu hồng nhạt khi hover
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#FFC0CB", // Màu hồng khi focus
+              },
+              "& input": { 
+                color: "#000000",
+                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho input
+              },
+              "&:hover input": { 
+                color: "#000000",
+              },
+              "& label.Mui-focused": {
+                color: "#e82652",
+                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+              },
+            }}
+          >
+            <MenuItem value="" disabled>
+              Chọn kích thước
+            </MenuItem>
+            {cakeSizes.map((cakeSize) => (
+              <MenuItem key={cakeSize.cakeSizeID} value={cakeSize.title}>
+                {cakeSize.title}
+              </MenuItem>
+            ))}
+          </Select>
+
+          {/* ComboBox cho nhân bánh */}
+          <Select
             value={filling}
             onChange={(e) => setFilling(e.target.value)}
+            displayEmpty
             fullWidth
             margin="normal"
             required
-          />
+            sx={{ 
+              marginBottom: 2, 
+              width: "100%",
+              "& .MuiOutlinedInput-notchedOutline": { // Thay đổi đường viền bên ngoài
+                borderColor: "#e82652", // Màu hồng
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#FFC0CB", // Màu hồng nhạt khi hover
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#FFC0CB", // Màu hồng khi focus
+              },
+              "& input": { 
+                color: "#000000",
+                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho input
+              },
+              "&:hover input": { 
+                color: "#000000",
+              },
+              "& label.Mui-focused": {
+                color: "#e82652",
+                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+              },
+            }}
+          >
+            <MenuItem value="" disabled>
+              Chọn nhân bánh
+            </MenuItem>
+            {cakeFillings.map((cakeFilling) => (
+              <MenuItem key={cakeFilling.cakeFillingID} value={cakeFilling.title}>
+                {cakeFilling.title}
+              </MenuItem>
+            ))}
+          </Select>
+
           <TextField
             label="Giá bánh kem"
             value={price}
@@ -76,6 +227,35 @@ const AddCakePage = () => {
             fullWidth
             margin="normal"
             required
+            sx={{ 
+              marginBottom: 2, 
+              width: "100%",
+              "& .MuiOutlinedInput-root": { 
+                "& fieldset": {
+                  borderColor: "#e82652", 
+                },
+                "&:hover fieldset": { 
+                  borderColor: "#FFC0CB", 
+                },
+                "& input": { 
+                  color: "#000000",
+                  fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho input
+                },
+                "&:hover input": { 
+                  color: "#000000",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#e82652",
+                },
+              },
+              "& .MuiOutlinedInput-root.Mui-focused": {
+                outline: "none",
+              },
+              "& label.Mui-focused": {
+                color: "#e82652",
+                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+              },
+            }}
           />
           <Box sx={{ width: '100%', margin: '20px 0' }}>
             <Button
