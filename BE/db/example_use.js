@@ -2,6 +2,10 @@
 
 const model = require('../models');
 
+model.Cart.findAll().then(res => {
+  console.log(res.map(res => res.dataValues));
+})
+
 // model.Customer.findAll().then(res => {
 //   res.forEach(row => {
 //     console.log(row.customerID);
@@ -18,14 +22,14 @@ const model = require('../models');
 
 
 // joining 3 tables
-model.Cart.findAll({
-  include: [
-    {
-      model: model.OrderCakeDetail,
-      as: 'OrderCakeDetail',
-      include: model.OrderCake,
-    },
-  ],
-}).then(res => {
-  console.log(res.map(res => res.dataValues));
-});
+// model.Cart.findAll({
+//   include: [
+//     {
+//       model: model.OrderCakeDetail,
+//       as: 'OrderCakeDetail',
+//       include: model.OrderCake,
+//     },
+//   ],
+// }).then(res => {
+//   console.log(res.map(res => res.dataValues));
+// });

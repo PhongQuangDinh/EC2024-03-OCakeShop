@@ -19,7 +19,7 @@ const CartPage = () => {
         return acc + row.price * row.quantity;
       }
       return acc;
-    }, 0);
+      }, 0);
   };
 
   const handleSelectAll = (event) => {

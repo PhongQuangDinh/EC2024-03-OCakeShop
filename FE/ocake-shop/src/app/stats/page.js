@@ -1,8 +1,8 @@
-import HomePage from "@/modules/Home/home";
+import StatisticsPage from "@/modules/Stats/Stats";
 import Head from "next/head";
 
 export const metadata = {
-  title: "Home",
+  title: "Statistics",
 };
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <HomePage />
+        <StatisticsPage />
       </main>
     </div>
   );
