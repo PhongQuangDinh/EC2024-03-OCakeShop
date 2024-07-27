@@ -8,9 +8,11 @@ const Footer = () => {
     <Root>
       <LinkContainer container columnSpacing={{ xs: 2, lg: 0 }}>
         {footerItems.map((item, id) => (
-          <Grid className="footer-item" item xs={4} key={id}>
-            <Typography sx={{ color: "#000" }}>{item.title}</Typography>
-            <Box sx={StyleDivider} />
+          <Grid className="footer-item" item xs={3} key={id}>
+            <Typography sx={{ color: "#000", fontWeight: "600" }}>
+              {item.title}
+            </Typography>
+            <Box />
             {item.links.map((li, i) => (
               <Link
                 className="footer-link"
@@ -25,24 +27,67 @@ const Footer = () => {
           </Grid>
         ))}
       </LinkContainer>
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: "column",
+          paddingBottom: "3%",
+        }}
+      >
+        <Box
+          sx={{
+            height: "1px",
+            width: "50%",
+            backgroundColor: "#000",
+            margin: "1rem 3rem",
+          }}
+        />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+            textAlign: "center",
+          }}
+        >
+          <Typography sx={{ color: "#000", fontWeight: "600" }}>
+            Thông tin OCakeShop
+          </Typography>
+          {ShopInfo.map((item, i) => (
+            <Typography key={i} sx={{ color: "#000" }}>
+              {item}
+            </Typography>
+          ))}
+        </Box>
+      </Box>
     </Root>
   );
 };
 
 export default Footer;
 
+const ShopInfo = [
+  "Địa chỉ: 227 Nguyễn Văn Cừ, phường 4, quận 5 thành phố Hồ Chí Minh, Việt Nam",
+  "Liên hệ: 0565 858 281",
+  "Email: ocakeshop.bakery@gmail.com",
+  "Chịu trách nhiệm: Phạm Uyễn Nhi",
+];
+
 const Root = styled("div")(({ theme }) => ({
-  marginTop: "15%",
+  marginTop: "0",
+  borderTop: "solid 1px #000",
   [theme.breakpoints.down("md")]: {
-    marginTop: "10rem",
+    marginTop: "0",
   },
   [theme.breakpoints.down("sm")]: {
-    marginTop: "6rem",
+    marginTop: "0",
   },
 }));
 
 const LinkContainer = styled(Grid)(({ theme }) => ({
-  padding: "12% 0px 0px 0px",
+  padding: "3% 10%",
   textAlign: "center",
   color: "#000",
   "& .footer-item": {
@@ -65,87 +110,72 @@ const LinkContainer = styled(Grid)(({ theme }) => ({
   },
 }));
 
-const StyleDivider = {
-  height: 2,
-  width: 50,
-  backgroundColor: "white",
-  margin: "0.8rem 0px",
-  borderRadius: 999,
-};
-
 const footerItems = [
   {
-    title: "subtitle",
+    title: "OCakeShop",
     links: [
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/landing",
+        aliases: "Trang chủ",
       },
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/cake",
+        aliases: "Bánh kem",
       },
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
-      },
-      {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
-      },
-      {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/contact",
+        aliases: "Liên hệ",
       },
     ],
   },
   {
-    title: "subtitle",
+    title: "Chăm sóc khách hàng",
     links: [
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/landing",
+        aliases: "Trung tâm trợ giúp",
       },
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/landing",
+        aliases: "Hướng dẫn mua hàng",
       },
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
-      },
-      {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
-      },
-      {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/landing",
+        aliases: "Vận chuyển",
       },
     ],
   },
   {
-    title: "subtitle",
+    title: "Thanh toán",
     links: [
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/landing",
+        aliases: "Momo",
       },
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/landing",
+        aliases: "VNPay",
       },
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/landing",
+        aliases: "Paypal",
+      },
+    ],
+  },
+  {
+    title: "Theo dõi shop",
+    links: [
+      {
+        link: "/landing",
+        aliases: "Facebook",
       },
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/landing",
+        aliases: "Instagram",
       },
       {
-        link: "https://facebook.com",
-        aliases: "Parturient Lorem",
+        link: "/landing",
+        aliases: "LinkedIn",
       },
     ],
   },

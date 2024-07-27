@@ -3,6 +3,7 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Cake extends Model {
     static associate(models) {
+      
       Cake.hasMany(models.CakeImage, { foreignKey: "cakeID"});
       Cake.belongsTo(models.Cart, { foreignKey: 'cartID', as: 'cart' });
       Cake.belongsTo(models.CakeSize, { foreignKey: 'cakeSizeID', as: 'cakeSize' });
@@ -73,9 +74,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       purpose: {
         type: DataTypes.STRING,
-        validated: {
-          len: [0, 100],
-        },
       },
       description: {
         type: DataTypes.STRING,

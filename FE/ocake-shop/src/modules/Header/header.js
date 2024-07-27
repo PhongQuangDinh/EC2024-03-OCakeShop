@@ -8,33 +8,37 @@ import {
   AppBar,
   useScrollTrigger,
   IconButton,
-  Backdrop,
-  Divider,
   Fade,
-  Drawer,
+  Switch,
+  Tooltip,
+  Avatar,
+  Menu,
+  MenuItem,
   Typography,
 } from "@mui/material";
 import {
   SearchOutlined,
-  MenuOutlined,
-  ChevronRightOutlined,
   KeyboardArrowUp,
+  LogoutOutlined,
+  UploadFileOutlined,
 } from "@mui/icons-material";
 
 import logo from "../../app/icon.png";
 
-const Header = () => {
+const homeData = [
+  { title: "Trang chủ", link: "/home" },
+  { title: "Thông tin shop", link: "/premium" },
+  { title: "Đơn mua", link: "/allpodcasts" },
+];
+
+const NavBar = () => {
   const [open, setOpen] = useState(false);
+  const [anchorElUser, setAnchorElUser] = useState(null);
   const [prior, setPrior] = useState(false);
   const trigger = useScrollTrigger({
     disableHysteresis: true,
-    threshold: 200,
+    threshold: 50,
   });
-
-  const handleToggleOpen = () => {
-    setOpen(open !== true);
-    document.body.style.overflow = !open ? "hidden" : "auto";
-  };
 
   useEffect(() => {
     if (open) setPrior(true);
@@ -44,45 +48,67 @@ const Header = () => {
       }, 500);
   }, [open]);
 
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+  const openUser = Boolean(anchorElUser);
+
+  const handleLogout = () => {
+    setAnchorElUser(null);
+    router.push("/login");
+  };
+
   return (
     <>
       <AppBarDesktop trigger={trigger} prior={prior}>
-        <Link style={{ textDecoration: "none" }} href="/">
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+        <Link href="/">
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <Image priority src={logo} alt="logo" width={100} />
-            <Typography sx={{ color: "#000" }}>Ocake Shop</Typography>
           </Box>
         </Link>
+        <StyledNavContainer>
+          {homeData.map((item, i) => (
+            <NavItem trigger={trigger} key={i} content={item}></NavItem>
+          ))}
+          <StyledNavItem
+            trigger={trigger}
+            sx={{ "&:before": { bottom: "-10px" } }}
+          >
+            <SearchOutlined
+              sx={{ "&:hover": { color: "var(--palette-03)" } }}
+            />
+          </StyledNavItem>
+        </StyledNavContainer>
 
-        <StyledIconButton onClick={handleToggleOpen}>
-          <MenuOutlined />
-        </StyledIconButton>
+        <Tooltip title="Profile">
+          <Avatar
+            src={null}
+            alt="Avatar"
+            onClick={handleOpenUserMenu}
+            sx={{ cursor: "pointer" }}
+          />
+        </Tooltip>
+
+        <StyledUserMenu
+          keepMounted
+          anchorEl={anchorElUser}
+          open={openUser}
+          onClick={handleCloseUserMenu}
+          onClose={handleCloseUserMenu}
+        >
+          <MenuItem>
+            <UploadFileOutlined />
+            Upload
+          </MenuItem>
+          <MenuItem onClick={handleLogout}>
+            <LogoutOutlined />
+            Logout
+          </MenuItem>
+        </StyledUserMenu>
       </AppBarDesktop>
-
-      <StyledBackdrop open={open} onClick={handleToggleOpen} />
-
-      <AppBarMobile
-        variant="persistent"
-        anchor="right"
-        open={open}
-        prior={prior}
-      >
-        <AppBarMobileHeader>
-          <IconButton onClick={handleToggleOpen}>
-            <ChevronRightOutlined />
-          </IconButton>
-          <IconButton>
-            <SearchOutlined />
-          </IconButton>
-        </AppBarMobileHeader>
-        <Divider />
-      </AppBarMobile>
 
       <Fade in={trigger && !open}>
         <ScrollTop size="small" onClick={() => window.scrollTo(0, 0)}>
@@ -92,9 +118,32 @@ const Header = () => {
     </>
   );
 };
-export default Header;
+export default NavBar;
 
-const drawerWidth = 280;
+const NavItem = ({
+  content = { title: "", link: "" },
+  sx = {},
+  trigger,
+  asPath,
+  uid,
+  ...props
+}) => {
+  return (
+    <StyledNavItem trigger={trigger} {...props}>
+      <Link href={content.title == "Premium" && !uid ? "/login" : content.link}>
+        <Typography
+          component="h1"
+          sx={{
+            color: "#fff",
+            "&:hover": { color: "var(--palette-03)" },
+          }}
+        >
+          {content.title}
+        </Typography>
+      </Link>
+    </StyledNavItem>
+  );
+};
 
 const AppBarDesktop = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== "prior" && prop !== "trigger",
@@ -102,70 +151,116 @@ const AppBarDesktop = styled(AppBar, {
   position: "fixed",
   width: "100%",
   transition: "all .4s ease-in-out",
-  background: "linear-gradient(180deg, #f8f8f8 0%, rgba(23, 96, 118, 0) 100%)",
-  backdropFilter: "blur(2px)",
+  background: trigger
+    ? "linear-gradient(30deg, #EF8F6E 0%, #f6e187 100%)"
+    : "transparent",
   display: "flex",
   flexDirection: "row",
   alignItems: "center",
-  justifyContent: "end !important",
+  justifyContent: "space-between",
+  gap: "4rem",
   boxShadow: trigger ? "4px 4px 25px rgba(0, 0, 0, 0.6)" : "none",
-  backgroundColor: trigger ? "var(--palette-02)" : "transparent",
+  backgroundColor: "transparent",
   zIndex: prior ? "10001" : "10002",
-  padding: "0rem 3rem",
+  padding: "0 3rem",
   [theme.breakpoints.down("sm")]: {
     padding: "1rem",
     paddingLeft: "2rem",
   },
 }));
 
-const AppBarMobile = styled(Drawer, {
-  shouldForwardProp: (prop) => prop !== "prior" && prop !== "trigger",
-})(({ prior }) => ({
-  position: "fixed",
-  zIndex: prior ? 10002 : 0,
-  height: "100vh",
-  width: drawerWidth,
-  flexShrink: 0,
-  "& .MuiDrawer-paper": {
-    width: drawerWidth,
-    boxSizing: "border-box",
-  },
-}));
-
-const AppBarMobileHeader = styled(Box)(() => ({
+const StyledNavContainer = styled(Box)(({ theme }) => ({
   display: "flex",
-  justifyContent: "space-between",
-  padding: "1rem",
+  alignItems: "stretch",
+  justifyContent: "center",
+  width: "100%",
+  padding: "0 4rem",
+  [theme.breakpoints.down("md")]: {
+    padding: "2rem 0",
+  },
 }));
 
 const ScrollTop = styled(IconButton)(() => ({
-  color: "var(--palette-06)",
-  backgroundColor: "var(--palette-02)",
+  color: "#fff",
+  backgroundColor: "#e82451",
   position: "fixed",
-  bottom: 20,
-  right: 20,
+  bottom: 25,
+  right: 25,
   zIndex: 100000,
-  boxShadow: "0px 0px 15px rgba(255,255,255,0.6)",
+  boxShadow: "0px 0px 15px rgba(0,0,0,0.6)",
   transition: "all .4s ease-in-out !important",
   border: "2px solid transparent",
   "&:hover": {
-    color: "var(--palette-02)",
-    backgroundColor: "var(--palette-06)",
-    border: "2px solid var(--palette-02)",
+    color: "#fff",
+    backgroundColor: "#f1858f",
   },
 }));
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  color: "var(--palette-06)",
-  display: "none",
+const StyledNavItem = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "trigger",
+})(({ theme, trigger }) => ({
+  position: "relative",
+  cursor: "pointer",
+  flexGrow: "1",
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  maxWidth: "10rem",
+  padding: "1rem 0",
+  "& .MuiTypography-root": {
+    fontSize: "18px",
+    whiteSpace: "pre-line",
+    textAlign: "center",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+  },
+  "&:hover": {
+    "& .MuiBox-root": {
+      display: "block",
+    },
+    "& #shadow": {
+      animation: "shadow 0.3s ease-in-out forwards",
+      animationDelay: `0.5s`,
+      "@keyframes shadow": {
+        "0%": { boxShadow: "none" },
+        "100%": { boxShadow: "0px 15px 25px rgba(255, 255, 255, 0.35)" },
+      },
+    },
+  },
   [theme.breakpoints.down("md")]: {
-    display: "inline-flex",
+    display: "none",
   },
 }));
 
-const StyledBackdrop = styled(Backdrop)(({ theme }) => ({
-  color: "var(--palette-06)",
-  zIndex: 10002,
-  position: "fixed",
-  height: "100vh",
+const StyledUserMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: "bottom",
+      horizontal: "left",
+    }}
+    transformOrigin={{
+      vertical: "top",
+      horizontal: "left",
+    }}
+    disableScrollLock={true}
+    {...props}
+  />
+))(({ theme }) => ({
+  "& .MuiPaper-root": {
+    borderRadius: "15px",
+    boxShadow:
+      "0 4px 8px 0 rgba(0, 0, 0, 0.4), 0 6px 20px 0 rgba(0, 0, 0, 0.3)",
+    "& .MuiMenu-list": {
+      padding: "0.5rem 0",
+      width: "180px",
+    },
+  },
+  marginTop: "1.25rem",
+  zIndex: 999999,
+  [theme.breakpoints.down("md")]: {
+    marginTop: "0.5rem",
+  },
 }));

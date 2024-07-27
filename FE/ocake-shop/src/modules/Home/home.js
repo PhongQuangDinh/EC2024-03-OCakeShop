@@ -1,17 +1,250 @@
-import { Box } from "@mui/material";
+"use client";
+import {
+  styled,
+  Tabs as MuiTabs,
+  Tab,
+  Box,
+  Typography,
+  Grid,
+} from "@mui/material";
 import Layout from "../layout";
+import { useState } from "react";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+import CakeCard from "./components/cakeCard";
+import Image from "next/image";
+import arrow from "../../assets/arrow.png";
 
 const HomePage = () => {
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const responsive = {
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 3,
+      slidesToSlide: 3,
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 2,
+      slidesToSlide: 2,
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1,
+      slidesToSlide: 1,
+    },
+  };
+
+  const Circle = styled(Box)(({ theme }) => ({
+    width: 50,
+    height: 50,
+    borderRadius: "50%",
+    background: `linear-gradient(90deg, #e82451 0%, #f1858f 100%)`,
+    color: "white",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "1.5rem",
+    marginBottom: 10,
+  }));
+
+  const steps = [
+    {
+      number: "1",
+      title: "Khách hàng đặt bánh kem",
+      description:
+        "Khách hàng lựa chọn nhân bánh kem ưa thích và kích thước bánh kem phù hợp với nhu cầu",
+    },
+    {
+      number: "2",
+      title: "Ocake xử lý đơn hàng",
+      description:
+        "Ocake sắp xếp thứ tự làm bánh và ngày làm bánh để có thể đưa đến cho khách hàng những chiếc bánh kem tươi ngon nhất",
+    },
+    {
+      number: "3",
+      title: "Đầu bếp làm bánh kem theo yêu cầu",
+      description:
+        "Đầu bếp dựa trên kinh nghiệm và công thức để tạo ra những chiếc bánh kem thơm ngon",
+    },
+    {
+      number: "4",
+      title: "Vận chuyển bánh kem đến khách hàng",
+      description:
+        "Đưa đến cho khách hàng những chiếc bánh kem tươi ngon và đẹp mắt nhất",
+    },
+  ];
+
   return (
     <Layout>
       <Box
         sx={{
           background: "linear-gradient(30deg, #EF8F6E 0%, #f6e187 100%)",
           height: "100vh",
+          padding: "7% 20%",
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem",
         }}
-      ></Box>
+      >
+        <Typography
+          sx={{
+            fontFamily: "'Monsterat', sans-serif",
+            fontWeight: 700,
+            fontSize: "2rem",
+            color: "#E82451",
+          }}
+        >
+          Sản phẩm của chúng tôi
+        </Typography>
+        <MyTabs value={value} onChange={handleChange}>
+          {category.map((item, i) => (
+            <Tab key={i} label={item} />
+          ))}
+        </MyTabs>
+        <Carousel
+          swipeable={false}
+          draggable={false}
+          keyBoardControl={true}
+          customTransition="all .5 ease-in-out"
+          transitionDuration={500}
+          containerClass="carousel-container"
+          removeArrowOnDeviceType={["tablet", "mobile", "pc"]}
+          responsive={responsive}
+          itemClass="carousel-item-padding-40-px"
+        >
+          <CakeCard img="https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/0A475B34-4E78-40D8-9F30-46223B7D77E7/Derivates/E55C7EA4-0E60-403F-B5DC-75EA358197BD.jpg" />
+          <CakeCard img="https://flouringkitchen.com/wp-content/uploads/2023/07/BW1A4089-2.jpg" />
+          <CakeCard img="https://hips.hearstapps.com/hmg-prod/images/vanilla-cake-index-64b741d111282.jpg?crop=0.6668240106993942xw:1xh;center,top&resize=1200:*" />
+          <CakeCard img="https://ichef.bbci.co.uk/food/ic/food_16x9_832/recipes/rainbow_cake_20402_16x9.jpg" />
+        </Carousel>
+      </Box>
+
+      <Box
+        sx={{
+          backgroundColor: "white",
+          height: "80vh",
+          padding: "7% 10%",
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem",
+        }}
+      >
+        <Typography
+          sx={{
+            fontFamily: "'Monsterat', sans-serif",
+            fontWeight: 700,
+            fontSize: "2rem",
+            color: "#E82451",
+            ml: "10%",
+          }}
+        >
+          Quy trình xử lý đơn hàng
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "start",
+            mt: 4,
+            ml: "10%",
+          }}
+        >
+          {steps.map((step, index) => (
+            <Grid
+              container
+              xs={4}
+              key={index}
+              sx={{
+                display: "flex",
+                alignItems: "start",
+              }}
+            >
+              <Grid item sx={{ display: "flex", flexDirection: "row" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Circle>{step.number}</Circle>
+
+                  <Typography
+                    variant="h6"
+                    color="#e82451"
+                    align="center"
+                    sx={{ fontSize: "1.15rem", mb: 2 }}
+                  >
+                    {step.title}
+                  </Typography>
+
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    align="center"
+                  >
+                    {step.description}
+                  </Typography>
+                </Box>
+                {
+                  <Box
+                    sx={{
+                      display: "flex",
+                      visibility: index == 3 ? "hidden" : "visible",
+                      alignItems: "start",
+                      height: "100%",
+                    }}
+                  >
+                    <Image src={arrow} width={100} />
+                  </Box>
+                }
+              </Grid>
+            </Grid>
+          ))}
+        </Box>
+      </Box>
     </Layout>
   );
 };
 
 export default HomePage;
+
+const MyTabs = styled(MuiTabs)(() => ({
+  "& .MuiTabs-flexContainer": {
+    gap: "1rem",
+  },
+  "& .MuiTabs-indicator": {
+    display: "none",
+  },
+  "& .MuiTab-root": {
+    padding: "0.6rem 2rem ",
+    borderRadius: 999,
+    textTransform: "initial",
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 700,
+    fontSize: "1rem",
+    border: "1px solid var(--palette-02)",
+    backgroundColor: "rgba(240,123,137,0.4)",
+    color: "white !important",
+  },
+  "& .Mui-selected": {
+    border: "none",
+    background: "linear-gradient(90deg, #e82451 0%, #f1858f 100%)",
+    color: "white !important",
+  },
+}));
+
+const category = [
+  "Cho nữ",
+  "Cho nam",
+  "Cho bé gái",
+  "Cho bé trai",
+  "Tiệc cưới",
+  "Theo mùa",
+];
