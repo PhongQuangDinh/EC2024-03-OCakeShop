@@ -6,7 +6,7 @@ const Customer = require('../models/Customer');
 const Cart = require('../models/Cart');
 
 router.get('/cart/:id', async (req, res, next) => {
-    try{
+    try {
         const user = await User.findByPk(req.params.id, {
             include: [
                 {
@@ -18,6 +18,22 @@ router.get('/cart/:id', async (req, res, next) => {
                             as: 'Cart',
                         }
                     ]
+                }
+            ]
+        });
+
+        if (user) {
+            res.status(200).json(user);
+        } else {
+            res.status(404).json({ message: "User not found" });
+        }
+    } catch (err) {
+        next(err);
+    }
+});
+
+module.exports = router;
+
 const model = require('../models');
 
 router.get('/:id', async (req, res, next) => {
