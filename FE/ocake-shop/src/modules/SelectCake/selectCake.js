@@ -39,7 +39,6 @@ const SelectCake = () => {
           padding: "90px",
           paddingLeft: "200px"
           }}>
-           {/* <Image priority src={logo} alt="logo" width={100} /> */}
            <Typography sx={{
               display:"flex",
               alignItems: "center",

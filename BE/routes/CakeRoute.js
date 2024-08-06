@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 // routes/cakes.js
 const express = require("express");
 const router = express.Router();
@@ -20,7 +19,7 @@ router.get("/", async (req, res, next) => {
         },
       ],
     });
-=======
+
 // // routes/cakes.js
 const express = require("express");
 const router = express.Router();
@@ -29,14 +28,13 @@ const model = require('../models');
 router.get("/", async (req, res, next) => {
   try {
     const cakes = await model.Cake.findAll();
->>>>>>> Stashed changes
+
     res.status(200).json(cakes);
   } catch (err) {
     next(err);
   }
 });
-<<<<<<< Updated upstream
-=======
+
 router.get("/:id", async (req, res, next) => {
     try {
         const cake = await model.Cake.findByPk(req.params.id, {
@@ -53,6 +51,3 @@ router.get("/:id", async (req, res, next) => {
     }
     catch (err) { next(err); }
 })
->>>>>>> Stashed changes
-
-module.exports = router;
