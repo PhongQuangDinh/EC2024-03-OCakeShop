@@ -11,3 +11,4 @@ function route(app){
     app.use('/', authenticationRouter);
 
 module.exports = route;
+}
