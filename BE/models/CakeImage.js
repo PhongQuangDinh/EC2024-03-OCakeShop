@@ -4,10 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   class CakeImage extends Model {
     static associate(models) {
       CakeImage.belongsTo(models.Cake, { foreignKey: "cakeID" });
-      CakeImage.belongsTo(models.ImageDetail, {
-        foreignKey: "imageID",
-        as: "imageDetail",
-      });
+      CakeImage.belongsTo(models.ImageDetail, {foreignKey: "imageID", as: "imageDetail", });
     }
   }
 
@@ -17,12 +14,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         primaryKey: true,
       },
-      imagePath: {
-        type: DataTypes.STRING,
-        validated: {
-          len: [0, 255],
-        },
+      imageID: {
+        type: DataTypes.INTEGER,
         primaryKey: true,
+      },
+      isPoster: {
+        type: DataTypes.INTEGER,
       },
     },
     {

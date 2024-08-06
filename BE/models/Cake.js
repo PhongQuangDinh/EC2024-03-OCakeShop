@@ -3,11 +3,18 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Cake extends Model {
     static associate(models) {
+
+      Cake.hasMany(models.CakeImage, {
+        foreignKey: "cakeID",
+        as: "cakeImages",
+      });
+
       
-      Cake.hasMany(models.CakeImage, { foreignKey: "cakeID"});
-      Cake.belongsTo(models.Cart, { foreignKey: 'cartID', as: 'cart' });
+      Cake.hasMany(models.CakeImage, { foreignKey: "cakeID", as: "cakeImages"});
+      // Cake.belongsTo(models.Cart, { foreignKey: 'cartID', as: 'cart' });
       Cake.belongsTo(models.CakeSize, { foreignKey: 'cakeSizeID', as: 'cakeSize' });
       Cake.belongsTo(models.CakeFilling, { foreignKey: 'cakeFillingID', as: 'cakeFilling' });
+
     }
     static async createCake(cake){
         try {
@@ -72,8 +79,8 @@ module.exports = (sequelize, DataTypes) => {
       priceCake: {
         type: DataTypes.INTEGER,
       },
-      purpose: {
-        type: DataTypes.STRING,
+      purposeID: {
+        type: DataTypes.INTEGER,
       },
       description: {
         type: DataTypes.STRING,
