@@ -33,15 +33,18 @@ router.get('/myinfor/:id', async (req, res, next) => {
     catch (err) {next(err)};
 });
 
-router.get('/:id/cart', async (req, res, next) => {
+router.get('/cart/:id/', async (req, res, next) => {
     try{
         const user = await model.Customer.findByPk(req.params.id, {
             include: [
                 {
                     model: model.Cart,
+                    as: 'cart',
+                    required: true,
                     include: [
                         {
                             model: model.Cake,
+                            required: true,
                         }
                     ]
                 }

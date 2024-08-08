@@ -4,16 +4,13 @@ module.exports = (sequelize, DataTypes) => {
   class Cake extends Model {
     static associate(models) {
 
-      Cake.hasMany(models.CakeImage, {
-        foreignKey: "cakeID",
-        as: "cakeImages",
-      });
-
+      // Cake.hasMany(models.CakeImage, {foreignKey: "cakeID", as: "cakeImages",});
       
       Cake.hasMany(models.CakeImage, { foreignKey: "cakeID", as: "cakeImages"});
       // Cake.belongsTo(models.Cart, { foreignKey: 'cartID', as: 'cart' });
       Cake.belongsTo(models.CakeSize, { foreignKey: 'cakeSizeID', as: 'cakeSize' });
       Cake.belongsTo(models.CakeFilling, { foreignKey: 'cakeFillingID', as: 'cakeFilling' });
+      Cake.belongsTo(models.Purpose, {foreignKey: "purposeID", as: "purpose"});
 
     }
     static async createCake(cake){

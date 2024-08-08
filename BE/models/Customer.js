@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       static associate(models) {
         Customer.belongsTo(models.User, { foreignKey: 'userID', as: 'user' });
         Customer.belongsTo(models.CreditCard, { foreignKey: 'customerID'});
+        Customer.hasMany(models.Cart, {foreignKey: 'customerID', as: 'cart'});
       }
 
       static async createCustomer(customer){

@@ -1,26 +1,3 @@
-// routes/cakes.js
-const express = require("express");
-const router = express.Router();
-const { Cake, CakeImage, ImageDetail } = require("../models/associations");
-
-router.get("/", async (req, res, next) => {
-  try {
-    const cakes = await Cake.findAll({
-      include: [
-        {
-          model: CakeImage,
-          as: "cakeImages",
-          include: [
-            {
-              model: ImageDetail,
-              as: "imageDetail",
-            },
-          ],
-        },
-      ],
-    });
-
-// // routes/cakes.js
 const express = require("express");
 const router = express.Router();
 const model = require('../models');
@@ -35,6 +12,40 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/purpose/:purposeId", async (req, res, next) => {
+  try {
+      const purposeId = req.params.purposeId;
+      const cake = await model.Cake.findAll({
+        include:
+        [
+          {
+              model: model.CakeImage,
+              as: "cakeImages",
+              required: true,
+              include: 
+              {
+                model: model.ImageDetail,
+                as: "imageDetail",
+                required: true,
+              }
+          },
+          {
+            model: model.Purpose,
+            as: "purpose",
+            required: true,
+            where: {
+              purposeID: purposeId
+            }
+          }
+        ]
+      });
+          
+      res.status(200).json(cake);
+      // );
+  }
+  catch (err) { next(err); }
+});
+
 router.get("/:id", async (req, res, next) => {
     try {
         const cake = await model.Cake.findByPk(req.params.id, {
@@ -42,7 +53,13 @@ router.get("/:id", async (req, res, next) => {
                 {
                     model: model.CakeImage,
                     as: "cakeImages",
-                    required: true
+                    required: true,
+                    include: 
+                    {
+                      model: model.ImageDetail,
+                      as: "imageDetail",
+                      required: true,
+                    }
                 }
         });
             
@@ -50,4 +67,6 @@ router.get("/:id", async (req, res, next) => {
         // );
     }
     catch (err) { next(err); }
-})
+});
+
+module.exports = router;
