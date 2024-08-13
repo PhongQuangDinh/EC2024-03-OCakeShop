@@ -3,11 +3,61 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Cake extends Model {
     static associate(models) {
-      Cake.hasMany(models.CakeImage, {
-        foreignKey: "cakeID",
-        as: "cakeImages",
-      });
+
+      // Cake.hasMany(models.CakeImage, {foreignKey: "cakeID", as: "cakeImages",});
+      
+      Cake.hasMany(models.CakeImage, { foreignKey: "cakeID", as: "cakeImages"});
+      // Cake.belongsTo(models.Cart, { foreignKey: 'cartID', as: 'cart' });
+      Cake.belongsTo(models.CakeSize, { foreignKey: 'cakeSizeID', as: 'cakeSize' });
+      Cake.belongsTo(models.CakeFilling, { foreignKey: 'cakeFillingID', as: 'cakeFilling' });
+      Cake.belongsTo(models.Purpose, {foreignKey: "purposeID", as: "purpose"});
+
     }
+    static async createCake(cake){
+        try {
+            const newCake = await Cake.create(cake);
+            return newCake;
+        } catch (error) {
+            throw new Error(`Error create Cake`);
+        }
+    }
+
+    static async getAllCake(){
+        try {
+            const allCake = await Cake.findAll()
+            return allCake;
+        } catch (error) {
+            throw new Error(`Error retrieving Cake`);
+        }
+    }
+
+    static async updateCake(cakeID, newData){
+        try {
+            const [updateNewRowsCount] = await Cake.update(newData,{
+                where: {cakeID: cakeID}
+            });
+            return updateNewRowsCount > 0;
+        } catch (error) {
+            throw new Error(`Error update Cake`);
+        }
+    }
+    static async deleteCake(cakeID){
+        try {
+            const userDelete = await Cake.findOne({
+                where: {cakeID: cakeID}
+            })
+            if(!userDelete){
+                console.log('User not found');
+            }
+            const isDelete = await User.destroy({
+                where: {cakeID: cakeID}
+            })
+            return isDelete > 0;
+        } catch (error) {
+            throw new Error(`Error delete Cake`);
+        }
+      }
+
   }
 
   Cake.init(
@@ -26,11 +76,14 @@ module.exports = (sequelize, DataTypes) => {
       priceCake: {
         type: DataTypes.INTEGER,
       },
-      purpose: {
-        type: DataTypes.STRING,
+      purposeID: {
+        type: DataTypes.INTEGER,
       },
       description: {
         type: DataTypes.STRING,
+        validated: {
+          len: [0, 255],
+        },
       },
     },
     {

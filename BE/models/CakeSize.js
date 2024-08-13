@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
           } catch (error) {
               throw new Error(`Error delete CakeSize`);
           }
-      }
+        }
 
     }
   

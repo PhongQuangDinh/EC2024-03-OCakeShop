@@ -2,13 +2,13 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const model = require('../models');
 const bcrypt = require('bcrypt');
 
 router.post('/signup', async (req, res, next) => {
     try{
         const request = req.body;
-        const newUser = await User.create({
+        const newUser = await model.User.create({
             username: request.username,
             password: request.password});
         res.status(200).json(newUser);
@@ -20,15 +20,17 @@ router.post('/signup', async (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
     try {
-        const user = await User.findOne({
-            where: { username: req.body.username }
+        const username = req.body.username;
+        const password = req.body.password;
+        const user = await model.User.findOne({
+            where: { username: username }
         });
 
         if (!user) {
             return res.status(401).json({ message: "Authentication unsuccessful" });
         }
 
-        const isMatch = await bcrypt.compare(req.body.password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
             res.status(200).json(user);
