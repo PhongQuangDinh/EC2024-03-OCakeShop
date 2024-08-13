@@ -2,71 +2,17 @@ const express = require("express");
 const router = express.Router();
 const model = require('../models');
 
+// Lấy nguyên liệu
 router.get("/", async (req, res, next) => {
   try {
-    const cakes = await model.Cake.findAll();
+    const ingredients = await model.Ingredient.findAll();
 
-    res.status(200).json(cakes);
+    res.status(200).json(ingredients);
   } catch (err) {
     next(err);
   }
 });
 
-router.get("/purpose/:purposeId", async (req, res, next) => {
-  try {
-      const purposeId = req.params.purposeId;
-      const cake = await model.Cake.findAll({
-        include:
-        [
-          {
-              model: model.CakeImage,
-              as: "cakeImages",
-              required: true,
-              include: 
-              {
-                model: model.ImageDetail,
-                as: "imageDetail",
-                required: true,
-              }
-          },
-          {
-            model: model.Purpose,
-            as: "purpose",
-            required: true,
-            where: {
-              purposeID: purposeId
-            }
-          }
-        ]
-      });
-          
-      res.status(200).json(cake);
-      // );
-  }
-  catch (err) { next(err); }
-});
 
-router.get("/:id", async (req, res, next) => {
-    try {
-        const cake = await model.Cake.findByPk(req.params.id, {
-            include:
-                {
-                    model: model.CakeImage,
-                    as: "cakeImages",
-                    required: true,
-                    include: 
-                    {
-                      model: model.ImageDetail,
-                      as: "imageDetail",
-                      required: true,
-                    }
-                }
-        });
-            
-        res.status(200).json(cake.cakeImages);
-        // );
-    }
-    catch (err) { next(err); }
-});
 
 module.exports = router;
