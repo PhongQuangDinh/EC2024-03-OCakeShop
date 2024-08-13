@@ -19,9 +19,6 @@ router.get('/myinfor/:id', async (req, res, next) => {
                 }
             ]
         });
-
-        console.log("HELP");
-
         if(!user){
             return res.status(404).json({
                 message: "User is not exist"
