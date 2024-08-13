@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const model = require('../models');
 
-router.get('/myinfor/:id', async (req, res, next) => {
+router.get('/myinfo/:id', async (req, res, next) => {
     try{
         const user = await model.User.findOne({
             where: {userID: req.params.id},
@@ -19,9 +19,6 @@ router.get('/myinfor/:id', async (req, res, next) => {
                 }
             ]
         });
-
-        console.log("HELP");
-
         if(!user){
             return res.status(404).json({
                 message: "User is not exist"
