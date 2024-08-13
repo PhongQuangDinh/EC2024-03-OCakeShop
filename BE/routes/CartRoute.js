@@ -7,7 +7,7 @@ const Cart = require('../models/Cart');
 
 router.get('/cart/:id', async (req, res, next) => {
     try {
-        const user = await User.findByPk(req.params.id, {
+        const user = await model.User.findByPk(req.params.id, {
             include: [
                 {
                     model: Customer,
