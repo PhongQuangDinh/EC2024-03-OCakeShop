@@ -12,61 +12,15 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/purpose/:purposeId", async (req, res, next) => {
-  try {
-      const purposeId = req.params.purposeId;
-      const cake = await model.Cake.findAll({
-        include:
-        [
-          {
-              model: model.CakeImage,
-              as: "cakeImages",
-              required: true,
-              include: 
-              {
-                model: model.ImageDetail,
-                as: "imageDetail",
-                required: true,
-              }
-          },
-          {
-            model: model.Purpose,
-            as: "purpose",
-            required: true,
-            where: {
-              purposeID: purposeId
-            }
-          }
-        ]
-      });
-          
-      res.status(200).json(cake);
-      // );
-  }
-  catch (err) { next(err); }
+app.post('/pay', (req, res) => {
+  const url = paypal.createOrder(); // pass payment stuff here
+  res.redirect(url);
 });
-
-router.get("/:id", async (req, res, next) => {
-    try {
-        const cake = await model.Cake.findByPk(req.params.id, {
-            include:
-                {
-                    model: model.CakeImage,
-                    as: "cakeImages",
-                    required: true,
-                    include: 
-                    {
-                      model: model.ImageDetail,
-                      as: "imageDetail",
-                      required: true,
-                    }
-                }
-        });
-            
-        res.status(200).json(cake.cakeImages);
-        // );
-    }
-    catch (err) { next(err); }
+app.get('/CONTINUE-ORDER', (req, res) => {
+  res.send('Bạn đã mất 100$ :33');
+});
+app.get('/CANCEL-ORDER', (req, res) => {
+  res.send('Bạn ko trả dc ư >:(');
 });
 
 module.exports = router;

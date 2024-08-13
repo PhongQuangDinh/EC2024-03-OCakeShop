@@ -12,18 +12,8 @@ const app = express();
 
 // app.use(morgan('combined'));
 app.use(express.json());
-app.post('/pay', (req, res) => {
-  const url = paypal.createOrder(); // pass payment stuff here
-  res.redirect(url);
-});
-app.get('/CONTINUE-ORDER', (req, res) => {
-  res.send('Bạn đã mất 100$ :33');
-});
-app.get('/CANCEL-ORDER', (req, res) => {
-  res.send('Bạn ko trả dc ư >:(');
-});
 
-// router(app);
+router(app);
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
