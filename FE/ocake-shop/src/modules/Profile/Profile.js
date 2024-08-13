@@ -1,19 +1,30 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Container, Box, Typography, MenuItem } from '@mui/material';
 import Layout from "../layout";
 
 const Profile = () => {
-  const [formData, setFormData] = useState({
-    fullName: 'Phạm Uyên Nhi',
-    phone: '0123123144',
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-    address: 'Phường 5, quận 8, TP Hồ Chí Minh',
-    paymentMethod: 'MB Bank',
-    accountNumber: '*******789',
-  });
+  // const [formData, setFormData] = useState({
+  //   fullName: 'Phạm Uyên Nhi',
+  //   phone: '0123123144',
+  //   oldPassword: '',
+  //   newPassword: '',
+  //   confirmPassword: '',
+  //   address: 'Phường 5, quận 8, TP Hồ Chí Minh',
+  //   paymentMethod: 'MB Bank',
+  //   accountNumber: '*******789',
+  // });
+  const [formData, setFormData] = useState([]);
+
+  useEffect(()=>{
+    const getData = async() =>{
+      const query = await fetch("http://localhost:8080/customer/myinfo/12");
+      const response = await query.json();
+      console.log("response from API ",response);
+      setFormData(response);
+    }
+    getData();
+  },[]);
 
   const handleSave = () => {
     // Handle save changes

@@ -14,7 +14,7 @@ async function generateAccessToken(){
     return response.data.access_token
 }
 
-exports.createOrder = async () => {
+async function createOrder() {
     const accessToken = await generateAccessToken();
     const response = await axios ({
         url: process.env.PAYPAL_BASE_URL + '/v2/checkout/orders',
@@ -51,8 +51,8 @@ exports.createOrder = async () => {
                 }
             ],
             application_context: {
-                return_url: process.env.BASE_URL + '/CONTINUE-ORDER',
-                cancel_url: process.env.BASE_URL + '/CANCEL-ORDER',
+                return_url: process.env.BASE_URL + '/payment/CONTINUE-ORDER',
+                cancel_url: process.env.BASE_URL + '/payment/CANCEL-ORDER',
                 shipping_preference: 'NO_SHIPPING',
                 user_action: 'PAY_NOW',
                 brand_name: 'dinhquangphong.io'
@@ -60,9 +60,12 @@ exports.createOrder = async () => {
         })
     }) 
 
-    console.log(response.data);
+    // console.log(response.data);
     return response.data.links.find(link => link.rel === 'approve').href
 }
 
+// this.createOrder().then(result => console.log(result)); // just for testing, this is the demo for a button
 
-this.createOrder().then(result => console.log(result)); // just for testing, this is the demo for a button
+module.exports = {
+    createOrder : createOrder
+}

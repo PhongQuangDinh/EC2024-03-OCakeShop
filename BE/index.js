@@ -6,8 +6,6 @@ const router = require('./routes/router');
 const sequelize = require('./config/dbConfig');
 // const morgan = require('morgan');
 
-const paypal = require('./services/paypal');
-
 const app = express();
 
 // app.use(morgan('combined'));
