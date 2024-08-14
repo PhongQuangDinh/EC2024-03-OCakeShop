@@ -88,4 +88,19 @@ router.get('/', async (req, res, next) => {
     catch (err) {next(err)};
 });
 
+// thêm bánh vào giỏ hàng
+router.post('/add-to-cart', async (req, res, next) => {
+    try {
+      const cartData = req.body;
+  
+      // Tạo mục giỏ hàng mới sử dụng phương thức model
+      const newCartItem = await model.Cart.create(cartData);
+      res.status(201).json(newCartItem);
+    } catch (err) {
+      // Chuyển lỗi cho middleware xử lý lỗi toàn cục
+      next(err);
+    }
+  });
+  
+
 module.exports = router;
