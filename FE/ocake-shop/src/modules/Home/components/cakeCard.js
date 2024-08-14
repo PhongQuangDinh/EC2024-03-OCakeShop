@@ -1,7 +1,8 @@
 "use client";
 import { Box, CardMedia, Chip, Grid, styled, Typography } from "@mui/material";
 
-const CakeCard = ({ img }) => {
+const CakeCard = ({ img, title }) => {
+  
   return (
     <ArticleBox>
       <GridCard sx={{ border: "none" }} direction="column" container>
@@ -10,7 +11,7 @@ const CakeCard = ({ img }) => {
         </Grid>
         <Grid item xs={2} sx={{ color: "#000" }}>
           <TitleTypo component="h1" size="18px" weight="bold">
-            {"hi"}
+            {title}
           </TitleTypo>
         </Grid>
       </GridCard>

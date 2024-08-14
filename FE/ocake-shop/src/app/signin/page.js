@@ -1,5 +1,4 @@
 import SignIn from "@/modules/SignIn/signin";
-import HomePage from "@/modules/Home/home";
 import Head from "next/head";
 
 export default function Home() {

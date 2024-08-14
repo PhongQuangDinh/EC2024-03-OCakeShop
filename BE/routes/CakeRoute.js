@@ -4,10 +4,41 @@ const model = require('../models');
 
 router.get("/", async (req, res, next) => {
   try {
-    const cakes = await model.Cake.findAll();
+    const cakes = await model.Cake.findAll({
+      include: {
+        model:  model.CakeImage,
+        as: "cakeImages",
+        required: true,
+        where: {isPoster : 1},
+        include: 
+        {
+          model: model.ImageDetail,
+          as: "imageDetail",
+          required: true,
+        }
+      }
+    });
 
     res.status(200).json(cakes);
   } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/purpose",  async (req, res, next) =>{
+  try{
+    const purpose = await model.Purpose.findAll({
+      where: {
+        purposeID_ref: null
+      }
+    });
+
+    if(!purpose){
+      return res.status(404).json({message: "No purpose found"});
+    }
+    return res.status(200).json(purpose);
+  }
+  catch (err) {
     next(err);
   }
 });

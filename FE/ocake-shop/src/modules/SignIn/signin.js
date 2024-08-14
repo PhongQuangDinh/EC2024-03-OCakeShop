@@ -1,9 +1,40 @@
-import { Box, Button, TextField, Typography, Link } from "@mui/material";
+"use client";
+import React, { useState } from 'react';
+import { Box, Button, TextField, Typography } from "@mui/material";
 import Layout from "../layout";
 import Head from "next/head";
-import SignUp from "@/modules/SignUp/signup";
+import Link from "next/link";
 
 const SignIn = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSignIn = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || 'Login failed');
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Response data:', data);
+      window.location.href = '/home';
+
+    } catch (err) {
+      // console.error('An error occurred:', err);
+      setError('Invalid username or password');
+    }
+  };
   return (
     <div>
       <Head>
@@ -20,7 +51,7 @@ const SignIn = () => {
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "column",
-            fontFamily: "Monospace, sans-serif", // Áp dụng font Montserrat cho toàn bộ component này
+            fontFamily: "Monospace, sans-serif",
           }}
         >
           <Box
@@ -39,6 +70,8 @@ const SignIn = () => {
             <TextField
               label="Số điện thoại"
               variant="outlined"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)} // Cập nhật giá trị của username
               sx={{ 
                 marginBottom: 2, 
                 width: "100%",
@@ -51,7 +84,7 @@ const SignIn = () => {
                   },
                   "& input": { 
                     color: "#000000",
-                    fontFamily: "Montserrat, Monospace", // Áp dụng font Montserrat cho input
+                    fontFamily: "Montserrat, Monospace",
                   },
                   "&:hover input": { 
                     color: "#000000",
@@ -65,7 +98,7 @@ const SignIn = () => {
                 },
                 "& label.Mui-focused": {
                   color: "#e82652",
-                  fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+                  fontFamily: "Montserrat, sans-serif",
                 },
               }}
             />
@@ -73,6 +106,8 @@ const SignIn = () => {
               label="Mật khẩu"
               type="password"
               variant="outlined"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} // Cập nhật giá trị của password
               sx={{ 
                 marginBottom: 2, 
                 width: "100%",
@@ -85,7 +120,7 @@ const SignIn = () => {
                   },
                   "& input": { 
                     color: "#000000",
-                    fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho input
+                    fontFamily: "Montserrat, sans-serif",
                   },
                   "&:hover input": { 
                     color: "#000000",
@@ -99,7 +134,7 @@ const SignIn = () => {
                 },
                 "& label.Mui-focused": {
                   color: "#e82652",
-                  fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+                  fontFamily: "Montserrat, sans-serif",
                 },
               }}
             />
@@ -115,12 +150,14 @@ const SignIn = () => {
                   backgroundColor: "#FFC0CB", 
                   color: "#000000" 
                 },
-                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
+                fontFamily: "Montserrat, sans-serif",
                 outline: "none",
               }}
+              onClick={handleSignIn} // Xử lý sự kiện khi nhấn nút
             >
               Đăng Nhập
             </Button>
+            {error && <Typography color="error">{error}</Typography>}
             <Link href="#" underline="none" sx={{ display: "block", marginBottom: 2, fontFamily: "Montserrat, sans-serif" }}>
               Quên mật khẩu
             </Link>

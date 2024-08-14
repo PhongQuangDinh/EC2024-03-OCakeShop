@@ -1,6 +1,8 @@
-import { Box, Button, TextField, Typography, Link } from "@mui/material";
+"use client";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import Layout from "../layout";
 import Head from "next/head";
+import Link from 'next/link'
 
 const SignUp = () => {
   return (
@@ -125,7 +127,7 @@ const SignUp = () => {
             </Typography>
             <Typography variant="body2" sx={{ fontFamily: "Montserrat, sans-serif" }}>
               Bạn đã có tài khoản ở OCake Shop?{" "}
-              <Link href="/signup" underline="none" color="#e82652" sx={{ fontFamily: "Montserrat, sans-serif" }}>
+              <Link href="/signin" underline="none" color="#e82652" sx={{ fontFamily: "Montserrat, sans-serif" }}>
                 Đăng nhập
               </Link>
             </Typography>

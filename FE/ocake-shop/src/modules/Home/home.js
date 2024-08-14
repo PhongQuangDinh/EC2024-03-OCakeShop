@@ -8,7 +8,7 @@ import {
   Grid,
 } from "@mui/material";
 import Layout from "../layout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import CakeCard from "./components/cakeCard";
@@ -16,6 +16,62 @@ import Image from "next/image";
 import arrow from "../../assets/arrow.png";
 
 const HomePage = () => {
+
+  useEffect(() => {
+    GetCategory();
+  },[]);
+
+  useEffect(() => {
+    GetInforCake();
+  }, []);
+
+  const [category, setCategory] = useState([]);
+  const [cake, setCake] = useState('');
+  const [error, setError] = useState('');
+  // const
+
+  const GetCategory = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/cake/purpose", {
+        method: "GET", 
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if(!response.ok){
+        const errorData = await response.json();
+        setError(errorData.message || 'Login failed');
+        return;
+      }
+      const data = await response.json();
+      setCategory(Array.isArray(data) ? data : []);
+    } catch(err){
+      console.error(err);
+      setError('An error occurred while get category');
+  }};
+
+  const GetInforCake = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/cake/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+    });
+    if(!response.ok)
+    {
+      const errorData = await response.json();
+      setError(errorData.message || 'Login failed');
+      return;
+    }
+    const data = await response.json();
+    setCake(Array.isArray(data) ? data : []);
+    // alter(cake)
+  } catch(err){
+    console.error('An error occurred:', err);
+    setError('An error occurred while get cake');
+  }};
+
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -103,8 +159,8 @@ const HomePage = () => {
           Sản phẩm của chúng tôi
         </Typography>
         <MyTabs value={value} onChange={handleChange}>
-          {category.map((item, i) => (
-            <Tab key={i} label={item} />
+          {category.map((category) => (
+            <Tab key={category.purposeID} label={category.title} />
           ))}
         </MyTabs>
         <Carousel
@@ -118,10 +174,19 @@ const HomePage = () => {
           responsive={responsive}
           itemClass="carousel-item-padding-40-px"
         >
-          <CakeCard img="https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/0A475B34-4E78-40D8-9F30-46223B7D77E7/Derivates/E55C7EA4-0E60-403F-B5DC-75EA358197BD.jpg" />
-          <CakeCard img="https://flouringkitchen.com/wp-content/uploads/2023/07/BW1A4089-2.jpg" />
-          <CakeCard img="https://hips.hearstapps.com/hmg-prod/images/vanilla-cake-index-64b741d111282.jpg?crop=0.6668240106993942xw:1xh;center,top&resize=1200:*" />
-          <CakeCard img="https://ichef.bbci.co.uk/food/ic/food_16x9_832/recipes/rainbow_cake_20402_16x9.jpg" />
+          {/* <CakeCard title="name" img="https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/0A475B34-4E78-40D8-9F30-46223B7D77E7/Derivates/E55C7EA4-0E60-403F-B5DC-75EA358197BD.jpg" />
+          <CakeCard title = "ten" img="https://flouringkitchen.com/wp-content/uploads/2023/07/BW1A4089-2.jpg" />
+          <CakeCard title="banh" img="https://hips.hearstapps.com/hmg-prod/images/vanilla-cake-index-64b741d111282.jpg?crop=0.6668240106993942xw:1xh;center,top&resize=1200:*" />
+          <CakeCard title="kem" img="https://ichef.bbci.co.uk/food/ic/food_16x9_832/recipes/rainbow_cake_20402_16x9.jpg" /> */}
+
+          {Array.isArray(cake) && cake.map((cakeItem) => (
+            <CakeCard 
+              key={cakeItem.cakeID}
+              title={cakeItem.description}
+              img={cakeItem.cakeImages.length > 0 ? cakeItem.cakeImages[0].imageDetail.imagePath : ""}
+            />
+            // alert(cakeItem.cakeImages_imageDetail_imagePath)
+          ))}
         </Carousel>
       </Box>
 
@@ -240,11 +305,3 @@ const MyTabs = styled(MuiTabs)(() => ({
   },
 }));
 
-const category = [
-  "Cho nữ",
-  "Cho nam",
-  "Cho bé gái",
-  "Cho bé trai",
-  "Tiệc cưới",
-  "Theo mùa",
-];
