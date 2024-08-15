@@ -100,4 +100,20 @@ router.get("/:id", async (req, res, next) => {
     catch (err) { next(err); }
 });
 
+// thêm loại bánh mới (admin)
+// Route để thêm loại bánh mới
+router.post('/', async (req, res, next) => {
+  try {
+    const cakeData = req.body;
+
+    // Tạo loại bánh mới sử dụng phương thức model
+    const newCake = await model.Cake.createCake(cakeData);
+    res.status(201).json(newCake);
+  } catch (err) {
+    // Chuyển lỗi cho middleware xử lý lỗi toàn cục
+    next(err);
+  }
+});
+
+
 module.exports = router;
