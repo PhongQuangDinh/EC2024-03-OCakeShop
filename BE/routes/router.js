@@ -13,6 +13,6 @@ function route(app){
     app.use('/cart', cartRouter);
     app.use('/ingredient', ingredientRouter);
     app.use('/ordercake', orderCakeRouter);
-    app.use('/', authenticationRouter);
+    app.use('/', authenticationRouter.router);
 }
 module.exports = route;

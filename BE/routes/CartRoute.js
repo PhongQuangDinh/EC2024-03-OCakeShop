@@ -61,21 +61,21 @@ router.get('/:id', async (req, res, next) => {
             ]
         });
 
-        if(!user){
+        if(!cart){
             return res.status(404).json({
                 message: "User is not exist"
             });
         }
         else{
-            return res.status(200).json(user)
+            return res.status(200).json(cart)
         }
-        res.status(200).json(user);
-        if(!cart){
-            return res.status(404).json({
-                message: "Cart is not exist"
-            });
-        }
-        res.status(200).json(cart);
+        // res.status(200).json(user);
+        // if(!cart){
+        //     return res.status(404).json({
+        //         message: "Cart is not exist"
+        //     });
+        // }
+        // res.status(200).json(cart);
     }
     catch (err) {next(err)};
 });

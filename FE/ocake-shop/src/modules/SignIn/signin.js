@@ -27,12 +27,12 @@ const SignIn = () => {
       }
 
       const data = await response.json();
-      console.log('Response data:', data);
+      alert('Token:', data.token);
+      localStorage.setItem('token', data.token);
       window.location.href = '/home';
 
     } catch (err) {
-      // console.error('An error occurred:', err);
-      setError('Invalid username or password');
+      setError('Invalid 111 or password' + err.message);
     }
   };
   return (

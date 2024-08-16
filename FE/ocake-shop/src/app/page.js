@@ -1,6 +1,4 @@
-import SignIn from "@/modules/SignIn/signin";
-import SignUp from "@/modules/SignUp/signup";
-// import CartPage from "@/modules/Cart/cartpage";
+import HomePage from "@/modules/Home/home";
 import Head from "next/head";
 
 export const metadata = {
@@ -15,6 +13,7 @@ export default function Home() {
       </Head>
 
       <main>
+        <HomePage />
       </main>
     </div>
   );

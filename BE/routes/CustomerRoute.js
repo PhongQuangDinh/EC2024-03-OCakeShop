@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const model = require('../models');
 
-router.get('/myinfo/:id', async (req, res, next) => {
+router.get('/myinfor/:id', async (req, res, next) => {
     try{
         const user = await model.User.findOne({
             where: {userID: req.params.id},
@@ -30,13 +30,13 @@ router.get('/myinfo/:id', async (req, res, next) => {
     catch (err) {next(err)};
 });
 
-router.get('/cart/:id/', async (req, res, next) => {
+router.get('/cart/:id', async (req, res, next) => {
     try{
         const user = await model.Customer.findByPk(req.params.id, {
             include: [
                 {
                     model: model.Cart,
-                    as: 'cart',
+                    // as: 'cart',
                     required: true,
                     include: [
                         {

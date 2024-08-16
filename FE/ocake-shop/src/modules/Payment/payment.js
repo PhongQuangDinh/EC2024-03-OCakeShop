@@ -213,8 +213,10 @@ const Payment = () => {
               }}
             >
               <Box sx={{
-                // justifyContent: "center", 
-                display: "flex",    
+                justifyContent: "space-between", 
+                gap: "100px",
+                display: "flex",
+                alignContent: "center",  
                 marginLeft: "3%"
               }}>
                 {inforCustomer.map((info, index) => (
@@ -357,7 +359,7 @@ const Payment = () => {
                   Phí vận chuyển
                 </Typography>
               </Box>
-              <Box sx={{marginRight: "5%"}}>
+              <Box sx={{marginRight: "5.5%"}}>
                 <Typography sx={{}} align="right">
                   {costDelivery}
                 </Typography>
@@ -402,7 +404,7 @@ const Payment = () => {
                 </Typography>
               </Box>
               <Box sx={{
-                marginRight: "3%"
+                marginRight: "4%"
               }}>
                 <Typography sx={{ 
                   // fontSize: "20px" 

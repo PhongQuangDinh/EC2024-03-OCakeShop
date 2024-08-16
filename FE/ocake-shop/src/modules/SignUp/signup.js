@@ -2,9 +2,41 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Layout from "../layout";
 import Head from "next/head";
-import Link from 'next/link'
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 const SignUp = () => {
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSingUp = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({username, password}),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || 'Signup failed');
+        return;
+      }
+
+      const data = await response.json();
+      alert('Response data:', data.token);
+      localStorage.setItem("token", data.token);
+      window.location.href = '/home';
+
+    } catch (error) {
+        setError('Invalid username or password');
+    }
+  }
+
   return (
     <div>
       <Head>
@@ -40,6 +72,8 @@ const SignUp = () => {
             <TextField
               label="Số điện thoại"
               variant="outlined"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               sx={{ 
                 marginBottom: 2, 
                 width: "100%",
@@ -74,6 +108,8 @@ const SignUp = () => {
               label="Mật khẩu"
               type="password"
               variant="outlined"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               sx={{ 
                 marginBottom: 2, 
                 width: "100%",
@@ -119,9 +155,12 @@ const SignUp = () => {
                 fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
                 outline: "none",
               }}
+              onClick={handleSingUp}
             >
               Đăng Ký
             </Button>
+            {error && <Typography color="error">{error}</Typography>}
+            <Link href="#" underline="none" sx={{ display: "block", marginBottom: 2, fontFamily: "Montserrat, sans-serif" }}></Link>
             <Typography variant="body2" sx={{ marginBottom: 2, fontFamily: "Montserrat, sans-serif" }}>
               HOẶC
             </Typography>
