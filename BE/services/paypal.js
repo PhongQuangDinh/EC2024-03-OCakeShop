@@ -51,8 +51,8 @@ exports.createOrder = async () => {
                 }
             ],
             application_context: {
-                return_url: process.env.BASE_URL + '/CONTINUE-ORDER',
-                cancel_url: process.env.BASE_URL + '/CANCEL-ORDER',
+                return_url: process.env.BASE_URL + '/payment/CONTINUE-ORDER',
+                cancel_url: process.env.BASE_URL + '/payment/CANCEL-ORDER',
                 shipping_preference: 'NO_SHIPPING',
                 user_action: 'PAY_NOW',
                 brand_name: 'dinhquangphong.io'
