@@ -117,28 +117,6 @@ const HomePage = () => {
     
   };
 
-  // const getCakesByCategory  = async () => {
-  //   try {
-  //     const selectedCategory = category[value];
-  //     const response = await fetch(`http://localhost:8080/cake/purpose/${selectedCategory.purposeID}`, {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //   });
-  //   if(!response.ok)
-  //   {
-  //     const errorData = await response.json();
-  //     setError(errorData.message || 'Get cake by purpose is failed');
-  //     return;
-  //   }
-  //   const data = await response.json();
-  //   // setCakeData(Array.isArray(data) ? data : []);
-  //   setCake(Array.isArray(data) ? data : []);
-  // } catch(err){
-  //   console.error('An error occurred:', err);
-  //   setError('An error occurred while get cake');
-  // }};
 
   const responsive = {
     desktop: {

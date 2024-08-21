@@ -17,6 +17,12 @@ import arrow from "../../assets/arrow.png";
 
 const HomePage = () => {
 
+  const [category, setCategory] = useState(["Tất cả"]);
+  const [cake, setCake] = useState('');
+  const [allCake, setAllCake] = useState('');
+  const [error, setError] = useState('');
+  const [value, setValue] = useState(0);
+
   useEffect(() => {
     GetCategory();
   },[]);
@@ -25,9 +31,37 @@ const HomePage = () => {
     GetInforCake();
   }, []);
 
-  const [category, setCategory] = useState([]);
-  const [cake, setCake] = useState('');
-  const [error, setError] = useState('');
+  useEffect(() => {
+    if (value === 0) {
+      setCake(allCake);
+    } else {
+      const selectedCategory = category[value];
+      if (selectedCategory) {
+        const getCakesByCategory = async () => {
+          try {
+            const selectedCategory = category[value];
+            const response = await fetch(`http://localhost:8080/cake/purpose/${selectedCategory.purposeID}`, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+          });
+          if(!response.ok)
+          {
+            const errorData = await response.json();
+            setError(errorData.message || 'Get cake by purpose is failed');
+            return;
+          }
+          const data = await response.json();
+          // setCakeData(Array.isArray(data) ? data : []);
+          setCake(Array.isArray(data) ? data : []);
+        } catch(err){
+          console.error('An error occurred:', err);
+          setError('An error occurred while get cake');
+        }};;
+        getCakesByCategory();
+    };
+  }}, [value, category]);
   // const
 
   const GetCategory = async () => {
@@ -40,14 +74,17 @@ const HomePage = () => {
       });
       if(!response.ok){
         const errorData = await response.json();
-        setError(errorData.message || 'Login failed');
+        setError(errorData.message || 'Load dữ liệu thất bại');
         return;
       }
       const data = await response.json();
-      setCategory(Array.isArray(data) ? data : []);
+      const allCategory = { purposeID: 0, title: "Tất cả" };
+      const updatedData = [allCategory, ...data];
+      setCategory(Array.isArray(updatedData) ? updatedData : []);
+      // setCategory(Array.isArray(data) ? data : []);
     } catch(err){
       console.error(err);
-      setError('An error occurred while get category');
+      setError('Có lỗi khi lấy danh mục sản phẩm');
   }};
 
   const GetInforCake = async () => {
@@ -61,10 +98,11 @@ const HomePage = () => {
     if(!response.ok)
     {
       const errorData = await response.json();
-      setError(errorData.message || 'Login failed');
+      setError(errorData.message || 'Get cake failed');
       return;
     }
     const data = await response.json();
+    setAllCake(Array.isArray(data) ? data : []);
     setCake(Array.isArray(data) ? data : []);
     // alter(cake)
   } catch(err){
@@ -72,10 +110,11 @@ const HomePage = () => {
     setError('An error occurred while get cake');
   }};
 
-  const [value, setValue] = useState(0);
+  // const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    
   };
 
   const responsive = {
