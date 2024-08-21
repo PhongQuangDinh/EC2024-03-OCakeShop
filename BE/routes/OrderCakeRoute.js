@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const model = require('../models');
 
-// Lấy nguyên liệu
+// Lấy đơn đặt hàng
 router.get("/", async (req, res, next) => {
   try {
-    const ingredients = await model.OrderCake.findAll();
+    const order = await model.OrderCake.findAll();
 
-    res.status(200).json(ingredients);
+    res.status(200).json(order);
   } catch (err) {
     next(err);
   }
