@@ -117,7 +117,6 @@ const HomePage = () => {
     
   };
 
-
   const responsive = {
     desktop: {
       breakpoint: { max: 3000, min: 1024 },
@@ -188,9 +187,37 @@ const HomePage = () => {
           gap: "1rem",
         }}
       >
-        <Box sx = {{
-          display: "flex",
+        <Box sx={{
           justifyContent: "center",
+          alignItems: "center",
+          display: "flex",
+        }}>
+          <Typography sx={{
+              fontFamily: "'Monsterat', sans-serif",
+              fontWeight: 700,
+              fontSize: "2rem",
+              color: "#E82451",
+            }}>Thanh toán thành công</Typography>
+        </Box>
+        <Box sx={{
+          justifyContent: "center",
+          alignItems: "center",
+          display: "flex",
+        }}>
+          <Box
+            sx={{
+              height: "1px",
+              width: "100%",
+              backgroundColor: "#000",
+              margin: "1rem 3rem",
+            }}
+          />
+        </Box>
+        
+        <Box sx={{
+          justifyContent: "center",
+          alignItems: "center",
+          display: "flex",
         }}>
           <Typography
             sx={{
@@ -200,7 +227,7 @@ const HomePage = () => {
               color: "#E82451",
             }}
           >
-            Sản phẩm của chúng tôi
+            Sản phẩm đề xuất của chúng tôi
           </Typography>
         </Box>
         <MyTabs value={value} onChange={handleChange}>

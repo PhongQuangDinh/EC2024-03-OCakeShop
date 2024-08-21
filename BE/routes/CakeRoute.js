@@ -43,9 +43,9 @@ router.get("/purpose",  async (req, res, next) =>{
   }
 });
 
-router.get("/purpose/:purposeId", async (req, res, next) => {
+router.get("/purpose/:purposeID", async (req, res, next) => {
   try {
-      const purposeId = req.params.purposeId;
+      const purposeID = req.params.purposeID;
       const cake = await model.Cake.findAll({
         include:
         [
@@ -65,7 +65,7 @@ router.get("/purpose/:purposeId", async (req, res, next) => {
             as: "purpose",
             required: true,
             where: {
-              purposeID: purposeId
+              purposeID: purposeID
             }
           }
         ]

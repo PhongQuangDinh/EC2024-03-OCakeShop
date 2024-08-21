@@ -12,7 +12,7 @@ router.post('/signup', async (req, res, next) => {
         const { username, password } = req.body;
 
         if (!username || !password) {
-            console.log("0");
+            // console.log("0");
             return res.status(400).json({ message: "Username and password are required" });
         }
         const user = await model.User.findOne({
