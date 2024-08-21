@@ -66,7 +66,7 @@ const NavBar = () => {
       <AppBarDesktop trigger={trigger} prior={prior}>
         <Link href="/">
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Image priority src={logo} alt="logo" width={100} />
+            <Image priority src={logo} alt="logo" width={100} href="/home"/>
           </Box>
         </Link>
         <StyledNavContainer>
