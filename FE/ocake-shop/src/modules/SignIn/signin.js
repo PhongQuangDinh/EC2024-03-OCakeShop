@@ -27,7 +27,7 @@ const SignIn = () => {
       }
 
       const data = await response.json();
-      alert('Token:', data.token);
+      // alert('Token:', data.token);
       localStorage.setItem('token', data.token);
       window.location.href = '/home';
 
