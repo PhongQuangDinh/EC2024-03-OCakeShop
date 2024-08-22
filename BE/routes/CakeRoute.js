@@ -77,6 +77,17 @@ router.get("/purpose/:purposeId", async (req, res, next) => {
   catch (err) { next(err); }
 });
 
+// lấy kích thước bánh s
+router.get('/cake-sizes', async (req, res) => {
+  try {
+    const cakeSizes = await model.CakeSize.findAll();
+
+    res.json(cakeSizes);
+  } catch (error) {
+    res.status(500).json({ message: `Error retrieving cake sizes: ${error.message}` });
+  }
+});
+
 router.get("/:id", async (req, res, next) => {
     try {
         const cake = await model.Cake.findByPk(req.params.id, {
