@@ -27,7 +27,8 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class ImageDetail extends Model {
     static associate(models){
-      ImageDetail.belongsTo(models.CakeImage, {foreignKey: "imageID", as: "imageDetail", });
+      // ImageDetail.belongsTo(models.CakeImage, {foreignKey: "imageID", as: "imageDetail", });
+      ImageDetail.hasMany(models.CakeImage, { as: "cakeImages", foreignKey: "imageID" });
     }
   }
 
