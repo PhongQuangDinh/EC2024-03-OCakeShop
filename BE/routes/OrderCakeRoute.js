@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const model = require('../models');
+const { Op } = require('sequelize');
 
 // Lấy đơn đặt hàng
 router.get("/", async (req, res, next) => {
@@ -121,6 +122,54 @@ router.get("/admin-delivered", async (req, res, next) => {
       next(err);
     }
   });
+
+// Lấy danh sách đơn hàng đã được thanh toán
+router.get("/paid-order", async (req, res, next) => {
+  try {
+    const paidOrders = await model.OrderCake.findAll({
+      include: [
+        {
+          model: model.Payment,
+          required: false, // This keeps the LEFT JOIN
+        },
+      ],
+      where: {
+        '$Payment.paymentID$': {
+          [Op.not]: null, // This filters for records where paymentID is not null in the joined Payment table
+        },
+      },
+    });
+    
+    // Trả về kết quả dưới dạng JSON
+    res.status(200).json(paidOrders);
+  } catch (err) {
+    // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
+    next(err);
+  }
+});
+
+// lấy danh sách đơn hàng chưa được thanh toán
+router.get("/unpaid-order", async (req, res, next) => {
+  try {
+    const unpaidOrders = await model.OrderCake.findAll({
+      include: [
+        {
+          model: model.Payment,
+          required: false, // This makes the join a LEFT JOIN
+          where: {
+            paymentID: null, // This filters for records where paymentID is null
+          },
+        },
+      ],
+    });
+
+    // Trả về kết quả dưới dạng JSON
+    res.status(200).json(unpaidOrders);
+  } catch (err) {
+    // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
+    next(err);
+  }
+});
 
 
 // Đã xử lý/ chưa xử lý đơn của Bếp

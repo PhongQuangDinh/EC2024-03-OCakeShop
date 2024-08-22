@@ -57,10 +57,10 @@ exports.createOrder = async () => {
                 user_action: 'PAY_NOW',
                 brand_name: 'dinhquangphong.io'
             }
-        })
+        })  
     }) 
 
-    console.log(response.data);
+    // console.log(response.data);
     return response.data.links.find(link => link.rel === 'approve').href
 }
 
