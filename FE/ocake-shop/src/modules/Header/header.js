@@ -48,6 +48,10 @@ const NavBar = () => {
       }, 500);
   }, [open]);
 
+  const handleGetProfile = (event) => {
+    window.location.href = '/profile';
+  }
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -58,7 +62,8 @@ const NavBar = () => {
 
   const handleLogout = () => {
     setAnchorElUser(null);
-    router.push("/login");
+    // router.push("/login");
+    window.location.href = '/signin';
   };
 
   return (
@@ -88,7 +93,8 @@ const NavBar = () => {
             src={null}
             alt="Avatar"
             onClick={handleOpenUserMenu}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer"}}
+            href="/profile"
           />
         </Tooltip>
 
@@ -99,6 +105,9 @@ const NavBar = () => {
           onClick={handleCloseUserMenu}
           onClose={handleCloseUserMenu}
         >
+          <MenuItem onClick={handleGetProfile}>
+            Profile
+          </MenuItem>
           <MenuItem>
             <UploadFileOutlined />
             Upload

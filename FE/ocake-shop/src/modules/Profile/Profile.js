@@ -1,19 +1,45 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { TextField, Button, Container, Box, Typography, MenuItem } from '@mui/material';
 import Layout from "../layout";
 
 const Profile = () => {
-  const [formData, setFormData] = useState({
-    fullName: 'Phạm Uyên Nhi',
-    phone: '0123123144',
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-    address: 'Phường 5, quận 8, TP Hồ Chí Minh',
-    paymentMethod: 'MB Bank',
-    accountNumber: '*******789',
-  });
+  const [formData, setFormData] = useState();
+  const [error, setError] = useState();
+  useEffect(()=>{
+    const fetchProfile = async()=>{
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.log('No token found');
+      } else {
+        try{
+          const response = await fetch("http://localhost:8080/customer/myinfor", {
+              method: "GET",
+              headers: {
+                "authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+              }
+            }
+          );
+          if(!response.ok){
+            const errorData = await response.json();
+            setError(errorData.message || 'Get profile failed');
+            return;
+          }
+          const data = await response.json();
+          console.log(data);
+          setFormData(data);
+        }
+        catch (err) {
+          setError('SOS' + err.message);
+          console.log('SOS' + err.message);
+        }
+      }
+    };
+    fetchProfile();
+  }, []);
+
+
 
   const handleSave = () => {
     // Handle save changes
@@ -96,7 +122,8 @@ const Profile = () => {
                   fontSize: "100px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.fullName}
+                // defaultValue={formData.Customer.name}
+                // value={formData.Customer.name}
               />
             </Box>
           </Box>
@@ -126,7 +153,7 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.phone}
+                defaultValue={formData.Customer.phoneNumber}
               />
             </Box>
           </Box>
@@ -220,7 +247,7 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.address}
+                defaultValue={formData.Customer.address}
               />
             </Box>
           </Box>
@@ -251,7 +278,7 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.paymentMethod}
+                // defaultValue={formData.paymentMethod}
               />
             </Box>
           </Box>
@@ -268,7 +295,7 @@ const Profile = () => {
                 fontSize: "40px",
                 color: "#E5E5E5",
               }}
-              defaultValue={formData.accountNumber}
+              // defaultValue={formData.accountNumber}
             />
           </Box>
 
