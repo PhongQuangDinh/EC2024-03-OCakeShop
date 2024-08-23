@@ -1,21 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const model = require('../models');
+const {authenticateToken} = require('../routes/authenticationRoute')
 
-router.get('/myinfor/:id', async (req, res, next) => {
+router.get('/myinfor', authenticateToken, async (req, res, next) => {
     try{
+        const userID = req.user.userID;
         const user = await model.User.findOne({
-            where: {userID: req.params.id},
+            where: {userID: userID},
             include: [
                 {
                     model: model.Customer,
-                    required: false,
-                    include: [
-                        {
-                            model: model.CreditCard,
-                            required: false,
-                        }
-                    ]
+                    required: true,
+                    // include: [
+                    //     {
+                    //         model: model.CreditCard,
+                    //         required: true,
+                    //     }
+                    // ]
                 }
             ]
         });

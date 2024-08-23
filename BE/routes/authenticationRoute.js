@@ -30,7 +30,7 @@ router.post('/signup', async (req, res, next) => {
         const getUser = await model.User.findOne({
             where: { username: username }
         });
-        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userID: user.userID }, process.env.SECRET_KEY, { expiresIn: '1h' });
         res.status(200).json({user: getUser, token: token});
     }
     catch(err){
@@ -66,7 +66,7 @@ router.post('/login', async (req, res, next) => {
     }
 });
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['Authorization'];
+    const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
   
     if (token == null) return res.sendStatus(401); 
@@ -77,5 +77,6 @@ const authenticateToken = (req, res, next) => {
       req.user = user; 
       next();
     });
-  };
+};
+
 module.exports = {router, authenticateToken};
