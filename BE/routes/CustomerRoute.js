@@ -12,12 +12,12 @@ router.get('/myinfo', authenticateToken, async (req, res, next) => {
                 {
                     model: model.Customer,
                     required: true,
-                    // include: [
-                    //     {
-                    //         model: model.CreditCard,
-                    //         required: true,
-                    //     }
-                    // ]
+                    include: [
+                        {
+                            model: model.CreditCard,
+                            required: false,
+                        }
+                    ]
                 }
             ]
         });

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Typography } from '@mui/material';
+import { TextField, Button, Box, Typography, Alert } from '@mui/material';
 import Layout from "../layout";
 
 const Profile = () => {
@@ -12,7 +12,7 @@ const Profile = () => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        console.log('No token found');
+        setError('No token found. Please log in.');
         return;
       }
 
@@ -34,8 +34,7 @@ const Profile = () => {
         const data = await response.json();
         setFormData(data);
       } catch (err) {
-        setError('SOS ' + err.message);
-        console.log('SOS ' + err.message);
+        setError('An error occurred: ' + err.message);
       }
     };
 
@@ -51,10 +50,6 @@ const Profile = () => {
     // Handle cancel changes
     console.log('Changes cancelled');
   };
-
-  if (!formData) {
-    return <Typography>Loading...</Typography>; // Show a loading indicator or message
-  }
 
   return (
     <Layout>
@@ -80,6 +75,13 @@ const Profile = () => {
           </Typography>
         </Box>
       </Box>
+
+      {/* Display Error Message */}
+      {error && (
+        <Box sx={{ marginTop: "20px", marginLeft: "200px", marginRight: "200px" }}>
+          <Alert severity="error">{error}</Alert>
+        </Box>
+      )}
 
       {/* Grey Box */}
       <Box sx={{
@@ -124,7 +126,7 @@ const Profile = () => {
                   fontSize: "100px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer?.name || ''}
+                defaultValue={formData?.Customer?.name || ''}
               />
             </Box>
           </Box>
@@ -153,7 +155,7 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer?.phoneNumber || ''}
+                defaultValue={formData?.Customer?.phoneNumber || ''}
               />
             </Box>
           </Box>
@@ -245,7 +247,7 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer?.address || ''}
+                defaultValue={formData?.Customer?.address || ''}
               />
             </Box>
           </Box>
@@ -275,7 +277,7 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer?.paymentMethod || ''}
+                defaultValue={formData?.Customer?.paymentMethod || ''}
               />
             </Box>
           </Box>
@@ -292,7 +294,7 @@ const Profile = () => {
                 fontSize: "40px",
                 color: "#E5E5E5",
               }}
-              defaultValue={formData.Customer?.accountNumber || ''}
+              defaultValue={formData?.Customer?.accountNumber || ''}
             />
           </Box>
 
