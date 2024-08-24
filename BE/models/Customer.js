@@ -72,7 +72,7 @@ module.exports = (sequelize, DataTypes) => {
         address:{
             type: DataTypes.STRING,
             validate: {
-                len:[0, 50],
+                len:[0, 255],
             },
         },
         dateOfBirth:{

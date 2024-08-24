@@ -2,11 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Layout from "../layout";
-import { useRouter} from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
+import dayjs from 'dayjs';
 
 const Profile = () => {
-  const [formData, setFormData] = useState(null);  // Initialize as null
+  const [formData, setFormData] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
 
@@ -30,7 +34,7 @@ const Profile = () => {
         if (!response.ok) {
           if (response.status === 403) {
             setError('Session expired. Please log in again.');
-            localStorage.removeItem('token'); // Remove the expired token
+            localStorage.removeItem('token');
             router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
           } else {
             const contentType = response.headers.get("content-type");
@@ -46,7 +50,7 @@ const Profile = () => {
         }
 
         const data = await response.json();
-        setFormData(data);
+        setFormData(data?.Customer || '');
       } catch (err) {
         setError('SOS ' + err.message);
         console.log('SOS ' + err.message);
@@ -56,18 +60,76 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-  const handleSave = () => {
-    // Handle save changes
-    console.log('Changes saved:', formData);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No token found, please log in again.');
+        router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+        return;
+      }
+
+      const response = await fetch("http://localhost:8080/customer/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(formData), // Send the updated formData
+      });
+
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          setError(errorData.message || 'Failed to update profile.');
+        } else {
+          const errorText = await response.text();
+          setError(errorText || 'An error occurred.');
+        }
+        return;
+      }
+
+      const data = await response.json();
+      alert('Cập nhật thành công!');
+      router.push('/profile');
+    } catch (error) {
+      setError("Cập nhật thất bại: " + error.message);
+    }
   };
 
   const handleCancel = () => {
-    // Handle cancel changes
     console.log('Changes cancelled');
+    router.push('/home');
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+  
+    setFormData((prevState) => {
+      const updatedFormData = { ...prevState };
+
+      // Check if the field belongs to the CreditCard object
+      if (updatedFormData.CreditCard && name in updatedFormData.CreditCard) {
+        updatedFormData.CreditCard[name] = value;
+      } else {
+        // Update top-level Customer fields
+        updatedFormData[name] = value;
+      }
+
+      return updatedFormData;
+    });
+  };
+
+  const handleDateChange = (date) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      dateOfBirth: dayjs(date).format('YYYY-MM-DD'), // Adjust to only keep the date
+    }));
   };
 
   if (!formData) {
-    return <Typography>Loading...</Typography>; // Show a loading indicator or message
+    return <Typography>Loading...</Typography>;
   }
 
   return (
@@ -95,7 +157,6 @@ const Profile = () => {
         </Box>
       </Box>
 
-      {/* Grey Box */}
       <Box sx={{
         background: "#E5E5E5",
         alignItems: "center",
@@ -103,7 +164,6 @@ const Profile = () => {
         paddingTop: "1%", paddingBottom: "5%"
       }}>
 
-        {/* White Content One */}
         <Box sx={{
           display: "flex",
           flexDirection: "column",
@@ -114,6 +174,7 @@ const Profile = () => {
           paddingRight: "230px",
           gap: "30px",
         }}>
+
           {/* Họ tên */}
           <Box sx={{
             display: "flex",
@@ -133,13 +194,48 @@ const Profile = () => {
               width: "600px",
             }}>
               <TextField
+                name="name"
+                value={formData?.name}
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   fontSize: "100px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer?.name || ''}
               />
+            </Box>
+          </Box>
+
+          {/* Sinh nhật */}
+          <Box sx={{
+            display: "flex",
+            justifyContent: "end",
+            alignItems: "center",
+            gap: "30px",
+          }}>
+            <Typography sx={{
+              color: "#000",
+              fontSize: "20px",
+              fontWeight: "bold",
+              fontFamily: "Montserrat, sans-serif",
+            }}>
+              Ngày sinh
+            </Typography>
+            <Box sx={{
+              width: "600px",
+            }}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  value={formData?.dateOfBirth ? dayjs(formData.dateOfBirth) : null} // Convert string to dayjs object
+                  onChange={handleDateChange}
+                  format="DD/MM/YYYY"
+                  sx={{
+                    width: "100%",
+                    fontSize: "100px",
+                    color: "#E5E5E5",
+                  }}
+                />
+              </LocalizationProvider>
             </Box>
           </Box>
 
@@ -162,76 +258,16 @@ const Profile = () => {
               width: "600px",
             }}>
               <TextField
+                name="phoneNumber"
+                value={formData?.phoneNumber}
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer?.phoneNumber || ''}
               />
             </Box>
-          </Box>
-
-          {/* Đổi mật khẩu */}
-          <Box sx={{
-            display: "flex",
-            justifyContent: "end",
-            alignItems: "center",
-            gap: "30px",
-          }}>
-            <Typography sx={{
-              color: "#000",
-              fontSize: "20px",
-              fontWeight: "bold",
-              fontFamily: "Montserrat, sans-serif",
-            }}>
-              Đổi mật khẩu
-            </Typography>
-            <Box sx={{
-              display: "flex",
-              width: "600px",
-            }}>
-              <TextField
-                sx={{
-                  width: "100%",
-                  fontSize: "40px",
-                  color: "#E5E5E5",
-                }}
-                label="Mật khẩu cũ" variant="outlined"
-              />
-            </Box>
-          </Box>
-
-          {/* Mật khẩu mới */}
-          <Box sx={{
-            display: "flex",
-            justifyContent: "end",
-            alignItems: "center",
-          }}>
-            <TextField
-              sx={{
-                width: "600px",
-                fontSize: "40px",
-                color: "#E5E5E5",
-              }}
-              label="Mật khẩu mới" variant="outlined"
-            />
-          </Box>
-
-          {/* Xác nhận mật khẩu mới */}
-          <Box sx={{
-            display: "flex",
-            justifyContent: "end",
-            alignItems: "center",
-          }}>
-            <TextField
-              sx={{
-                width: "600px",
-                fontSize: "40px",
-                color: "#E5E5E5",
-              }}
-              label="Xác nhận Mật khẩu mới" variant="outlined"
-            />
           </Box>
 
           {/* Địa chỉ mặc định */}
@@ -254,12 +290,14 @@ const Profile = () => {
               width: "600px",
             }}>
               <TextField
+                name="address"
+                value={formData?.address}
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer?.address || ''}
               />
             </Box>
           </Box>
@@ -284,12 +322,14 @@ const Profile = () => {
               width: "600px",
             }}>
               <TextField
+                name="paymentMethod"
+                value={formData.CreditCard?.paymentMethod}
+                onChange={handleChange}
                 sx={{
                   width: "100%",
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer?.paymentMethod || ''}
               />
             </Box>
           </Box>
@@ -301,12 +341,14 @@ const Profile = () => {
             alignItems: "center",
           }}>
             <TextField
+              name="accountNumber"
+              value={formData.CreditCard?.accountNumber}
+              onChange={handleChange}
               sx={{
                 width: "600px",
                 fontSize: "40px",
                 color: "#E5E5E5",
               }}
-              defaultValue={formData.Customer?.accountNumber || ''}
             />
           </Box>
 

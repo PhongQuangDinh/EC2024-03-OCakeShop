@@ -13,7 +13,7 @@ const SignUp = () => {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSingUp = async () => {
+  const handleSignUp = async () => {
     try {
       const response = await fetch("http://localhost:8080/signup", {
         method: "POST",
@@ -158,7 +158,7 @@ const SignUp = () => {
                 fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
                 outline: "none",
               }}
-              onClick={handleSingUp}
+              onClick={handleSignUp}
             >
               Đăng Ký
             </Button>
