@@ -4,12 +4,14 @@ import Layout from "../layout";
 import Head from "next/head";
 import Link from 'next/link';
 import React, { useState } from 'react';
+import {useRouter} from "next/navigation";
 
 const SignUp = () => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleSingUp = async () => {
     try {
@@ -28,9 +30,10 @@ const SignUp = () => {
       }
 
       const data = await response.json();
-      alert('Response data:', data.token);
+      alert('Response data: Đăng ký thành công ', data.token);
       localStorage.setItem("token", data.token);
-      window.location.href = '/home';
+      // window.location.href = '/home';
+      router.push("/home");
 
     } catch (error) {
         setError('Invalid username or password');

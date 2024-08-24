@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
 import {
   styled,
   Box,
@@ -22,7 +23,7 @@ import {
   LogoutOutlined,
   UploadFileOutlined,
 } from "@mui/icons-material";
-
+import {useRouter} from "next/navigation";
 import logo from "./../../app/image/logo.png";
 
 const homeData = [
@@ -35,6 +36,7 @@ const NavBar = () => {
   const [open, setOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [prior, setPrior] = useState(false);
+  const router = useRouter();
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 50,
@@ -49,7 +51,8 @@ const NavBar = () => {
   }, [open]);
 
   const handleGetProfile = (event) => {
-    window.location.href = '/profile';
+    // window.location.href = '/profile';
+    router.push('/profile');
   }
 
   const handleOpenUserMenu = (event) => {
@@ -62,8 +65,8 @@ const NavBar = () => {
 
   const handleLogout = () => {
     setAnchorElUser(null);
-    // router.push("/login");
-    window.location.href = '/signin';
+    router.push("/signin");
+    // window.location.href = '/signin';
   };
 
   return (

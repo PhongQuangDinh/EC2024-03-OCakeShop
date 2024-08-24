@@ -20,17 +20,25 @@ router.post('/signup', async (req, res, next) => {
         });
 
         if (user) {
-            return res.status(401).json({ message: "User has exited" });
+            return res.status(401).json({ message: "User is already exists" });
         }
 
         const newUser = await model.User.create({
             username: username,
             password: password});
         
+        // default data
+        const newCustomer = await model.Customer.create({
+            name: "",
+            address: "Phường 1, Quận 5, Thành phố Hồ Chí Minh",
+            phoneNumber: "",
+            userID: newUser.userID
+        });
+        
         const getUser = await model.User.findOne({
             where: { username: username }
         });
-        const token = jwt.sign({ userID: user.userID }, process.env.SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userID: newUser.userID }, process.env.SECRET_KEY, { expiresIn: '1h' });
         res.status(200).json({user: getUser, token: token});
     }
     catch(err){
@@ -74,7 +82,6 @@ const authenticateToken = (req, res, next) => {
   
     jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
       if (err) return res.sendStatus(403); 
-  
       req.user = user; 
       next();
     });

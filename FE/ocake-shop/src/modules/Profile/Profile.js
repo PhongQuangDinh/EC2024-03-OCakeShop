@@ -1,18 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Typography, Alert } from '@mui/material';
+import { TextField, Button, Box, Typography } from '@mui/material';
 import Layout from "../layout";
+import { useRouter} from 'next/navigation'; // Import useRouter
 
 const Profile = () => {
   const [formData, setFormData] = useState(null);  // Initialize as null
   const [error, setError] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        setError('No token found. Please log in.');
+        console.log('No token found');
         return;
       }
 
@@ -26,15 +28,28 @@ const Profile = () => {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          setError(errorData.message || 'Get profile failed');
+          if (response.status === 403) {
+            setError('Session expired. Please log in again.');
+            localStorage.removeItem('token'); // Remove the expired token
+            router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+          } else {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              const errorData = await response.json();
+              setError(errorData.message || 'Get profile failed');
+            } else {
+              const errorText = await response.text();
+              setError(errorText || 'An error occurred');
+            }
+          }
           return;
         }
 
         const data = await response.json();
         setFormData(data);
       } catch (err) {
-        setError('An error occurred: ' + err.message);
+        setError('SOS ' + err.message);
+        console.log('SOS ' + err.message);
       }
     };
 
@@ -50,6 +65,10 @@ const Profile = () => {
     // Handle cancel changes
     console.log('Changes cancelled');
   };
+
+  if (!formData) {
+    return <Typography>Loading...</Typography>; // Show a loading indicator or message
+  }
 
   return (
     <Layout>
@@ -75,13 +94,6 @@ const Profile = () => {
           </Typography>
         </Box>
       </Box>
-
-      {/* Display Error Message */}
-      {error && (
-        <Box sx={{ marginTop: "20px", marginLeft: "200px", marginRight: "200px" }}>
-          <Alert severity="error">{error}</Alert>
-        </Box>
-      )}
 
       {/* Grey Box */}
       <Box sx={{
@@ -126,7 +138,7 @@ const Profile = () => {
                   fontSize: "100px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData?.Customer?.name || ''}
+                defaultValue={formData.Customer?.name || ''}
               />
             </Box>
           </Box>
@@ -155,7 +167,7 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData?.Customer?.phoneNumber || ''}
+                defaultValue={formData.Customer?.phoneNumber || ''}
               />
             </Box>
           </Box>
@@ -247,7 +259,7 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData?.Customer?.address || ''}
+                defaultValue={formData.Customer?.address || ''}
               />
             </Box>
           </Box>
@@ -277,7 +289,7 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData?.Customer?.paymentMethod || ''}
+                defaultValue={formData.Customer?.paymentMethod || ''}
               />
             </Box>
           </Box>
@@ -294,7 +306,7 @@ const Profile = () => {
                 fontSize: "40px",
                 color: "#E5E5E5",
               }}
-              defaultValue={formData?.Customer?.accountNumber || ''}
+              defaultValue={formData.Customer?.accountNumber || ''}
             />
           </Box>
 

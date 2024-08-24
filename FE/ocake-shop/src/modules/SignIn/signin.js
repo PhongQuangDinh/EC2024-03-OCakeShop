@@ -1,14 +1,25 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Layout from "../layout";
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter, useSearchParams } from 'next/navigation'; // Import useRouter
 
 const SignIn = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  const router = useRouter(); // Initialize useRouter
+  const searchParams = useSearchParams(); // Initialize useSearchParams
+
+  useEffect(() => {
+    const message = searchParams.get('message');
+    if (message) {
+      setError(message); // Set the error message from the query parameter
+    }
+  }, [searchParams]);
 
   const handleSignIn = async () => {
     try {
