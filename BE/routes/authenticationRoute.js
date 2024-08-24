@@ -65,6 +65,7 @@ router.post('/login', async (req, res, next) => {
         next(error);
     }
 });
+
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];

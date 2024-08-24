@@ -3,7 +3,7 @@ const router = express.Router();
 const model = require('../models');
 const {authenticateToken} = require('../routes/authenticationRoute')
 
-router.get('/myinfor', authenticateToken, async (req, res, next) => {
+router.get('/myinfo', authenticateToken, async (req, res, next) => {
     try{
         const userID = req.user.userID;
         const user = await model.User.findOne({

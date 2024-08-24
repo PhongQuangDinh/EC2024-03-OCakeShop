@@ -1,48 +1,46 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect} from 'react';
-
-import { TextField, Button, Container, Box, Typography, MenuItem } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, Box, Typography } from '@mui/material';
 import Layout from "../layout";
 
 const Profile = () => {
-  const [formData, setFormData] = useState();
-  const [error, setError] = useState();
-  useEffect(()=>{
-    const fetchProfile = async()=>{
+  const [formData, setFormData] = useState(null);  // Initialize as null
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchProfile = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
         console.log('No token found');
-      } else {
-        try{
-          const response = await fetch("http://localhost:8080/customer/myinfor", {
-              method: "GET",
-              headers: {
-                "authorization": `Bearer ${token}`,
-                "Content-Type": "application/json",
-              }
-            }
-          );
-          if(!response.ok){
-            const errorData = await response.json();
-            setError(errorData.message || 'Get profile failed');
-            return;
-          }
-          const data = await response.json();
-          console.log(data);
-          setFormData(data);
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:8080/customer/myinfo", {
+          method: "GET",
+          headers: {
+            "authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          setError(errorData.message || 'Get profile failed');
+          return;
         }
-        catch (err) {
-          setError('SOS' + err.message);
-          console.log('SOS' + err.message);
-        }
+
+        const data = await response.json();
+        setFormData(data);
+      } catch (err) {
+        setError('SOS ' + err.message);
+        console.log('SOS ' + err.message);
       }
     };
+
     fetchProfile();
   }, []);
-
-
-
 
   const handleSave = () => {
     // Handle save changes
@@ -54,14 +52,17 @@ const Profile = () => {
     console.log('Changes cancelled');
   };
 
+  if (!formData) {
+    return <Typography>Loading...</Typography>; // Show a loading indicator or message
+  }
+
   return (
     <Layout>
       <Box sx={{
         background: "#fff",
         gap: "20px",
         marginTop: "100px",
-      }}
-      >
+      }}>
         <Box sx={{
           display: "flex",
           alignItems: "center",
@@ -74,8 +75,7 @@ const Profile = () => {
             fontSize: "40px",
             fontWeight: "bold",
             fontFamily: "Montserrat, sans-serif",
-          }}
-          >
+          }}>
             OcakeShop | Hồ sơ khách hàng
           </Typography>
         </Box>
@@ -100,7 +100,7 @@ const Profile = () => {
           paddingRight: "230px",
           gap: "30px",
         }}>
-          {/*Họ tên*/}
+          {/* Họ tên */}
           <Box sx={{
             display: "flex",
             justifyContent: "end",
@@ -115,7 +115,6 @@ const Profile = () => {
             }}>
               Họ tên
             </Typography>
-
             <Box sx={{
               width: "600px",
             }}>
@@ -125,13 +124,12 @@ const Profile = () => {
                   fontSize: "100px",
                   color: "#E5E5E5",
                 }}
-                // defaultValue={formData.Customer.name}
-                // value={formData.Customer.name}
+                defaultValue={formData.Customer?.name || ''}
               />
             </Box>
           </Box>
 
-          {/*Số điện thoại*/}
+          {/* Số điện thoại */}
           <Box sx={{
             display: "flex",
             justifyContent: "end",
@@ -146,7 +144,6 @@ const Profile = () => {
             }}>
               Số điện thoại
             </Typography>
-
             <Box sx={{
               width: "600px",
             }}>
@@ -156,12 +153,12 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer.phoneNumber}
+                defaultValue={formData.Customer?.phoneNumber || ''}
               />
             </Box>
           </Box>
 
-          {/* Reset Password */}
+          {/* Đổi mật khẩu */}
           <Box sx={{
             display: "flex",
             justifyContent: "end",
@@ -176,7 +173,6 @@ const Profile = () => {
             }}>
               Đổi mật khẩu
             </Typography>
-
             <Box sx={{
               display: "flex",
               width: "600px",
@@ -192,7 +188,7 @@ const Profile = () => {
             </Box>
           </Box>
 
-          {/* New password */}
+          {/* Mật khẩu mới */}
           <Box sx={{
             display: "flex",
             justifyContent: "end",
@@ -208,7 +204,7 @@ const Profile = () => {
             />
           </Box>
 
-          {/* New password Confirm */}
+          {/* Xác nhận mật khẩu mới */}
           <Box sx={{
             display: "flex",
             justifyContent: "end",
@@ -224,7 +220,7 @@ const Profile = () => {
             />
           </Box>
 
-          {/* Address */}
+          {/* Địa chỉ mặc định */}
           <Box sx={{
             display: "flex",
             justifyContent: "end",
@@ -239,7 +235,6 @@ const Profile = () => {
             }}>
               Địa chỉ mặc định
             </Typography>
-
             <Box sx={{
               display: "flex",
               width: "600px",
@@ -250,12 +245,12 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                defaultValue={formData.Customer.address}
+                defaultValue={formData.Customer?.address || ''}
               />
             </Box>
           </Box>
 
-          {/* Payment method */}
+          {/* Phương thức thanh toán */}
           <Box sx={{
             display: "flex",
             justifyContent: "end",
@@ -270,7 +265,6 @@ const Profile = () => {
             }}>
               Phương thức thanh toán
             </Typography>
-
             <Box sx={{
               display: "flex",
               width: "600px",
@@ -281,12 +275,12 @@ const Profile = () => {
                   fontSize: "40px",
                   color: "#E5E5E5",
                 }}
-                // defaultValue={formData.paymentMethod}
+                defaultValue={formData.Customer?.paymentMethod || ''}
               />
             </Box>
           </Box>
 
-          {/* Bank account */}
+          {/* Tài khoản ngân hàng */}
           <Box sx={{
             display: "flex",
             justifyContent: "end",
@@ -298,7 +292,7 @@ const Profile = () => {
                 fontSize: "40px",
                 color: "#E5E5E5",
               }}
-              // defaultValue={formData.accountNumber}
+              defaultValue={formData.Customer?.accountNumber || ''}
             />
           </Box>
 
@@ -322,7 +316,7 @@ const Profile = () => {
           </Box>
         </Box>
       </Box>
-    </Layout >
+    </Layout>
   );
 };
 
