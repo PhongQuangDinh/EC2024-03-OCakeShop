@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const model = require('../models');
+
 const { Transaction, Op, fn, col } = require("sequelize");
 
 router.get("/", async (req, res, next) => {
@@ -11,6 +12,7 @@ router.get("/", async (req, res, next) => {
     next(err);
   }
 });
+
 
 // lấy tổng tiền thu được group by theo giá, still not working
 router.get("/profit-n-price", async (req, res, next) => {
@@ -59,6 +61,7 @@ router.get("/profit-n-price", async (req, res, next) => {
   }
 });
 
+
 // router.get("/user-payment-history/:id", async (req, res, next) => {
 //   try {
 //     const paymentHistory = await model.Payment.findAll();
@@ -79,6 +82,7 @@ router.post('/pay', (req, res) => { // put inside form action for submit button
     res.status(200).json({"check this link": result});
   })
 });
+
 
 router.get('/CONTINUE-ORDER', (req, res) => {
   res.send('Bạn đã mất 100$ :33');

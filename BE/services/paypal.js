@@ -14,7 +14,7 @@ async function generateAccessToken(){
     return response.data.access_token
 }
 
-exports.createOrder = async () => {
+async function createOrder() {
     const accessToken = await generateAccessToken();
     const response = await axios ({
         url: process.env.PAYPAL_BASE_URL + '/v2/checkout/orders',
@@ -64,5 +64,8 @@ exports.createOrder = async () => {
     return response.data.links.find(link => link.rel === 'approve').href
 }
 
+// this.createOrder().then(result => console.log(result)); // just for testing, this is the demo for a button
 
-this.createOrder().then(result => console.log(result)); // just for testing, this is the demo for a button
+module.exports = {
+    createOrder : createOrder
+}

@@ -1,5 +1,7 @@
 "use client"
+
 import React, { useState, useEffect} from 'react';
+
 import { TextField, Button, Container, Box, Typography, MenuItem } from '@mui/material';
 import Layout from "../layout";
 
@@ -38,6 +40,7 @@ const Profile = () => {
     };
     fetchProfile();
   }, []);
+
 
 
 
