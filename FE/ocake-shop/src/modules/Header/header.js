@@ -51,7 +51,6 @@ const NavBar = () => {
   }, [open]);
 
   const handleGetProfile = (event) => {
-    // window.location.href = '/profile';
     router.push('/profile');
   }
 
@@ -66,7 +65,6 @@ const NavBar = () => {
   const handleLogout = () => {
     setAnchorElUser(null);
     router.push("/signin");
-    // window.location.href = '/signin';
   };
 
   return (

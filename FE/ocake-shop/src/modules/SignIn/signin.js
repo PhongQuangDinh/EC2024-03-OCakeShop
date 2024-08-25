@@ -13,6 +13,7 @@ const SignIn = () => {
 
   const router = useRouter(); // Initialize useRouter
   const searchParams = useSearchParams(); // Initialize useSearchParams
+  const apiUrl = process.env.NEXT_PUBLIC_BE_BASE_URL;
 
   useEffect(() => {
     const message = searchParams.get('message');
@@ -23,7 +24,7 @@ const SignIn = () => {
 
   const handleSignIn = async () => {
     try {
-      const response = await fetch("http://localhost:8080/login", {
+      const response = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,10 +41,14 @@ const SignIn = () => {
       const data = await response.json();
       // alert('Token:', data.token);
       localStorage.setItem('token', data.token);
-      window.location.href = '/home';
+      router.push('/home');
 
     } catch (err) {
-      setError('Invalid 111 or password' + err.message);
+      if (err.message.includes("Failed to fetch")) {
+        setError("The service is unavailable, please wait.");
+      } else {
+        setError('Invalid username or password: ' + err.message);
+      }
     }
   };
   return (

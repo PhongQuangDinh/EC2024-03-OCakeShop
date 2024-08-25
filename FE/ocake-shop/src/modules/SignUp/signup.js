@@ -12,10 +12,11 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const apiUrl = process.env.NEXT_PUBLIC_BE_BASE_URL;
 
   const handleSignUp = async () => {
     try {
-      const response = await fetch("http://localhost:8080/signup", {
+      const response = await fetch(`${apiUrl}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

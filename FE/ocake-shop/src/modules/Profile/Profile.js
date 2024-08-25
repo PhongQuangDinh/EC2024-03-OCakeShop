@@ -13,6 +13,7 @@ const Profile = () => {
   const [formData, setFormData] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const apiUrl = process.env.NEXT_PUBLIC_BE_BASE_URL;
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -23,7 +24,7 @@ const Profile = () => {
       }
 
       try {
-        const response = await fetch("http://localhost:8080/customer/myinfo", {
+        const response = await fetch(`${apiUrl}/customer/myinfo`, {
           method: "GET",
           headers: {
             "authorization": `Bearer ${token}`,
@@ -69,7 +70,7 @@ const Profile = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:8080/customer/update", {
+      const response = await fetch(`${apiUrl}/customer/update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
