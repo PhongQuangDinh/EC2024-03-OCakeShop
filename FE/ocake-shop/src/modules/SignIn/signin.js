@@ -1,18 +1,20 @@
 "use client";
+
 import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Layout from "../layout";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter, useSearchParams } from 'next/navigation'; // Import useRouter
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getApiUrl } from '../../../WebConfig';
+import dynamic from 'next/dynamic';
 
 const SignIn = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
   const searchParams = useSearchParams(); // Initialize useSearchParams
   const apiUrl = getApiUrl();
 
@@ -32,7 +34,7 @@ const SignIn = () => {
         },
         body: JSON.stringify({ username, password }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.message || 'Login failed');
@@ -40,7 +42,6 @@ const SignIn = () => {
       }
 
       const data = await response.json();
-      // alert('Token:', data.token);
       localStorage.setItem('token', data.token);
       router.push('/home');
 
@@ -52,13 +53,14 @@ const SignIn = () => {
       }
     }
   };
+
   return (
     <div>
       <Head>
         <title>Đăng Nhập - OCake Shop</title>
         <link rel="icon" href="/icon.png" />
         <link href="https://cdn.jsdelivr.net/npm/fontsource-montserrat@latest" rel="stylesheet" />
-      </Head> 
+      </Head>
       <Layout>
         <Box
           sx={{
@@ -88,22 +90,22 @@ const SignIn = () => {
               label="Số điện thoại"
               variant="outlined"
               value={username}
-              onChange={(e) => setUsername(e.target.value)} // Cập nhật giá trị của username
-              sx={{ 
-                marginBottom: 2, 
+              onChange={(e) => setUsername(e.target.value)}
+              sx={{
+                marginBottom: 2,
                 width: "100%",
-                "& .MuiOutlinedInput-root": { 
+                "& .MuiOutlinedInput-root": {
                   "& fieldset": {
-                    borderColor: "#e82652", 
+                    borderColor: "#e82652",
                   },
-                  "&:hover fieldset": { 
-                    borderColor: "#FFC0CB", 
+                  "&:hover fieldset": {
+                    borderColor: "#FFC0CB",
                   },
-                  "& input": { 
+                  "& input": {
                     color: "#000000",
                     fontFamily: "Montserrat, Monospace",
                   },
-                  "&:hover input": { 
+                  "&:hover input": {
                     color: "#000000",
                   },
                   "&.Mui-focused fieldset": {
@@ -124,22 +126,22 @@ const SignIn = () => {
               type="password"
               variant="outlined"
               value={password}
-              onChange={(e) => setPassword(e.target.value)} // Cập nhật giá trị của password
-              sx={{ 
-                marginBottom: 2, 
+              onChange={(e) => setPassword(e.target.value)}
+              sx={{
+                marginBottom: 2,
                 width: "100%",
-                "& .MuiOutlinedInput-root": { 
+                "& .MuiOutlinedInput-root": {
                   "& fieldset": {
-                    borderColor: "#e82652", 
+                    borderColor: "#e82652",
                   },
-                  "&:hover fieldset": { 
-                    borderColor: "#FFC0CB", 
+                  "&:hover fieldset": {
+                    borderColor: "#FFC0CB",
                   },
-                  "& input": { 
+                  "& input": {
                     color: "#000000",
                     fontFamily: "Montserrat, sans-serif",
                   },
-                  "&:hover input": { 
+                  "&:hover input": {
                     color: "#000000",
                   },
                   "&.Mui-focused fieldset": {
@@ -155,22 +157,22 @@ const SignIn = () => {
                 },
               }}
             />
-            <Button 
-              variant="contained" 
-              sx={{ 
-                width: "100%", 
-                marginBottom: 2, 
-                backgroundColor: "#FFDFE7", 
-                color: "#000000", 
-                border: "1px solid #e82652", 
-                "&:hover": { 
-                  backgroundColor: "#FFC0CB", 
-                  color: "#000000" 
+            <Button
+              variant="contained"
+              sx={{
+                width: "100%",
+                marginBottom: 2,
+                backgroundColor: "#FFDFE7",
+                color: "#000000",
+                border: "1px solid #e82652",
+                "&:hover": {
+                  backgroundColor: "#FFC0CB",
+                  color: "#000000"
                 },
                 fontFamily: "Montserrat, sans-serif",
                 outline: "none",
               }}
-              onClick={handleSignIn} // Xử lý sự kiện khi nhấn nút
+              onClick={handleSignIn}
             >
               Đăng Nhập
             </Button>
@@ -194,4 +196,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default dynamic(() => Promise.resolve(SignIn), { ssr: false });
