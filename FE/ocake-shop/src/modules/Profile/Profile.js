@@ -8,12 +8,13 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Layout from "../layout";
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
+import { getApiUrl } from '../../../WebConfig';
 
 const Profile = () => {
   const [formData, setFormData] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
-  const apiUrl = process.env.NEXT_PUBLIC_BE_BASE_URL;
+  const apiUrl = getApiUrl();
 
   useEffect(() => {
     const fetchProfile = async () => {

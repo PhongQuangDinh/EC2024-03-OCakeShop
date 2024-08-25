@@ -5,6 +5,7 @@ import Head from "next/head";
 import Link from 'next/link';
 import React, { useState } from 'react';
 import {useRouter} from "next/navigation";
+import { getApiUrl } from '../../../WebConfig';
 
 const SignUp = () => {
 
@@ -12,7 +13,7 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
-  const apiUrl = process.env.NEXT_PUBLIC_BE_BASE_URL;
+  const apiUrl = getApiUrl();
 
   const handleSignUp = async () => {
     try {

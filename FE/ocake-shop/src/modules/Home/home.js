@@ -14,6 +14,7 @@ import "react-multi-carousel/lib/styles.css";
 import CakeCard from "./components/cakeCard";
 import Image from "next/image";
 import arrow from "../../assets/arrow.png";
+import { getApiUrl } from '../../../WebConfig';
 
 const HomePage = () => {
 
@@ -22,6 +23,7 @@ const HomePage = () => {
   const [allCake, setAllCake] = useState('');
   const [error, setError] = useState('');
   const [value, setValue] = useState(0);
+  const apiUrl = getApiUrl();
 
   useEffect(() => {
     GetCategory();
@@ -40,7 +42,7 @@ const HomePage = () => {
         const getCakesByCategory = async () => {
           try {
             const selectedCategory = category[value];
-            const response = await fetch(`http://localhost:8080/cake/purpose/${selectedCategory.purposeID}`, {
+            const response = await fetch(`${apiUrl}/cake/purpose/${selectedCategory.purposeID}`, {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
@@ -66,7 +68,7 @@ const HomePage = () => {
 
   const GetCategory = async () => {
     try {
-      const response = await fetch("http://localhost:8080/cake/purpose", {
+      const response = await fetch(`${apiUrl}/cake/purpose`, {
         method: "GET", 
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +91,7 @@ const HomePage = () => {
 
   const GetInforCake = async () => {
     try {
-      const response = await fetch("http://localhost:8080/cake/", {
+      const response = await fetch(`${apiUrl}/cake/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

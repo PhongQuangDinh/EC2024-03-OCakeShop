@@ -5,6 +5,7 @@ import Layout from "../layout";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter, useSearchParams } from 'next/navigation'; // Import useRouter
+import { getApiUrl } from '../../../WebConfig';
 
 const SignIn = () => {
   const [username, setUsername] = useState('');
@@ -13,7 +14,7 @@ const SignIn = () => {
 
   const router = useRouter(); // Initialize useRouter
   const searchParams = useSearchParams(); // Initialize useSearchParams
-  const apiUrl = process.env.NEXT_PUBLIC_BE_BASE_URL;
+  const apiUrl = getApiUrl();
 
   useEffect(() => {
     const message = searchParams.get('message');
