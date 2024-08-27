@@ -1,21 +1,15 @@
-"use client"
-import { Box, Typography, Grid, Button } from "@mui/material";
+"use client";
+import { Box, Typography, Grid, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import Layout from "../layout";
 import React, { useState } from "react";
 
 const Handling = () => {
 
   const [inforDelivery, setInforDelivery] = useState([
-    {id: 1, idOrder: "001", name: "Phạm Uyễn Nhi", phoneNumber: "0123231211", time: "12/6/2024"},
-    {id: 2, idOrder: "002", name: "Phạm Trần Thị Uyễn Nhi", phoneNumber: "0123231211", time: "12/6/2024"},
-    {id: 3, idOrder: "003", name: "Phạm Uyễn Nhi", phoneNumber: "0123231211", time: "12/6/2024"},
+    {id: 1, idOrder: "001", name: "Đinh Quang Phong", phoneNumber: "0123231211", time: "12/6/2024"},
+    {id: 2, idOrder: "002", name: "Trần Đỗ Anh Khoa", phoneNumber: "0123231211", time: "12/6/2024"},
+    {id: 3, idOrder: "003", name: "Trần Trung Hiếu", phoneNumber: "0123231211", time: "12/6/2024"},
   ]);
-
-  const columnStyles = {
-    textAlign: "center",
-    flexGrow: 1,
-    flexBasis: 0,
-  };
 
   return (
     <Layout>
@@ -87,76 +81,33 @@ const Handling = () => {
               }}>Đã hoàn thành</Typography>
             </Box>
           </Box>
-          <Box>
-            <Box sx={{
-              justifyContent: "center",
+          <Box sx={{
               display: "flex",
+              justifyContent: "center",
+              marginTop: "20px",
             }}>
-              <Box sx={{ marginTop: "20px",
-                width: "91%",
-               }}>
-                <Grid sx={{
-                  backgroundColor: "#fff",
-                  padding: "0 10px",
-                }} container spacing={2}>
-                  <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
-                    <Typography>
-                      Đơn hàng
-                    </Typography>
-                  </Grid>
-                  <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
-                    <Typography>
-                      Tên khách hàng
-                    </Typography>
-                  </Grid>
-                  <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
-                    <Typography>
-                      Số điện thoại
-                    </Typography>
-                  </Grid>
-                  <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
-                    <Typography>
-                      Thời gian nhận hàng
-                    </Typography>
-                  </Grid>
-                  <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
-                    <Typography>
-                      Xác nhận giao hàng
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Box>
+            <TableContainer component={Paper} sx={{ width: '91%', backgroundColor: "#fff" }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">Đơn hàng</TableCell>
+                    <TableCell align="center">Tên khách hàng</TableCell>
+                    <TableCell align="center">Số điện thoại</TableCell>
+                    <TableCell align="center">Thời gian nhận hàng</TableCell>
+                    <TableCell align="center">Xác nhận giao hàng</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
                   {inforDelivery.map((item) => (
-                    <Grid sx={{
-                      marginTop: "20px",
-                      backgroundColor: "#fff",
-                      padding: "10px 0", 
-                    }} container spacing={2} key={item.id} alignItems="center">
-                      <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
-                        <Typography>
-                          {item.idOrder}
-                        </Typography>
-                      </Grid>
-                      <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
-                        <Typography>
-                          {item.name}
-                        </Typography>
-                      </Grid>
-                      <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
-                        <Typography>
-                          {item.phoneNumber}
-                        </Typography>
-                      </Grid>
-                      <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
-                        <Typography>
-                          {item.time}
-                        </Typography>
-                      </Grid>
-                      <Grid item sx={{ flexGrow: 1, textAlign: "center" }}>
+                    <TableRow key={item.id}>
+                      <TableCell align="center">{item.idOrder}</TableCell>
+                      <TableCell align="center">{item.name}</TableCell>
+                      <TableCell align="center">{item.phoneNumber}</TableCell>
+                      <TableCell align="center">{item.time}</TableCell>
+                      <TableCell align="center">
                         <Button
                           variant="contained"
                           sx={{
-                            marginBottom: 2,
                             backgroundColor: "#FFDFE7",
                             color: "#000000",
                             border: "1px solid #e82652",
@@ -170,20 +121,14 @@ const Handling = () => {
                         >
                           Xác nhận
                         </Button>
-                      </Grid>
-                    </Grid>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </Box>
-              </Box>
-            </Box>  
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         </Box>
-      </Box>
-      <Box sx={{
-        paddingTop: "50px",
-        background: "#E5E5E5",
-      }}>
-
       </Box>
     </Layout>
   );

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Box, Typography, TextField, FormControl, InputLabel, Select, MenuItem, Button } from "@mui/material";
 import Layout from "../layout";
 import Image from "next/image";
@@ -10,6 +10,7 @@ const SelectCake = () => {
   const [selectedSize, setSelectedSize] = useState([]);
   const [selectedFilling, setSelectedFilling] = useState([]);
   const [selectedFloors, setSelectedFloors] = useState([]);
+  const [note, setNote] = useState("");
 
   const handleChangeSize = (event) => {
     setSelectedSize(event.target.value);
@@ -21,6 +22,10 @@ const SelectCake = () => {
 
   const handleChangeFilling = (event) => {
     setSelectedFilling(event.target.value);
+  }
+
+  const handleNoteChange = (event) => {
+    setNote(event.target.value);
   }
 
   const priceCake = 130000;
@@ -82,7 +87,7 @@ const SelectCake = () => {
           paddingBottom: "40px",
           marginBottom: "50px"
         }}>
-          <Box sx={{}}>
+          <Box>
             <Box sx={{
               display: "flex",
               gap: "115px",
@@ -95,25 +100,19 @@ const SelectCake = () => {
               }}>
                 Tên bánh
               </Typography>
-              <Typography sx={{
-                color: "#000",
-                fontSize:"30px",
-                fontFamily: "Montserrat, sans-serif",
-              }}>
-                <TextField
+              <Typography
                 sx={{
-                    width: "20vw",
-                    fontSize: "40px",
+                  width: "20vw",
+                  fontSize: "30px",
                 }}
-                  hiddenLabel
-                  defaultValue="Bánh kem cho bé trai"
-                />
+              >
+                Bánh kem cho bé trai
               </Typography>
             </Box>
             <Box sx={{
               display: "flex",
               alignContent: "center",
-              paddingTop: "20px",
+              paddingTop: "40px",
               gap: "90px"
               
             }}>
@@ -137,10 +136,10 @@ const SelectCake = () => {
                     id:"select-tang",
 
                   }}>
-                    Số tầng</InputLabel>
+                    Tầng</InputLabel>
                   <Select
                   sx={{
-                    fontSize: "20px",
+                    fontSize: "16px",
                   }}
                     labelId="select-floor"
                     id="select-floor"
@@ -151,40 +150,6 @@ const SelectCake = () => {
                     <MenuItem value={1}>Một tầng</MenuItem>
                     <MenuItem value={2}>Hai tầng</MenuItem>
                     <MenuItem value={3}>Ba tầng</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
-              <Box sx={{
-                display: "flex",
-                gap: "50px"
-              }}>
-                <Typography sx={{
-                  color: "#000",
-                  fontSize:"30px",
-                  fontWeight:"bold",
-                  fontFamily: "Montserrat, sans-serif",
-                }}>
-                  Size bánh kem
-                </Typography>
-                <FormControl sx={{
-                  width: "20vw",
-                }}>
-                  <InputLabel sx={{
-                    fontSize:"20px",
-                  }} 
-                  id="select-size">Size bánh</InputLabel>
-                  <Select 
-                    labelId="select-size"
-                    id="size"
-                    value={selectedSize}
-                    label="size"
-                    onChange={handleChangeSize}
-                  >
-                    <MenuItem value={16}>16 cm</MenuItem>
-                    <MenuItem value={18}>18 cm</MenuItem>
-                    <MenuItem value={20}>20 cm</MenuItem>
-                    <MenuItem value={22}>22 cm</MenuItem>
-                    <MenuItem value={24}>24 cm</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
@@ -209,7 +174,7 @@ const SelectCake = () => {
                 <InputLabel sx={{
                     fontSize:"20px",
                   }} 
-                   id="select-filling">Nhân bánh kem</InputLabel>
+                   id="select-filling">Nhân</InputLabel>
                 <Select
                   labelId="select-filling"
                   id="select-filling"
@@ -226,7 +191,68 @@ const SelectCake = () => {
                 </Select>
               </FormControl>
             </Box>
-            
+            <Box sx={{
+              display: "flex",
+              paddingTop: "20px",
+              gap: "40px",
+            }}>
+              <Typography sx={{
+                color: "#000",
+                fontSize:"30px",
+                fontWeight:"bold",
+                fontFamily: "Montserrat, sans-serif",
+              }}>
+                Size bánh kem
+              </Typography>
+              <FormControl sx={{
+                width: "20vw",
+              }}>
+                <InputLabel sx={{
+                    fontSize:"20px",
+                  }} 
+                   id="select-size">Size  </InputLabel>
+                <Select
+                  labelId="select-size"
+                  id="select-size"
+                  label="size"
+                  value={selectedSize}
+                  onChange={handleChangeSize}
+                >
+                 <MenuItem value={16}>16 cm</MenuItem>
+                  <MenuItem value={18}>18 cm</MenuItem>
+                  <MenuItem value={20}>20 cm</MenuItem>
+                  <MenuItem value={22}>22 cm</MenuItem>
+                  <MenuItem value={24}>24 cm</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box sx={{
+              display: "flex",
+              paddingTop: "20px",
+              gap: "140px",
+              marginLeft: "auto",
+            }}>
+              <Typography sx={{
+                color: "#000",
+                fontSize:"30px",
+                fontWeight:"bold",
+                fontFamily: "Montserrat, sans-serif",
+              }}>
+                Ghi chú
+              </Typography>
+              <TextField
+                sx={{
+                  width: "20vw",
+                  fontSize: "30px",
+                }}
+                id="note"
+                label="Ghi chú"
+                value={note}
+                onChange={handleNoteChange}
+              />
+            </Box>
+
           </Box>
           <Box sx={{
               marginTop: "30px",
