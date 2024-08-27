@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import {
   Box,
   Typography,
@@ -10,24 +10,17 @@ import {
   TableCell,
   TableBody,
   Button,
-  Grid,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from "@mui/material";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 import Layout from "../layout";
-import Image from "next/image";
-import logo from "./../../app/image/logo.png";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import React, { useState } from "react";
-import { useRouter } from "next/router";
 
 const Payment = () => {
-  // const router = useRouter();
-  // const inforCustomer = ["Phạm Uyển Nhi", "0123456789", "191 Nguyễn Trãi phường 1 quận 5 TP.HCM"];
-
   const [inforCustomer, setInforCustomer] = useState([
     "Phạm Uyễn Nhi",
     "0123456789",
@@ -118,16 +111,17 @@ const Payment = () => {
     },
   ]);
 
-
   const costDelivery = 35000;
-
-  const time = "22/12/2024";
 
   const calculateTotal = () => {
     return inforCake.reduce((acc, row) => {
       return acc + row.price * row.quantity + costDelivery;
     }, 0);
   };
+
+  const [selectedDate, setSelectedDate] = useState(null);
+  const today = dayjs();
+  const minDate = today.add(2, 'day');
 
   const handleChange = () => {
     alert("Hello");
@@ -141,7 +135,6 @@ const Payment = () => {
           sx={{
             background: "#fff",
             gap: "20px",
-            // fontSize: "20px",
             marginTop: "100px",
           }}
         >
@@ -149,11 +142,9 @@ const Payment = () => {
             sx={{
               display: "flex",
               alignItems: "center",
-              // padding: "90px",
               marginLeft: "200px",
             }}
           >
-            {/* <Image priority src={logo} alt="logo" width={100} /> */}
             <Typography
               sx={{
                 display: "flex",
@@ -204,12 +195,8 @@ const Payment = () => {
             </Box>
             <Box
               sx={{
-                // padding: "20px",
-                // marginLeft: "90px",
-                // marginRight: "90px",
                 justifyContent: "space-between",
                 display: "flex",
-                // gap: "362px",
               }}
             >
               <Box sx={{
@@ -224,8 +211,6 @@ const Payment = () => {
                     key={index}
                     sx={{
                       alignContent: "center",
-                      // fontSize: "20px",
-                      gap: "auto",
                       fontFamily: "Montserrat, sans-serif",
                     }}
                   >
@@ -233,22 +218,16 @@ const Payment = () => {
                   </Typography>
                 ))}
               </Box>
-              <Box sx={{
-                marginRight: "4%"
-              }}>
-                <Button onClick={handleChange} sx={{ 
-                  // fontSize: "20px"
-                   }}>
+              <Box sx={{ marginRight: "4%" }}>
+                <Button onClick={handleChange} sx={{}}>
                   Thay đổi
                 </Button>
               </Box>
-              
             </Box>
           </Box>
           <Box
             sx={{
               marginTop: "20px",
-              // marginBottom: "20px",
               background: "#fff",
               width: "90%",
             }}
@@ -256,10 +235,6 @@ const Payment = () => {
             <TableContainer
               component={Paper}
               sx={{
-                // marginTop: "20px",
-                // background: "#fff",
-                // height: "50vh",
-                // width: "90vw",
                 borderBottom: "none",
                 boxShadow: "none",
                 "& .MuiTable-root": {
@@ -269,17 +244,11 @@ const Payment = () => {
             >
               <Table
                 sx={{
-                  // marginLeft: "40px",
                   marginTop: "20px",
-                  // marginRight: "40px",
-                  // borderBottom: 'none',
-                  // '& .MuiTableCell-root': {
-                  //   borderBottom: 'none',
-                  // }
                 }}
               >
                 <TableHead>
-                  <TableRow sx={{}}>
+                  <TableRow>
                     <TableCell
                       sx={{
                         fontSize: "30px",
@@ -312,13 +281,13 @@ const Payment = () => {
                         {cake.name} | {cake.floor} | {cake.size} |{" "}
                         {cake.filling}
                       </TableCell>
-                      <TableCell sx={{ }} align="center">
+                      <TableCell align="center">
                         {cake.quantity}
                       </TableCell>
-                      <TableCell sx={{}} align="center">
+                      <TableCell align="center">
                         {cake.price}
                       </TableCell>
-                      <TableCell sx={{}} align="center">
+                      <TableCell align="center">
                         {cake.price * cake.quantity}
                       </TableCell>
                     </TableRow>
@@ -326,19 +295,6 @@ const Payment = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-
-            {/* <Box sx={{ 
-              background: "#fff",
-              // padding: "20px", 
-              width: "90%", 
-              margin: "0 auto",
-            }}>
-              <div style={{ 
-                height: '1px', 
-                borderBottom: '2px dashed rgba(0, 0, 0, 0.3)', 
-                margin: '20px 0' 
-              }} />
-            </Box> */}
 
             <Box
               sx={{
@@ -351,7 +307,6 @@ const Payment = () => {
               <Box>
                 <Typography
                   sx={{
-                    // fontSize: "20px",
                     fontWeight: "bold",
                   }}
                   align="left"
@@ -359,18 +314,16 @@ const Payment = () => {
                   Phí vận chuyển
                 </Typography>
               </Box>
-              <Box sx={{marginRight: "5.5%"}}>
-                <Typography sx={{}} align="right">
+              <Box sx={{ marginRight: "5.5%" }}>
+                <Typography align="right">
                   {costDelivery}
                 </Typography>
               </Box>
-             
             </Box>
 
             <Box
               sx={{
                 background: "#fff",
-                // padding: "20px",
                 width: "100%",
                 margin: "0 auto",
               }}
@@ -392,24 +345,29 @@ const Payment = () => {
                 marginBottom: "20px",
               }}
             >
-              <Box>
-                <Typography
-                  sx={{
-                    // fontSize: "20px",
-                    fontWeight: "bold",
-                  }}
-                  align="left"
-                >
-                  Thời gian nhận hàng
-                </Typography>
-              </Box>
-              <Box sx={{
-                marginRight: "4%"
-              }}>
-                <Typography sx={{ 
-                  // fontSize: "20px" 
-                }}>{time}</Typography>
-              </Box>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                      flex: 1,
+                      textAlign: "left"
+                    }}
+                  >
+                    Thời gian nhận hàng
+                  </Typography>
+                  <Box sx={{ marginRight: "50px" }}>
+                    <DatePicker
+                      value={selectedDate}
+                      onChange={(newValue) => setSelectedDate(newValue)}
+                      minDate={minDate} // Đặt ngày tối thiểu
+                      renderInput={(params) => <TextField {...params} />}
+                      disablePast // Vô hiệu hóa các ngày trong quá khứ
+                      format="DD/MM/YYYY"
+                    />
+                  </Box>
+                </Box>
+              </LocalizationProvider>
             </Box>
           </Box>
           <Box
