@@ -1,22 +1,71 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import Layout from '../layout';
+import { getApiUrl } from '../../../WebConfig';
 
 const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [rows, setRows] = useState([
-    { id: 1, name: 'Bánh kem sinh nhật hồng cho bé gái | 2 tầng | 24cm, 20cm | Chocolate', price: 120000, quantity: 1, stockLimit: 10 },
-    { id: 2, name: 'Nón sinh nhật', price: 30000, quantity: 2, stockLimit: 5 },
-    { id: 3, name: 'Nến thơm', price: 120000, quantity: 1, stockLimit: 20 },
-  ]);
+  // const [rows, setRows] = useState([
+  //   { id: 1, name: 'Bánh kem sinh nhật hồng cho bé gái | 2 tầng | 24cm, 20cm | Chocolate', price: 120000, quantity: 1, stockLimit: 10 },
+  //   { id: 2, name: 'Nón sinh nhật', price: 30000, quantity: 2, stockLimit: 5 },
+  //   { id: 3, name: 'Nến thơm', price: 120000, quantity: 1, stockLimit: 20 },
+  // ]);
+  const [rows, setRows] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const apiUrl = getApiUrl();
+  const [error, setError] = useState('');
+  const [value, setValue] = useState();
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  const fetchCart = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No token found, please log in again.');
+        router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+        return;
+      }
+      const response = await fetch(`${apiUrl}/cart/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          setError(errorData.message || 'Failed to get cart.');
+        } else {
+          const errorText = await response.text();
+          setError(errorText || 'An error occurred.');
+        }
+        return;
+      }
+      const data = await response.json();
+      console.log(data);
+      setRows(data);
+
+
+    }
+    catch(err){
+      console.error(err);
+      console.log(err);
+      setError('Có lỗi khi lấy giỏ hàng');
+    }
+  }
 
   const calculateTotal = () => {
     return rows.reduce((acc, row) => {
-      if (selectedItems.includes(row.id)) {
-        return acc + row.price * row.quantity;
+      if (selectedItems.includes(row.cartID)) {
+        return acc + (row.Cake.cakeSize.priceSize + row.Cake.cakeFilling.priceCakeFilling) * row.quantity;
       }
       return acc;
       }, 0);
@@ -24,7 +73,7 @@ const CartPage = () => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedItems(rows.map(row => row.id));
+      setSelectedItems(rows.map(row => row.cartID));
     } else {
       setSelectedItems([]);
     }
@@ -40,7 +89,8 @@ const CartPage = () => {
 
   const increaseQuantity = (id) => {
     setRows(rows.map(row => {
-      if (row.id === id && row.quantity < row.stockLimit) {
+      // if (row.cartID === id && row.quantity < row.stockLimit) {
+      if (row.cartID === id) {
         return { ...row, quantity: row.quantity + 1 };
       }
       return row;
@@ -49,9 +99,9 @@ const CartPage = () => {
 
   const decreaseQuantity = (id) => {
     setRows(rows.map(row => {
-      if (row.id === id) {
+      if (row.cartID === id) {
         if (row.quantity === 1) {
-          setItemToDelete(row.id);
+          setItemToDelete(row.cartID);
           setOpenDialog(true);
         } else {
           return { ...row, quantity: row.quantity - 1 };
@@ -62,11 +112,50 @@ const CartPage = () => {
   };
 
   const handleDeleteItem = () => {
-    setRows(rows.filter(row => row.id !== itemToDelete));
+    setRows(rows.filter(row => row.cartID !== itemToDelete));
     setSelectedItems(selectedItems.filter(id => id !== itemToDelete));
     setOpenDialog(false);
     setItemToDelete(null);
+    
+    // deleteCake(rows.filter(row => row.cartID !== itemToDelete));
   };
+
+  const deleteCake = async (id) => {
+    try {
+      // console.log(id + "SOSSSSSSSSSSSSS");
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No token found, please log in again.');
+        router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+        return;
+      }
+      const response = await fetch(`${apiUrl}/cart/delete-cake/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+      });
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          setError(errorData.message || 'Failed to update profile.');
+        } else {
+          const errorText = await response.text();
+          setError(errorText || 'An error occurred.');
+        }
+        return;
+      }
+      const data = await response.json();
+      console.log(data);
+      window.location.reload();
+    }
+    catch (e) {
+      console.log(e);
+      setError('Xóa thất bại '+ e);
+    }
+  }
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -98,26 +187,27 @@ const CartPage = () => {
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.cartID}>
                   <TableCell>
                     <Checkbox 
-                      checked={selectedItems.includes(row.id)}
-                      onChange={(event) => handleSelectItem(event, row.id)} 
+                      checked={selectedItems.includes(row.cartID)}
+                      onChange={(event) => handleSelectItem(event, row.cartID)} 
                     />
-                    {row.name}
+                    {"Bánh kem nhân " + row.Cake.cakeFilling.title + " kích thước" + row.Cake.cakeSize.title}
                   </TableCell>
                   <TableCell align="right">
-                    {row.price.toLocaleString()} VND
-                    <Typography variant="body2" color="textSecondary">
+                    {/* {row.price.toLocaleString()} VND */}
+                    {row.Cake.cakeSize.priceSize + row.Cake.cakeFilling.priceCakeFilling} VND
+                    {/* <Typography variant="body2" color="textSecondary">
                       Kho: {row.stockLimit}
-                    </Typography>
+                    </Typography> */}
                   </TableCell>
                   <TableCell align="center">
                     <Box display="flex" justifyContent="center" alignItems="center">
                       <Button 
                         variant="outlined" 
                         sx={{ minWidth: '30px' }} 
-                        onClick={() => decreaseQuantity(row.id)}
+                        onClick={() => decreaseQuantity(row.cartID)}
                       >
                         -
                       </Button>
@@ -125,16 +215,16 @@ const CartPage = () => {
                       <Button 
                         variant="outlined" 
                         sx={{ minWidth: '30px' }} 
-                        onClick={() => increaseQuantity(row.id)}
-                        disabled={row.quantity >= row.stockLimit}
+                        onClick={() => increaseQuantity(row.cartID)}
+                        // disabled={row.quantity >= row.stockLimit}
                       >
                         +
                       </Button>
                     </Box>
                   </TableCell>
-                  <TableCell align="right">{(row.price * row.quantity).toLocaleString()} VND</TableCell>
+                  <TableCell align="right">{((row.Cake.cakeSize.priceSize + row.Cake.cakeFilling.priceCakeFilling) * row.quantity).toLocaleString()} VND</TableCell>
                   <TableCell align="center">
-                    <Button color="error" onClick={() => handleDeleteClick(row.id)}>Xóa</Button>
+                    <Button color="error" onClick={() => handleDeleteClick(row.cartID)}>Xóa</Button>
                   </TableCell>
                 </TableRow>
               ))}

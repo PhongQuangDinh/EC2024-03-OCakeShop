@@ -38,7 +38,7 @@ router.post('/signup', async (req, res, next) => {
         const getUser = await model.User.findOne({
             where: { username: username }
         });
-        const token = jwt.sign({ userID: newUser.userID }, process.env.SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userID: getUser.userID, userRole: getUser.role }, process.env.SECRET_KEY, { expiresIn: '1h' });
         res.status(200).json({user: getUser, token: token});
     }
     catch(err){
@@ -64,7 +64,7 @@ router.post('/login', async (req, res, next) => {
         
         if (isMatch) {
             // return res.status(200).json({user: user});
-            const token = jwt.sign({ userID: user.userID }, process.env.SECRET_KEY, { expiresIn: '1h' });
+            const token = jwt.sign({ userID: user.userID, role: user.role }, process.env.SECRET_KEY, { expiresIn: '1h' });
             return res.status(200).json({ message: "Login successful", user: user, token: token });
         } else {
             return res.status(401).json({ message: "Invalid username or password" });

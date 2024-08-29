@@ -1,4 +1,4 @@
-import HomePage from "@/modules/Home/home";
+import SignIn from "@/modules/SignIn/signin";
 import Head from "next/head";
 
 export const metadata = {
@@ -13,7 +13,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <HomePage />
+        <SignIn />
       </main>
     </div>
   );
