@@ -2,6 +2,7 @@
 import { Box, Typography, Grid, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import Layout from "../layout";
 import React, { useState } from "react";
+import Link from "next/link";
 
 const Handling = () => {
 
@@ -75,10 +76,11 @@ const Handling = () => {
               justifyContent: "center",
               alignItems: "center",
             }}>
+              <Link href="/completed-delivery" passHref>
               <Typography sx={{
                 fontSize: "30px",
                 fontWeight: "bold",
-              }}>Đã hoàn thành</Typography>
+              }}>Đã hoàn thành</Typography></Link>
             </Box>
           </Box>
           <Box sx={{

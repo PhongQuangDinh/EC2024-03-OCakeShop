@@ -206,7 +206,8 @@ const CartPage = () => {
                 <TableCell align="right">Đơn giá</TableCell>
                 <TableCell align="center">Số lượng</TableCell>
                 <TableCell align="right">Thành tiền</TableCell>
-                <TableCell align="center">Thao tác</TableCell>
+                <TableCell align="center">Xóa</TableCell>
+                <TableCell align="center">Thay đổi</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -249,7 +250,13 @@ const CartPage = () => {
                   <TableCell align="right">{((row.Cake.cakeSize.priceSize + row.Cake.cakeFilling.priceCakeFilling) * row.quantity).toLocaleString()} VND</TableCell>
                   <TableCell align="center">
                     <Button color="error" onClick={() => handleDeleteClick(row.cartID)}>Xóa</Button>
+                  
                   </TableCell>
+                  <TableCell align="center">
+                    <Button color="primary" onClick={() => changeQuantityCake(row.cartID, row.quantity)}>Lưu</Button>
+                  
+                  </TableCell>
+                  
                 </TableRow>
               ))}
             </TableBody>
