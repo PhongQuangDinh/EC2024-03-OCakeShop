@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  SearchOutlined,
+  ShoppingCartOutlined ,
   KeyboardArrowUp,
   LogoutOutlined,
   UploadFileOutlined,
@@ -28,8 +28,7 @@ import logo from "./../../app/image/logo.png";
 
 const homeData = [
   { title: "Trang chủ", link: "/home" },
-  { title: "Thông tin shop", link: "/premium" },
-  { title: "Đơn mua", link: "/allpodcasts" },
+  { title: "Đơn mua", link: "/handleDelivery" },
 ];
 
 const NavBar = () => {
@@ -84,8 +83,8 @@ const NavBar = () => {
             trigger={trigger}
             sx={{ "&:before": { bottom: "-10px" } }}
           >
-            <SearchOutlined
-              sx={{ "&:hover": { color: "var(--palette-03)" } }}
+            <ShoppingCartOutlined 
+              sx={{ color: "black",  }}
             />
           </StyledNavItem>
         </StyledNavContainer>
