@@ -66,7 +66,7 @@ router.post("/manage/update", authenticateToken, async (req, res, next) => {
       const { orderCakeDetailID, arrange } = orderCakeDetail;
     
       try {
-        await model.OrderCakeDetail.update(
+        const [updateRows] = await model.OrderCakeDetail.update(
           {
             handleStatus: "Đã xử lý",
             arrange: arrange
@@ -75,6 +75,13 @@ router.post("/manage/update", authenticateToken, async (req, res, next) => {
             where: {orderCakeDetailID: orderCakeDetailID }
           }
         );
+        if(updateRows === 0){
+          return res.status(400).json({message: "OrderCakeDetail not found"})
+        }
+        const updatedOrderCakeDetail = await model.OrderCakeDetail.findOne({
+          where: {orderCakeDetailID: orderCakeDetailID}
+        });
+        res.status(200).json(updatedOrderCakeDetail);
       } catch (err) {
         console.error(`Failed to update OrderCakeDetailID ${orderCakeDetailID}:`, err);
       }
