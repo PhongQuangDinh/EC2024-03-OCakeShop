@@ -6,18 +6,20 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Layout from "../layout";
-import { useRouter } from 'next/navigation';
+
 import dayjs from 'dayjs';
-import { getApiUrl, fetchWithAuth } from '../../../WebConfig';
+// ----------- IMPORTANT
+import { fetchWithAuth } from '../../../WebConfig';
+import { useRouter } from 'next/navigation';
 
 const Profile = () => {
   const [formData, setFormData] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
-  // const apiUrl = getApiUrl();
+  const router = useRouter(); // NO MISS
 
   useEffect(() => {
     const fetchProfile = async () => {
+      
       try {
         const data = await fetchWithAuth(router, '/customer/myinfo');  // if method not defined it would be GET by default
         setFormData(data?.Customer || '');

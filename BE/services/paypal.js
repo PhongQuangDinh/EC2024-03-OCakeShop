@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { application } = require('express');
+const { getApiUrl } = require('./WebConfig');
 
 async function generateAccessToken(){
     const response = await axios({
@@ -16,6 +17,7 @@ async function generateAccessToken(){
 
 async function createOrder() {
     const accessToken = await generateAccessToken();
+    const apiUrl = getApiUrl();
     const response = await axios ({
         url: process.env.PAYPAL_BASE_URL + '/v2/checkout/orders',
         method: 'post',
@@ -51,8 +53,8 @@ async function createOrder() {
                 }
             ],
             application_context: {
-                return_url: process.env.BASE_URL + '/payment/CONTINUE-ORDER',
-                cancel_url: process.env.BASE_URL + '/payment/CANCEL-ORDER',
+                return_url: apiUrl + '/payment/CONTINUE-ORDER',
+                cancel_url: apiUrl + '/payment/CANCEL-ORDER',
                 shipping_preference: 'NO_SHIPPING',
                 user_action: 'PAY_NOW',
                 brand_name: 'dinhquangphong.io'

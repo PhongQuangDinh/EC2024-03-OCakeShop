@@ -84,7 +84,6 @@ router.post('/pay', (req, res) => { // put inside form action for submit button
   })
 });
 
-
 router.get('/CONTINUE-ORDER', (req, res) => {
   res.send('Bạn đã mất 100$ :33');
 });

@@ -20,8 +20,8 @@ app.use(express.json());
 
 // Define allowed origins for CORS
 const allowedOrigins = [
-  'http://localhost:3000', // Local development
-  'https://ec2024-03-ocakeshop.vercel.app' // Deployed frontend on Vercel
+  process.env.LOCAL_BASE_URL, // Local development
+  process.env.PROD_BASE_URL // Deployed frontend on Vercel
 ];
 
 // Use CORS middleware

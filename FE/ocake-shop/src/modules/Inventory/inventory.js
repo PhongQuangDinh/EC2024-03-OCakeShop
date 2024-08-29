@@ -6,14 +6,27 @@ import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, T
 import Layout from '../layout';
 
 const InventoryPage = () => {
-  const [rows, setRows] = useState([
-    { id: 1, name: 'Bột mì', quantity: 50, unit: 'Kg', expiryDate: '12/12/2024' },
-    { id: 2, name: 'Trứng', quantity: 200, unit: 'Quả', expiryDate: '12/12/2024' },
-    { id: 3, name: 'Máy nướng', quantity: 2, unit: 'Cái', expiryDate: '' },
-    { id: 4, name: 'Máy đánh trứng', quantity: 2, unit: 'Cái', expiryDate: '' },
-  ]);
+  // const [rows, setRows] = useState([
+  //   { id: 1, name: 'Bột mì', quantity: 50, unit: 'Kg', expiryDate: '12/12/2024' },
+  //   { id: 2, name: 'Trứng', quantity: 200, unit: 'Quả', expiryDate: '12/12/2024' },
+  //   { id: 3, name: 'Máy nướng', quantity: 2, unit: 'Cái', expiryDate: '' },
+  //   { id: 4, name: 'Máy đánh trứng', quantity: 2, unit: 'Cái', expiryDate: '' },
+  // ]);
   const [openDialog, setOpenDialog] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
+
+  useEffect(() => {
+    const fetchInv = async () => {
+      
+      try {
+        const data = await fetchWithAuth(router, '/ingredient');  // if method not defined it would be GET by default
+      } catch (err) {
+        setError('SOS ' + err.message);
+      }
+    };
+
+    fetchInv();
+  }, []);
 
   const handleEditClick = (id) => {
     setItemToEdit(id);
