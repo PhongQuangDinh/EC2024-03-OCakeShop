@@ -63,6 +63,7 @@ const NavBar = () => {
   const openUser = Boolean(anchorElUser);
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
     setAnchorElUser(null);
     router.push("/signin");
   };

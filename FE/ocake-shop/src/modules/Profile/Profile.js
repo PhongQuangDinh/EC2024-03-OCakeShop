@@ -8,95 +8,120 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Layout from "../layout";
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
-import { getApiUrl } from '../../../WebConfig';
+import { getApiUrl, fetchWithAuth } from '../../../WebConfig';
 
 const Profile = () => {
   const [formData, setFormData] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
-  const apiUrl = getApiUrl();
+  // const apiUrl = getApiUrl();
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.log('No token found');
-        return;
-      }
-
       try {
-        const response = await fetch(`${apiUrl}/customer/myinfo`, {
-          method: "GET",
-          headers: {
-            "authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          if (response.status === 403) {
-            setError('Session expired. Please log in again.');
-            localStorage.removeItem('token');
-            router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
-          } else {
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("application/json")) {
-              const errorData = await response.json();
-              setError(errorData.message || 'Get profile failed');
-            } else {
-              const errorText = await response.text();
-              setError(errorText || 'An error occurred');
-            }
-          }
-          return;
-        }
-
-        const data = await response.json();
+        const data = await fetchWithAuth(router, '/customer/myinfo');  // if method not defined it would be GET by default
         setFormData(data?.Customer || '');
       } catch (err) {
         setError('SOS ' + err.message);
-        console.log('SOS ' + err.message);
       }
+      // const token = localStorage.getItem('token');
+      // if (!token) {
+      //   console.log('No token found');
+      //   return;
+      // }
+
+      // try {
+      //   const response = await fetch(`${apiUrl}/customer/myinfo`, {
+      //     method: "GET",
+      //     headers: {
+      //       "authorization": `Bearer ${token}`,
+      //       "Content-Type": "application/json",
+      //     },
+      //   });
+
+      //   if (!response.ok) {
+      //     if (response.status === 403) {
+      //       setError('Session expired. Please log in again.');
+      //       localStorage.removeItem('token');
+      //       router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+      //     } else {
+      //       const contentType = response.headers.get("content-type");
+      //       if (contentType && contentType.includes("application/json")) {
+      //         const errorData = await response.json();
+      //         setError(errorData.message || 'Get profile failed');
+      //       } else {
+      //         const errorText = await response.text();
+      //         setError(errorText || 'An error occurred');
+      //       }
+      //     }
+      //     return;
+      //   }
+
+      //   const data = await response.json();
+      //   setFormData(data?.Customer || '');
+      // } catch (err) {
+      //   setError('SOS ' + err.message);
+      //   console.log('SOS ' + err.message);
+      // }
     };
 
     fetchProfile();
   }, []);
 
+  // const handleSave = async () => {
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     if (!token) {
+  //       setError('No token found, please log in again.');
+  //       router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+  //       return;
+  //     }
+
+  //     const response = await fetch(`${apiUrl}/customer/update`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": `Bearer ${token}`
+  //       },
+  //       body: JSON.stringify(formData), // Send the updated formData
+  //     });
+
+  //     if (!response.ok) {
+  //       const contentType = response.headers.get("content-type");
+  //       if (contentType && contentType.includes("application/json")) {
+  //         const errorData = await response.json();
+  //         setError(errorData.message || 'Failed to update profile.');
+  //       } else {
+  //         const errorText = await response.text();
+  //         setError(errorText || 'An error occurred.');
+  //       }
+  //       return;
+  //     }
+
+  //     const data = await response.json();
+  //     alert('Cập nhật thành công!');
+  //     router.push('/profile');
+  //   } catch (error) {
+  //     setError("Cập nhật thất bại: " + error.message);
+  //   }
+  // };
+
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('No token found, please log in again.');
-        router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
-        return;
-      }
-
-      const response = await fetch(`${apiUrl}/customer/update`, {
+      const data = await fetchWithAuth(router, '/customer/update', {
         method: "POST",
+        body: JSON.stringify(formData),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(formData), // Send the updated formData
-      });
+      });  // Save the updated profile using POST
 
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await response.json();
-          setError(errorData.message || 'Failed to update profile.');
-        } else {
-          const errorText = await response.text();
-          setError(errorText || 'An error occurred.');
-        }
-        return;
+      if (data) {
+        alert('Profile updated successfully!');
+        router.push('/profile');
       }
-
-      const data = await response.json();
-      alert('Cập nhật thành công!');
-      router.push('/profile');
-    } catch (error) {
-      setError("Cập nhật thất bại: " + error.message);
+    } catch (err) {
+      setError('Error updating profile: ' + err.message);
     }
   };
 
@@ -107,7 +132,7 @@ const Profile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     setFormData((prevState) => {
       const updatedFormData = { ...prevState };
 
