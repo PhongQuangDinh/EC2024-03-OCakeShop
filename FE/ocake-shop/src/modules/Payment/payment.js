@@ -143,7 +143,7 @@ const Payment = () => {
 
       if (data) {
         alert('Order is set successfully!');
-        window.location.href = data.paypal_link;
+        window.location.href = data.paypal_link; // redirect to Paypal page
       }
     } catch (err) {
       setError('Error: ' + err.message);
