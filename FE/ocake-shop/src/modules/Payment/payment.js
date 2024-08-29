@@ -19,14 +19,17 @@ import dayjs from 'dayjs';
 import Layout from "../layout";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { fetchWithAuth } from '../../../WebConfig';
 
 const Payment = () => {
+  const router = useRouter();
   const [inforCustomer, setInforCustomer] = useState([
     "Phạm Uyễn Nhi",
     "0123456789",
     "191 Nguyễn Trãi phường 1 quận 5 TP.HCM",
   ]);
-
+  const [error, setError] = useState('');
   const [inforCake, setInforCake] = useState([
     {
       id: 1,
@@ -126,6 +129,25 @@ const Payment = () => {
   const handleChange = () => {
     alert("Hello");
     // router.push('/home');
+  };
+
+  const handleSetOrder = async() => {
+    try {
+      const data = await fetchWithAuth(router, '/payment/pay', {
+        method: "POST",
+        body: JSON.stringify(inforCustomer),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });  // Save the updated profile using POST
+
+      if (data) {
+        alert('Order is set successfully!');
+        window.location.href = data.paypal_link;
+      }
+    } catch (err) {
+      setError('Error: ' + err.message);
+    }
   };
 
   return (
@@ -498,7 +520,7 @@ const Payment = () => {
                   },
                   fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
                   outline: "none",
-                }}
+                }} onClick={handleSetOrder}
               >
                 Đặt hàng
               </Button>

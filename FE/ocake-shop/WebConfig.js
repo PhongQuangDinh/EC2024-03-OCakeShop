@@ -18,6 +18,7 @@ export const fetchWithAuth = async (router, endpoint, options = {}) => {
     }
 
     try {
+        console.log(apiUrl + endpoint);
         const response = await fetch(`${apiUrl}${endpoint}`, {
             ...options,
             headers: {

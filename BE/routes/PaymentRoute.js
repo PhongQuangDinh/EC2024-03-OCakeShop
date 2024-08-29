@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const model = require('../models');
+const paypal = require('../services/paypal');
 
 const { Transaction, Op, fn, col } = require("sequelize");
 
@@ -79,7 +80,7 @@ router.get("/profit-n-price", async (req, res, next) => {
 
 router.post('/pay', (req, res) => { // put inside form action for submit button
   const url = paypal.createOrder().then(result => {
-    res.status(200).json({"check this link": result});
+    res.status(200).json({"paypal_link": result});
   })
 });
 
