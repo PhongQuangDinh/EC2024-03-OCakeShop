@@ -28,7 +28,8 @@ import logo from "./../../app/image/logo.png";
 
 const homeData = [
   { title: "Trang chủ", link: "/home" },
-  { title: "Đơn mua", link: "/handleDelivery" },
+  { title: "Đơn mua", link: "/handle-delivery" },
+  { title: "Giỏ hàng", link: "/cart"}
 ];
 
 const NavBar = () => {
@@ -79,14 +80,14 @@ const NavBar = () => {
           {homeData.map((item, i) => (
             <NavItem trigger={trigger} key={i} content={item}></NavItem>
           ))}
-          <StyledNavItem
+          {/* <StyledNavItem
             trigger={trigger}
             sx={{ "&:before": { bottom: "-10px" } }}
           >
             <ShoppingCartOutlined 
-              sx={{ color: "black",  }}
+              sx={{ color: "black"}}
             />
-          </StyledNavItem>
+          </StyledNavItem> */}
         </StyledNavContainer>
 
         <Tooltip title="Profile">
@@ -146,7 +147,7 @@ const NavItem = ({
           sx={{
             // color: "#fff",
             color: "#000",
-            "&:hover": { color: "var(--palette-03)" },
+            "&:hover": { fontWeight: "bold" },
           }}
         >
           {content.title}

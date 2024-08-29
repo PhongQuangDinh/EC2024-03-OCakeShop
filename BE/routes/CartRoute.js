@@ -133,7 +133,7 @@ router.get('/', authenticateToken, async (req, res, next) => {
     catch (err) {next(err)};
 });
 
-router.post('/delete-cake/:id', async (req, res, next) => {
+router.delete('/delete-cake/:id', authenticateToken, async (req, res, next) => {
     try {
         const id = req.params.id;
         await model.Cart.destroy({
@@ -145,7 +145,21 @@ router.post('/delete-cake/:id', async (req, res, next) => {
     catch(err){
         console.error('Error deleting item from cart:', err);
         next(err)
-        // return res.status(500).json({ message: 'Failed to delete item from cart' });
+    }
+});
+
+router.post('/update-cake/:id', async (req, res, next) => {
+    try {
+        // const id = req.params.id;
+        // await model.Cart.destroy({
+        //     where: {cartID: id}
+        // });
+        // return res.status(200).json({ message: 'Item deleted successfully' });
+        
+    }
+    catch(err){
+        console.error('Error deleting item from cart:', err);
+        next(err)
     }
 });
 
