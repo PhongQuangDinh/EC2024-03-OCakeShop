@@ -6,6 +6,7 @@ import {
   Box,
   Typography,
   Grid,
+  TextField,
 } from "@mui/material";
 import Layout from "../layout";
 import { useState, useEffect } from "react";
@@ -15,19 +16,21 @@ import CakeCard from "./components/cakeCard";
 import Image from "next/image";
 import arrow from "../../assets/arrow.png";
 import { getApiUrl } from '../../../WebConfig';
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
 
 const HomePage = () => {
-
   const [category, setCategory] = useState(["Tất cả"]);
-  const [cake, setCake] = useState('');
-  const [allCake, setAllCake] = useState('');
+  const [cake, setCake] = useState([]);
+  const [allCake, setAllCake] = useState([]);
   const [error, setError] = useState('');
   const [value, setValue] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
   const apiUrl = getApiUrl();
 
   useEffect(() => {
     GetCategory();
-  },[]);
+  }, []);
 
   useEffect(() => {
     GetInforCake();
@@ -41,40 +44,49 @@ const HomePage = () => {
       if (selectedCategory) {
         const getCakesByCategory = async () => {
           try {
-            const selectedCategory = category[value];
             const response = await fetch(`${apiUrl}/cake/purpose/${selectedCategory.purposeID}`, {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
               },
-          });
-          if(!response.ok)
-          {
-            const errorData = await response.json();
-            setError(errorData.message || 'Get cake by purpose is failed');
-            return;
+            });
+            if(!response.ok) {
+              const errorData = await response.json();
+              setError(errorData.message || 'Get cake by purpose is failed');
+              return;
+            }
+            const data = await response.json();
+            setCake(Array.isArray(data) ? data : []);
+          } catch(err) {
+            console.error('An error occurred:', err);
+            setError('An error occurred while get cake');
           }
-          const data = await response.json();
-          // setCakeData(Array.isArray(data) ? data : []);
-          setCake(Array.isArray(data) ? data : []);
-        } catch(err){
-          console.error('An error occurred:', err);
-          setError('An error occurred while get cake');
-        }};;
+        };
         getCakesByCategory();
-    };
-  }}, [value, category]);
-  // const
+      }
+    }
+  }, [value, category]);
+
+  useEffect(() => {
+    if (searchTerm === "") {
+      setCake(allCake);
+    } else {
+      const filteredCakes = allCake.filter(cakeItem =>
+        cakeItem.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setCake(filteredCakes);
+    }
+  }, [searchTerm, allCake]);
 
   const GetCategory = async () => {
     try {
       const response = await fetch(`${apiUrl}/cake/purpose`, {
-        method: "GET", 
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      if(!response.ok){
+      if(!response.ok) {
         const errorData = await response.json();
         setError(errorData.message || 'Load dữ liệu thất bại');
         return;
@@ -83,11 +95,11 @@ const HomePage = () => {
       const allCategory = { purposeID: 0, title: "Tất cả" };
       const updatedData = [allCategory, ...data];
       setCategory(Array.isArray(updatedData) ? updatedData : []);
-      // setCategory(Array.isArray(data) ? data : []);
-    } catch(err){
+    } catch(err) {
       console.error(err);
       setError('Có lỗi khi lấy danh mục sản phẩm');
-  }};
+    }
+  };
 
   const GetInforCake = async () => {
     try {
@@ -96,29 +108,28 @@ const HomePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-    });
-    if(!response.ok)
-    {
-      const errorData = await response.json();
-      setError(errorData.message || 'Get cake failed');
-      return;
+      });
+      if(!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || 'Get cake failed');
+        return;
+      }
+      const data = await response.json();
+      setAllCake(Array.isArray(data) ? data : []);
+      setCake(Array.isArray(data) ? data : []);
+    } catch(err) {
+      console.error('An error occurred:', err);
+      setError('An error occurred while get cake');
     }
-    const data = await response.json();
-    setAllCake(Array.isArray(data) ? data : []);
-    setCake(Array.isArray(data) ? data : []);
-    // alter(cake)
-  } catch(err){
-    console.error('An error occurred:', err);
-    setError('An error occurred while get cake');
-  }};
-
-  // const [value, setValue] = useState(0);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-    
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
 
   const responsive = {
     desktop: {
@@ -150,6 +161,8 @@ const HomePage = () => {
     fontSize: "1.5rem",
     marginBottom: 10,
   }));
+
+  const [isFocused, setIsFocused] = useState(false);
 
   const steps = [
     {
@@ -210,6 +223,37 @@ const HomePage = () => {
             <Tab key={category.purposeID} label={category.title} />
           ))}
         </MyTabs>
+        
+        <TextField
+        sx={{
+          margin: "1rem 0",
+          backgroundColor: "#FFFFFF", // Màu nền trắng
+          width: "calc(100% - 40px)", // Giảm độ rộng của trường nhập liệu đi 50px
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "#FFC0CB", // Màu hồng của viền ngoài
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#FF1493", // Màu hồng đậm hơn khi trường được chọn
+            },
+          },
+        }}
+        label={!isFocused ? "Tìm kiếm bánh" : ""}
+        variant="outlined"
+        value={searchTerm}
+        onChange={handleSearchChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <SearchIcon sx={{ color: "#FF1493" }} /> {/* Màu hồng đậm của biểu tượng */}
+            </InputAdornment>
+          ),
+        }}
+      />
+
+
         <Carousel
           swipeable={false}
           draggable={false}
@@ -221,18 +265,12 @@ const HomePage = () => {
           responsive={responsive}
           itemClass="carousel-item-padding-40-px"
         >
-          {/* <CakeCard title="name" img="https://assets.tmecosys.com/image/upload/t_web767x639/img/recipe/ras/Assets/0A475B34-4E78-40D8-9F30-46223B7D77E7/Derivates/E55C7EA4-0E60-403F-B5DC-75EA358197BD.jpg" />
-          <CakeCard title = "ten" img="https://flouringkitchen.com/wp-content/uploads/2023/07/BW1A4089-2.jpg" />
-          <CakeCard title="banh" img="https://hips.hearstapps.com/hmg-prod/images/vanilla-cake-index-64b741d111282.jpg?crop=0.6668240106993942xw:1xh;center,top&resize=1200:*" />
-          <CakeCard title="kem" img="https://ichef.bbci.co.uk/food/ic/food_16x9_832/recipes/rainbow_cake_20402_16x9.jpg" /> */}
-
           {Array.isArray(cake) && cake.map((cakeItem) => (
             <CakeCard 
               key={cakeItem.cakeID}
               title={cakeItem.description}
               img={cakeItem.cakeImages.length > 0 ? cakeItem.cakeImages[0].imageDetail.imagePath : ""}
             />
-            // alert(cakeItem.cakeImages_imageDetail_imagePath)
           ))}
         </Carousel>
       </Box>
@@ -268,56 +306,13 @@ const HomePage = () => {
           }}
         >
           {steps.map((step, index) => (
-            <Grid
-              container
-              xs={4}
-              key={index}
-              sx={{
-                display: "flex",
-                alignItems: "start",
-              }}
-            >
-              <Grid item sx={{ display: "flex", flexDirection: "row" }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <Circle>{step.number}</Circle>
-
-                  <Typography
-                    variant="h6"
-                    color="#e82451"
-                    align="center"
-                    sx={{ fontSize: "1.15rem", mb: 2 }}
-                  >
-                    {step.title}
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    align="center"
-                  >
-                    {step.description}
-                  </Typography>
-                </Box>
-                {
-                  <Box
-                    sx={{
-                      display: "flex",
-                      visibility: index == 3 ? "hidden" : "visible",
-                      alignItems: "start",
-                      height: "100%",
-                    }}
-                  >
-                    <Image src={arrow} width={100} />
-                  </Box>
-                }
-              </Grid>
-            </Grid>
+            <Box key={index} sx={{ mr: 3 }}>
+              <Circle>{step.number}</Circle>
+              <Typography sx={{ fontWeight: 700, mb: 1 }}>
+                {step.title}
+              </Typography>
+              <Typography>{step.description}</Typography>
+            </Box>
           ))}
         </Box>
       </Box>
@@ -326,7 +321,6 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
 const MyTabs = styled(MuiTabs)(() => ({
   "& .MuiTabs-flexContainer": {
     gap: "1rem",
