@@ -111,51 +111,75 @@ const CartPage = () => {
     }));
   };
 
-  const handleDeleteItem = () => {
-    setRows(rows.filter(row => row.cartID !== itemToDelete));
-    setSelectedItems(selectedItems.filter(id => id !== itemToDelete));
-    setOpenDialog(false);
-    setItemToDelete(null);
-    
-    // deleteCake(rows.filter(row => row.cartID !== itemToDelete));
+  const handleDeleteItem = async () => {
+    try {
+      await deleteCake(itemToDelete);  // This calls the API to delete the item from the backend database.
+      setRows(rows.filter(row => row.cartID !== itemToDelete));  // Update the state to remove the deleted item.
+      setSelectedItems(selectedItems.filter(id => id !== itemToDelete));
+      setOpenDialog(false);
+      setItemToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+      setError('Failed to delete item. Please try again.');
+    }
   };
 
+  const changeQuantityCake = async () => {
+    try {
+      const response = await fetchWithAuth(router, '/cart/update-cake', {
+        method: "POST",
+        body: JSON.stringify(value),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response) {
+        alert('Profile updated successfully!');
+        window.location.reload();
+      }
+    }
+    catch (error) {
+      setError('Error updating profile: ' + err.message);
+    }
+  }
+  
   const deleteCake = async (id) => {
     try {
-      // console.log(id + "SOSSSSSSSSSSSSS");
       const token = localStorage.getItem('token');
       if (!token) {
         setError('No token found, please log in again.');
         router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
         return;
       }
+  
       const response = await fetch(`${apiUrl}/cart/delete-cake/${id}`, {
-        method: "POST",
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
       });
+      console.log(`${apiUrl}/cart/delete-cake/${id}`)
+  
       if (!response.ok) {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
           const errorData = await response.json();
-          setError(errorData.message || 'Failed to update profile.');
+          setError(errorData.message || 'Failed to delete the item.');
         } else {
           const errorText = await response.text();
           setError(errorText || 'An error occurred.');
         }
         return;
       }
-      const data = await response.json();
-      console.log(data);
-      window.location.reload();
+  
+      console.log('Item deleted successfully');
+    } catch (e) {
+      console.error('Delete failed:', e);
+      setError('Delete failed: ' + e);
     }
-    catch (e) {
-      console.log(e);
-      setError('Xóa thất bại '+ e);
-    }
-  }
+  };
+  
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
