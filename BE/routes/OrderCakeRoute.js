@@ -2,13 +2,88 @@ const express = require("express");
 const router = express.Router();
 const model = require('../models');
 const { Op } = require('sequelize');
+const {authenticateToken} = require('../routes/authenticationRoute')
+// import { getApiUrl } from '../../FE/ocake-shop/WebConfig';
 
 // Lấy đơn đặt hàng
-router.get("/", async (req, res, next) => {
+router.get("/manage", async (req, res, next) => {
   try {
-    const order = await model.OrderCake.findAll();
+    const order = await model.OrderCakeDetail.findAll({
+      include: [
+        {
+          model: model.OrderCake,
+          as: "Order",
+          required: true,
+          where: {pickUpTime:
+            {
+              [Op.gte]: new Date() 
+            }
+          }
+        },
+        {
+          model: model.Cart,
+          as: "OrderCart",
+          required: true,
+          where:{status: "Đã mua"},
+          include: [
+            {
+              model: model.Cake,
+              required: true,
+              include: 
+              [
+                {
+                model: model.CakeSize,
+                as: "cakeSize",
+                required: true,
+                },
+                {
+                  model: model.CakeFilling,
+                  as: "cakeFilling",
+                  required: true,
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      order: [["arrange", "ASC"]],
+    });
 
     res.status(200).json(order);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/manage/update", authenticateToken, async (req, res, next) => {
+  try {
+    const orderCakeDetails = req.body;
+    console.log(orderCakeDetails);
+    // const { OrderCakeDetailID, bakingStatus, handleStatus, cartID, OrderCakeID, arrange} = OrderCakeDetail;
+    // const order = await model.OrderCakeDetail.findAll({
+    // });
+    for (const orderCakeDetail of orderCakeDetails) {
+      const { orderCakeDetailID, arrange } = orderCakeDetail;
+    
+      try {
+        await model.OrderCakeDetail.update(
+          {
+            handleStatus: "Đã xử lý",
+            arrange: arrange
+          },
+          {
+            where: {orderCakeDetailID: orderCakeDetailID }
+          }
+        );
+      } catch (err) {
+        console.error(`Failed to update OrderCakeDetailID ${orderCakeDetailID}:`, err);
+      }
+    }
+
+    // const order = await fetch(`http://localhost:8080/ordercake/manage`)
+
+
+    res.status(200).json({"Message": "Success"});
   } catch (err) {
     next(err);
   }

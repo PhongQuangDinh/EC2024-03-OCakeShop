@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const model = require('../models');
-const {authenticateToken} = require('../routes/authenticationRoute')
+const {authenticateToken} = require('../routes/authenticationRoute');
 
 router.get('/myinfo', authenticateToken, async (req, res, next) => {
     try{

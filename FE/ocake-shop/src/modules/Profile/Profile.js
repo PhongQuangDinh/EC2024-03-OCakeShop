@@ -93,7 +93,7 @@ const Profile = () => {
       }
 
       const data = await response.json();
-      alert('Cập nhật thành công!');
+      // alert('Cập nhật thành công!');
       router.push('/profile');
     } catch (error) {
       setError("Cập nhật thất bại: " + error.message);

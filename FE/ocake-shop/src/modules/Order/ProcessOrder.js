@@ -12,63 +12,111 @@ import { Box, Button, IconButton, Tab, Tabs } from "@mui/material";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 import { useEffect } from "react";
 import { useState } from "react";
-
-function createData(name, quantity, processState, state, deliveryDate) {
-  return { name, quantity, processState, state, deliveryDate };
-}
-
-const initialRows = [
-  createData(
-    "Bánh kem vani  kích thước 20cm",
-    1,
-    "Đã xử lý",
-    "Đang xử lý",
-    "12/6/2024"
-  ),
-  createData(
-    "Bánh kem socola kích thước 24cm",
-    1,
-    "Đã xử lý",
-    "Chưa xử lý",
-    "11/6/2024"
-  ),
-  createData(
-    "Bánh kem dứa kích thước 26cm",
-    1,
-    "Đã xử lý",
-    "Chưa xử lý",
-    "11/6/2024"
-  ),
-  createData(
-    "Bánh kem socola kích thước 18cm",
-    1,
-    "Đã xử lý",
-    "Chưa xử lý",
-    "12/6/2024"
-  ),
-  createData(
-    "Bánh kem bắp kích thước 24cm",
-    1,
-    "Chưa xử lý",
-    "Chưa xử lý",
-    "12/6/2024"
-  ),
-];
+import { getApiUrl } from '../../../WebConfig';
 
 export default function ProcessOrder() {
-  const [rows, setRows] = useState(initialRows);
+  const [rows, setRows] = useState([]);
   const [value, setValue] = useState(0);
   const [movingRowIndex, setMovingRowIndex] = useState(null);
+  const apiUrl = getApiUrl();
+  const [error, setError] = useState('');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const handleUpdate = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No token found, please log in again.');
+        router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+        return;
+      }
+      const response = await fetch(`${apiUrl}/ordercake/manage/update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(rows),
+      });
+
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          setError(errorData.message || 'Failed to update profile.');
+        } else {
+          const errorText = await response.text();
+          setError(errorText || 'An error occurred.');
+        }
+        return;
+      }
+
+      const data = await response.json();
+      alert('Cập nhật thành công!');
+      window.location.reload();
+      // router.push('/profile');
+    } catch (error) {
+      setError("Cập nhật thất bại: " + error.message);
+    }
+  };
+
+  const fetchOrder = async() => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/ordercake/manage`, {
+        method: "GET",
+          headers: {
+            "authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+      });
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          setError('Session expired. Please log in again.');
+          localStorage.removeItem('token');
+          router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+        } else {
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const errorData = await response.json();
+            setError(errorData.message || 'Get order failed');
+          } else {
+            const errorText = await response.text();
+            setError(errorText || 'An error occurred');
+          }
+        }
+        return;
+      }
+
+      const data = await response.json();
+      console.log(data);
+      setRows(data || '');
+
+    } catch (err) {
+      // console.log('SOSSSSSSS  '+err);
+      if (err.message.includes("Failed to fetch")) {
+        setError("The service is unavailable, please wait.");
+      } else {
+        
+        setError('SOS: ' + err.message);
+      }
+    }
+  }
 
   const moveRow = (index, direction) => {
     const newRows = [...rows];
     const targetIndex = direction === "up" ? index - 1 : index + 1;
 
     if (targetIndex >= 0 && targetIndex < newRows.length) {
+      
+      const tempArrange = newRows[index].arrange;
+      newRows[index].arrange = newRows[targetIndex].arrange;
+      newRows[targetIndex].arrange = tempArrange;
+
       const temp = newRows[targetIndex];
       newRows[targetIndex] = newRows[index];
       newRows[index] = temp;
@@ -77,6 +125,10 @@ export default function ProcessOrder() {
       setTimeout(() => setMovingRowIndex(null), 300);
     }
   };
+
+  useEffect(() => {
+    fetchOrder()
+  }, []);
 
   return (
     <Layout>
@@ -105,7 +157,7 @@ export default function ProcessOrder() {
             <TableBody>
               {rows.map((row, index) => (
                 <TableRow
-                  key={row.name}
+                  key={row.arrange}
                   sx={{
                     "&:last-child td, &:last-child th": { border: 0 },
                     transition: "transform 0.3s ease-in-out",
@@ -140,19 +192,19 @@ export default function ProcessOrder() {
                     </Box>
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {row.name}
+                    {"Bánh kem nhân " + row.OrderCart?.Cake.cakeFilling.title + " kích thước "+ row.OrderCart?.Cake.cakeSize.title}
                   </TableCell>
-                  <TableCell align="center">{row.quantity}</TableCell>
-                  <TableCell align="center">{row.processState}</TableCell>
-                  <TableCell align="center">{row.state}</TableCell>
-                  <TableCell align="center">{row.deliveryDate}</TableCell>
+                  <TableCell align="center">{row.OrderCart?.quantity}</TableCell>
+                  <TableCell align="center">{row.handleStatus}</TableCell>
+                  <TableCell align="center">{row.bakingStatus ? row.bakingStatus: "Chưa xử lý"}</TableCell>
+                  <TableCell align="center">{new Date(row.Order?.pickUpTime).toLocaleDateString('vi-VN')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Button
+          <Button onClick={handleUpdate}
             sx={{
               padding: "0.5rem 2rem",
               border: "solid 2px #E82451",
