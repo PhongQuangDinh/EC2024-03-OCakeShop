@@ -2,6 +2,7 @@
 import { Box, Typography, Grid, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import Layout from "../layout";
 import React, { useState } from "react";
+import Link from "next/link";
 
 const CompleteDelivery = () => {
   const [inforDelivery, setInforDelivery] = useState([
@@ -59,10 +60,11 @@ const CompleteDelivery = () => {
               justifyContent: "center",
               alignItems: "center",
             }}>
+            <Link href="/handle-delivery" passHref>
               <Typography sx={{
                 fontSize: "30px",
                 fontWeight: "bold",
-              }}>Đang xử lý</Typography>
+              }}>Đang xử lý</Typography></Link>
             </Box>
             <Box sx={{
               backgroundColor: "#fff",
@@ -77,7 +79,7 @@ const CompleteDelivery = () => {
                 fontWeight: "bold",
                 textDecoration: "underline",
                 color: "#EA365F"
-              }}>Đã hoàn thành</Typography>
+              }}>Đã hoàn thành</Typography> 
             </Box>
           </Box>
           <Box sx={{
