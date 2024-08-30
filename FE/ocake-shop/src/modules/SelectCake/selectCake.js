@@ -3,14 +3,31 @@ import { Box, Typography, TextField, FormControl, InputLabel, Select, MenuItem, 
 import Layout from "../layout";
 import Image from "next/image";
 import logo from "./../../app/image/logo.png";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const SelectCake = () => {
-
-  const [selectedSize, setSelectedSize] = useState([]);
-  const [selectedFilling, setSelectedFilling] = useState([]);
-  const [selectedFloors, setSelectedFloors] = useState([]);
+  const [cake, setCake] = useState(null); // State to hold cake information
+  const [selectedSize, setSelectedSize] = useState(''); // State for size selection
+  const [selectedFloors, setSelectedFloors] = useState(1);
   const [note, setNote] = useState("");
+
+  useEffect(() => {
+    const fetchCakeInfo = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/cake/1`); // Replace '1' with the actual cake ID
+        if (!response.ok) {
+          throw new Error('Failed to fetch cake information');
+        }
+        const data = await response.json();
+        setCake(data);
+        setSelectedSize(data.cakeSizeID); // Initialize size from API data
+      } catch (error) {
+        console.error('Error fetching cake info:', error);
+      }
+    };
+
+    fetchCakeInfo();
+  }, []); // Empty dependency array means this runs once when the component mounts
 
   const handleChangeSize = (event) => {
     setSelectedSize(event.target.value);
@@ -20,15 +37,11 @@ const SelectCake = () => {
     setSelectedFloors(event.target.value);
   }
 
-  const handleChangeFilling = (event) => {
-    setSelectedFilling(event.target.value);
-  }
-
   const handleNoteChange = (event) => {
     setNote(event.target.value);
   }
 
-  const priceCake = 130000;
+  const priceCake = cake ? cake.priceCake : 0; // Use price from cake data if available
 
   return (
     <Layout>
@@ -36,25 +49,23 @@ const SelectCake = () => {
         background: "#fff",
         height: "175px",
         gap: "20px"
-      }}
-      >  
+      }}>
         <Box sx={{
           display: "flex", 
           alignItems: "center",
           padding: "90px",
           paddingLeft: "200px"
+        }}>
+          <Typography sx={{
+            display: "flex",
+            alignItems: "center",
+            color: "#E82552",
+            fontSize: "40px",
+            fontWeight: "bold",
+            fontFamily: "Montserrat, sans-serif",
           }}>
-           <Typography sx={{
-              display:"flex",
-              alignItems: "center",
-              color: "#E82552",
-              fontSize:"40px",
-              fontWeight:"bold",
-              fontFamily: "Montserrat, sans-serif",
-            }}
-            >
-              OcakeShop | Chi tiết bánh
-            </Typography>
+            OcakeShop | Chi tiết bánh
+          </Typography>
         </Box>
       </Box>
       <Box
@@ -94,8 +105,8 @@ const SelectCake = () => {
             }}>
               <Typography sx={{
                 color: "#000",
-                fontSize:"30px",
-                fontWeight:"bold",
+                fontSize: "30px",
+                fontWeight: "bold",
                 fontFamily: "Montserrat, sans-serif",
               }}>
                 Tên bánh
@@ -106,7 +117,7 @@ const SelectCake = () => {
                   fontSize: "30px",
                 }}
               >
-                Bánh kem cho bé trai
+                {cake ? cake.description : 'Loading...'}
               </Typography>
             </Box>
             <Box sx={{
@@ -114,7 +125,6 @@ const SelectCake = () => {
               alignContent: "center",
               paddingTop: "40px",
               gap: "90px"
-              
             }}>
               <Box sx={{
                 display: "flex",
@@ -122,8 +132,8 @@ const SelectCake = () => {
               }}>
                 <Typography sx={{
                   color: "#000",
-                  fontSize:"30px",
-                  fontWeight:"bold",
+                  fontSize: "30px",
+                  fontWeight: "bold",
                   fontFamily: "Montserrat, sans-serif",
                 }}>
                   Số tầng
@@ -132,15 +142,15 @@ const SelectCake = () => {
                   width: "20vw",
                 }}>
                   <InputLabel sx={{
-                    fontSize:"20px",
-                    id:"select-tang",
-
+                    fontSize: "20px",
+                    id: "select-tang",
                   }}>
-                    Tầng</InputLabel>
+                    Tầng
+                  </InputLabel>
                   <Select
-                  sx={{
-                    fontSize: "16px",
-                  }}
+                    sx={{
+                      fontSize: "16px",
+                    }}
                     labelId="select-floor"
                     id="select-floor"
                     value={selectedFloors}
@@ -154,7 +164,7 @@ const SelectCake = () => {
                 </FormControl>
               </Box>
             </Box>
-            
+
             <Box sx={{
               display: "flex",
               paddingTop: "20px",
@@ -162,35 +172,20 @@ const SelectCake = () => {
             }}>
               <Typography sx={{
                 color: "#000",
-                fontSize:"30px",
-                fontWeight:"bold",
+                fontSize: "30px",
+                fontWeight: "bold",
                 fontFamily: "Montserrat, sans-serif",
               }}>
                 Nhân bánh kem
               </Typography>
-              <FormControl sx={{
+              <Typography sx={{
                 width: "20vw",
+                fontSize: "30px",
               }}>
-                <InputLabel sx={{
-                    fontSize:"20px",
-                  }} 
-                   id="select-filling">Nhân</InputLabel>
-                <Select
-                  labelId="select-filling"
-                  id="select-filling"
-                  label="Filling"
-                  value={selectedFilling}
-                  onChange={handleChangeFilling}
-                >
-                  <MenuItem value={"Chocolate"}>Sô cô la</MenuItem>
-                  <MenuItem value={"Strawberry"}>Dâu tây</MenuItem>
-                  <MenuItem value={"Matcha"}>Trà xanh</MenuItem>
-                  <MenuItem value={"Pineapple"}>Dứa</MenuItem>
-                  <MenuItem value={"Coffee"}>Cà phê</MenuItem>
-                  <MenuItem value={"Cream Cheese"}>Kem phô mai</MenuItem>
-                </Select>
-              </FormControl>
+                {cake ? cake.cakeFillingID : 'Loading...'}
+              </Typography>
             </Box>
+            
             <Box sx={{
               display: "flex",
               paddingTop: "20px",
@@ -198,8 +193,8 @@ const SelectCake = () => {
             }}>
               <Typography sx={{
                 color: "#000",
-                fontSize:"30px",
-                fontWeight:"bold",
+                fontSize: "30px",
+                fontWeight: "bold",
                 fontFamily: "Montserrat, sans-serif",
               }}>
                 Size bánh kem
@@ -208,17 +203,17 @@ const SelectCake = () => {
                 width: "20vw",
               }}>
                 <InputLabel sx={{
-                    fontSize:"20px",
-                  }} 
-                   id="select-size">Size  </InputLabel>
+                    fontSize: "20px",
+                }} 
+                   id="select-size">Size</InputLabel>
                 <Select
                   labelId="select-size"
                   id="select-size"
-                  label="size"
+                  label="Size"
                   value={selectedSize}
                   onChange={handleChangeSize}
                 >
-                 <MenuItem value={16}>16 cm</MenuItem>
+                  <MenuItem value={16}>16 cm</MenuItem>
                   <MenuItem value={18}>18 cm</MenuItem>
                   <MenuItem value={20}>20 cm</MenuItem>
                   <MenuItem value={22}>22 cm</MenuItem>
@@ -235,8 +230,8 @@ const SelectCake = () => {
             }}>
               <Typography sx={{
                 color: "#000",
-                fontSize:"30px",
-                fontWeight:"bold",
+                fontSize: "30px",
+                fontWeight: "bold",
                 fontFamily: "Montserrat, sans-serif",
               }}>
                 Ghi chú
@@ -252,48 +247,49 @@ const SelectCake = () => {
                 onChange={handleNoteChange}
               />
             </Box>
-
           </Box>
+
           <Box sx={{
               marginTop: "30px",
               alignContent: 'center',
               display: "flex",
               gap: "10px"
             }}>
-              <Typography sx={{
-                fontSize: "30px",
-                fontWeight: "bold"
-              }}>
-                Giá
-              </Typography>
-              <Typography sx={{
-                fontSize: "30px",
-                fontWeight: "bold",
-                color: "#FF0000"
-              }}>
-                {priceCake}
-              </Typography>
-            </Box>
+            <Typography sx={{
+              fontSize: "30px",
+              fontWeight: "bold"
+            }}>
+              Giá
+            </Typography>
+            <Typography sx={{
+              fontSize: "30px",
+              fontWeight: "bold",
+              color: "#FF0000"
+            }}>
+              {priceCake}
+            </Typography>
+          </Box>
+
           <Box sx={{
             marginTop: "30px",
           }}>
             <Button
-                  variant="contained"
-                  sx={{
-                    marginBottom: 2,
-                    backgroundColor: "#FFDFE7",
-                    color: "#000000",
-                    border: "1px solid #e82652",
-                    "&:hover": {
-                      backgroundColor: "#FFC0CB",
-                      color: "#000000",
-                    },
-                    fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
-                    outline: "none",
-                  }}
-                >
-                  Thêm vào giỏ
-                </Button>
+              variant="contained"
+              sx={{
+                marginBottom: 2,
+                backgroundColor: "#FFDFE7",
+                color: "#000000",
+                border: "1px solid #e82652",
+                "&:hover": {
+                  backgroundColor: "#FFC0CB",
+                  color: "#000000",
+                },
+                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
+                outline: "none",
+              }}
+            >
+              Thêm vào giỏ
+            </Button>
           </Box>
         </Box>
       </Box>
