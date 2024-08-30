@@ -12,9 +12,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const Ingredient = () => {
-  const [formData, setFormData] = useState(null); // Initial state as null
+  const [formData, setFormData] = useState(null);
   const [error, setError] = useState('');
-  const [editingRow, setEditingRow] = useState(null); // State to track which row is being edited
+  const [editingRow, setEditingRow] = useState(null);
+  const [deletingRow, setDeletingRow] = useState(null); // State to track which row is being deleted
   const router = useRouter();
 
   useEffect(() => {
@@ -28,7 +29,7 @@ const Ingredient = () => {
     };
 
     fetchIngredient();
-  }, []);
+  }, [router]);
 
   const handleSave = async (id) => {
     try {
@@ -71,6 +72,35 @@ const Ingredient = () => {
         ? { ...item, quantity: item.quantity + 1 }
         : item
     ));
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await fetchWithAuth(router, `/ingredient/delete-ingredient/${id}`, {
+        method: "DELETE",
+      });
+      
+      // Remove the deleted item from the list
+      setFormData((prevState) => prevState.filter(item => item.ingredientID !== id));
+      alert('Nguyên liệu đã được xóa!');
+    } catch (err) {
+      setError('Lỗi khi xóa nguyên liệu: ' + err.message);
+    }
+  };
+
+  const handleOpenDeleteDialog = (id) => {
+    setDeletingRow(id); // Set the ingredient ID to be deleted
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeletingRow(null); // Close the dialog
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingRow !== null) {
+      handleDelete(deletingRow);
+      handleCloseDeleteDialog();
+    }
   };
 
   if (!formData) {
@@ -151,12 +181,20 @@ const Ingredient = () => {
                         Lưu
                       </Button>
                     ) : (
-                      <Button
-                        sx={{ color: "#e82652" }}
-                        onClick={() => handleEditClick(row.ingredientID)}
-                      >
-                        Chỉnh sửa
-                      </Button>
+                      <>
+                        <Button
+                          sx={{ color: "primary", mr: 1 }}
+                          onClick={() => handleEditClick(row.ingredientID)}
+                        >
+                          Chỉnh sửa
+                        </Button>
+                        <Button
+                          sx={{ color: "#e82652" }}
+                          onClick={() => handleOpenDeleteDialog(row.ingredientID)}
+                        >
+                          Xóa
+                        </Button>
+                      </>
                     )}
                   </TableCell>
                 </TableRow>
@@ -164,6 +202,23 @@ const Ingredient = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
+        {/* Xác nhận xóa */}
+        <Dialog
+          open={deletingRow !== null}
+          onClose={handleCloseDeleteDialog}
+        >
+          <DialogTitle>Xóa Nguyên Liệu</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Bạn có chắc chắn muốn xóa nguyên liệu này?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDeleteDialog}>Hủy</Button>
+            <Button onClick={handleConfirmDelete} color="error">Xóa</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Layout>
   );

@@ -53,5 +53,27 @@ router.put('/update-quantity/:ingredientID', async (req, res, next) => {
     next(err);
   }
 });
+// Route để xóa nguyên liệu
+router.delete('/delete-ingredient/:ingredientID', async (req, res, next) => {
+  try {
+    const { ingredientID } = req.params;
+
+    // Tìm nguyên liệu dựa trên ingredientID
+    const ingredient = await model.Ingredient.findByPk(ingredientID);
+
+    if (!ingredient) {
+      return res.status(404).json({ message: 'Ingredient not found' });
+    }
+
+    // Xóa nguyên liệu
+    await ingredient.destroy();
+
+    // Gửi phản hồi xác nhận xóa thành công
+    res.status(200).json({ message: 'Ingredient deleted successfully' });
+  } catch (err) {
+    // Chuyển lỗi cho middleware xử lý lỗi toàn cục
+    next(err);
+  }
+});
 
 module.exports = router;
