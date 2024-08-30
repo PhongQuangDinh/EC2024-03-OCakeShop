@@ -23,6 +23,9 @@ const CartPage = () => {
     try {
       const response = await fetchWithAuth(router, '/cart/');
       // const data = await response.json();
+      if(!response){
+        router.push('/home');
+      }
       console.log(response);
       setRows(response);
     }
@@ -97,7 +100,6 @@ const CartPage = () => {
 
   const changeQuantityCake = async (row) => {
     try {
-      
       const response = await fetchWithAuth(router, `/cart/update-cake`, {
         method: "POST",
         body: JSON.stringify(row),

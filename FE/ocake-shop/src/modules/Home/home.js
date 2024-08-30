@@ -80,7 +80,7 @@ const HomePage = () => {
 
   const GetCategory = async () => {
     try {
-      const response = await fetch(`${apiUrl}/cake/purpose`, {
+      const response = await fetch(`${apiUrl}/cake/purpose/all`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

@@ -49,6 +49,9 @@ const Payment = () => {
       
       try {
         const data = await fetchWithAuth(router, '/cart/buying');  // if method not defined it would be GET by default
+        if(!data){
+          router.push('/cart');
+        }
         setInfoCake(data);
       } catch (err) {
         setError('SOS ' + err.message);

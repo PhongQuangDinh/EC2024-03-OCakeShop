@@ -4,33 +4,53 @@ import Layout from "../layout";
 import Image from "next/image";
 import logo from "./../../app/image/logo.png";
 import React, { useState, useEffect } from 'react';
+import { fetchWithAuth } from '../../../WebConfig';
+import { useRouter } from 'next/navigation';
 
 const SelectCake = () => {
   const [cake, setCake] = useState(''); // State to hold cake information
   const [selectedSize, setSelectedSize] = useState(''); // State for size selection
   const [selectedFloors, setSelectedFloors] = useState(1);
   const [note, setNote] = useState("");
+  const [error, setError] = useState(''); 
   const cakeId = 1;
-  if (cakeId){
-    useEffect(() => {
-      const fetchCakeInfo = async () => {
-        try {
-          const response = await fetch(router, `/cake/${cakeId}`); // Replace '1' with the actual cake ID
-          if (!response.ok) {
-            throw new Error('Failed to fetch cake information');
-          }
-          const data = await response.json();
-          setCake(data);
-          setSelectedSize(data.cakeSizeID); // Initialize size from API data
-        } catch (error) {
-          console.error('Error fetching cake info:', error);
-        }
-      };
+  const router = useRouter();
+  // if (cakeId){
+  //   useEffect(() => {
+  //     const fetchCakeInfo = async () => {
+  //       try {
+  //         const response = await fetch(router, `/cake/${cakeId}`); // Replace '1' with the actual cake ID
+  //         if (!response.ok) {
+  //           throw new Error('Failed to fetch cake information');
+  //         }
+  //         const data = await response.json();
+  //         setCake(data);
+  //         setSelectedSize(data.cakeSizeID); // Initialize size from API data
+  //       } catch (error) {
+  //         console.error('Error fetching cake info:', error);
+  //       }
+  //     };
   
-      fetchCakeInfo();
-    }, []);
-  }
-   // Empty dependency array means this runs once when the component mounts
+  //     fetchCakeInfo();
+  //   }, []);
+  // }
+
+  useEffect(()=>{
+    const fetchCake = async () => {
+      try {
+        const data = await fetchWithAuth(router, `/cake/${id}`);
+        if(!data){
+          console.log("Not get Cake");
+        }
+        setCake(data);
+      }
+      catch (error) {
+        setError(error);
+        console.error('Failed to fetch' + error);
+      }
+    };
+    fetchCake();
+  }, []);
 
   const handleChangeSize = (event) => {
     setSelectedSize(event.target.value);
