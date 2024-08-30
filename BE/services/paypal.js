@@ -57,7 +57,7 @@ async function createOrder() {
                 cancel_url: apiUrl + '/payment/CANCEL-ORDER',
                 shipping_preference: 'NO_SHIPPING',
                 user_action: 'PAY_NOW',
-                brand_name: 'dinhquangphong.io'
+                brand_name: 'Ocake-shop'
             }
         })  
     }) 

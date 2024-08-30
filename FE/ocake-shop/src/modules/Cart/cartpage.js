@@ -2,21 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import Layout from '../layout';
-import { getApiUrl } from '../../../WebConfig';
+import { getApiUrl, fetchWithAuth } from '../../../WebConfig';
+import { useRouter } from 'next/navigation';
 
 const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
-  // const [rows, setRows] = useState([
-  //   { id: 1, name: 'Bánh kem sinh nhật hồng cho bé gái | 2 tầng | 24cm, 20cm | Chocolate', price: 120000, quantity: 1, stockLimit: 10 },
-  //   { id: 2, name: 'Nón sinh nhật', price: 30000, quantity: 2, stockLimit: 5 },
-  //   { id: 3, name: 'Nến thơm', price: 120000, quantity: 1, stockLimit: 20 },
-  // ]);
   const [rows, setRows] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const apiUrl = getApiUrl();
   const [error, setError] = useState('');
-  const [value, setValue] = useState();
+  const [value, setValue] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     fetchCart();
@@ -24,36 +21,10 @@ const CartPage = () => {
 
   const fetchCart = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('No token found, please log in again.');
-        router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
-        return;
-      }
-      const response = await fetch(`${apiUrl}/cart/`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-      });
-
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await response.json();
-          setError(errorData.message || 'Failed to get cart.');
-        } else {
-          const errorText = await response.text();
-          setError(errorText || 'An error occurred.');
-        }
-        return;
-      }
-      const data = await response.json();
-      console.log(data);
-      setRows(data);
-
-
+      const response = await fetchWithAuth(router, '/cart/');
+      // const data = await response.json();
+      console.log(response);
+      setRows(response);
     }
     catch(err){
       console.error(err);
@@ -124,55 +95,54 @@ const CartPage = () => {
     }
   };
 
-  const changeQuantityCake = async () => {
+  const changeQuantityCake = async (row) => {
     try {
-      const response = await fetchWithAuth(router, '/cart/update-cake', {
+      
+      const response = await fetchWithAuth(router, `/cart/update-cake`, {
         method: "POST",
-        body: JSON.stringify(value),
+        body: JSON.stringify(row),
         headers: {
           "Content-Type": "application/json",
         },
       });
+      console.log('Change Quantity Cake called with ' + row.quantity);
       if (response) {
-        alert('Profile updated successfully!');
-        window.location.reload();
+        // alert('Cart updated successfully!');
+        router.push('/cart');
       }
     }
     catch (error) {
-      setError('Error updating profile: ' + err.message);
+      setError('Error updating cart: ' + error);
+      console.log(error);
+    }
+  }
+
+  const handleOrder = async () => {
+    try {
+      // console.log('handleOrder + SOSSSSSSSSSSSSS')
+      if(rows.length <= 0) {
+        router.push('/home');
+      }
+      if(selectedItems.length <= 0) {
+        setError('Chọn bánh kem muốn mua');
+      }
+      
+    }
+    catch(err){
+      console.log(err);
+      setError('Error order: ' + err)
     }
   }
   
   const deleteCake = async (id) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('No token found, please log in again.');
-        router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
-        return;
-      }
-  
-      const response = await fetch(`${apiUrl}/cart/delete-cake/${id}`, {
+
+      const data = await fetchWithAuth(router, `/cart/delete-cake/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
         },
-      });
-      console.log(`${apiUrl}/cart/delete-cake/${id}`)
-  
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await response.json();
-          setError(errorData.message || 'Failed to delete the item.');
-        } else {
-          const errorText = await response.text();
-          setError(errorText || 'An error occurred.');
-        }
-        return;
-      }
-  
+      });  
       console.log('Item deleted successfully');
     } catch (e) {
       console.error('Delete failed:', e);
@@ -232,7 +202,7 @@ const CartPage = () => {
                       <Button 
                         variant="outlined" 
                         sx={{ minWidth: '30px' }} 
-                        onClick={() => decreaseQuantity(row.cartID)}
+                        onClick={() => decreaseQuantity(row.cartID) & setValue(row)}
                       >
                         -
                       </Button>
@@ -240,7 +210,7 @@ const CartPage = () => {
                       <Button 
                         variant="outlined" 
                         sx={{ minWidth: '30px' }} 
-                        onClick={() => increaseQuantity(row.cartID)}
+                        onClick={() => increaseQuantity(row.cartID) & setValue(row)}
                         // disabled={row.quantity >= row.stockLimit}
                       >
                         +
@@ -253,7 +223,7 @@ const CartPage = () => {
                   
                   </TableCell>
                   <TableCell align="center">
-                    <Button color="primary" onClick={() => changeQuantityCake(row.cartID, row.quantity)}>Lưu</Button>
+                    <Button color="primary" onClick={() => changeQuantityCake(row)}>Lưu</Button>
                   
                   </TableCell>
                   
@@ -285,7 +255,15 @@ const CartPage = () => {
                         fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
                         outline: "none",
                       }}
+                    onClick={handleOrder}
           >Mua hàng</Button>
+        </Box>
+        <Box sx={{
+          display: 'flex',
+          alignContent: 'center',
+          justifyContent: 'center',
+        }}>
+          {error && selectedItems.length <=0  && <Typography color="error">{error}</Typography>}
         </Box>
         <Dialog
           open={openDialog}
