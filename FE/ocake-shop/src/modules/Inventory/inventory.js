@@ -114,6 +114,7 @@ const Ingredient = () => {
           <Table>
             <TableHead>
               <TableRow>
+              <TableCell align="center">STT</TableCell>
                 <TableCell align="center">Tên sản phẩm</TableCell>
                 <TableCell align="right">Số lượng</TableCell>
                 <TableCell align="center">Đơn vị</TableCell>
@@ -124,6 +125,7 @@ const Ingredient = () => {
             <TableBody>
               {formData.map((row) => (
                 <TableRow key={row.id}>
+                <TableCell>{row.ingredientID}</TableCell>
                   <TableCell>{row.title}</TableCell>
                   <TableCell align="right">{row.quantity}</TableCell>
                   <TableCell align="center">{row.unit}</TableCell>
