@@ -37,9 +37,9 @@ const CartPage = () => {
   }
 
   const calculateTotal = () => {
-    return rows.reduce((acc, row) => {
-      if (selectedItems.includes(row.cartID)) {
-        return acc + (row.Cake.cakeSize.priceSize + row.Cake.cakeFilling.priceCakeFilling) * row.quantity;
+    return rows?.reduce((acc, row) => {
+      if (selectedItems.includes(row?.cartID)) {
+        return acc + (row?.Cake.cakeSize.priceSize + row?.Cake.cakeFilling.priceCakeFilling) * row?.quantity;
       }
       return acc;
       }, 0);
@@ -47,7 +47,7 @@ const CartPage = () => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedItems(rows.map(row => row.cartID));
+      setSelectedItems(rows?.map(row => row?.cartID));
     } else {
       setSelectedItems([]);
     }
@@ -62,23 +62,23 @@ const CartPage = () => {
   };
 
   const increaseQuantity = (id) => {
-    setRows(rows.map(row => {
+    setRows(rows?.map(row => {
       // if (row.cartID === id && row.quantity < row.stockLimit) {
-      if (row.cartID === id) {
-        return { ...row, quantity: row.quantity + 1 };
+      if (row?.cartID === id) {
+        return { ...row, quantity: row?.quantity + 1 };
       }
       return row;
     }));
   };
 
   const decreaseQuantity = (id) => {
-    setRows(rows.map(row => {
-      if (row.cartID === id) {
-        if (row.quantity === 1) {
-          setItemToDelete(row.cartID);
+    setRows(rows?.map(row => {
+      if (row?.cartID === id) {
+        if (row?.quantity === 1) {
+          setItemToDelete(row?.cartID);
           setOpenDialog(true);
         } else {
-          return { ...row, quantity: row.quantity - 1 };
+          return { ...row, quantity: row?.quantity - 1 };
         }
       }
       return row;
@@ -88,7 +88,7 @@ const CartPage = () => {
   const handleDeleteItem = async () => {
     try {
       await deleteCake(itemToDelete);  // This calls the API to delete the item from the backend database.
-      setRows(rows.filter(row => row.cartID !== itemToDelete));  // Update the state to remove the deleted item.
+      setRows(rows?.filter(row => row?.cartID !== itemToDelete));  // Update the state to remove the deleted item.
       setSelectedItems(selectedItems.filter(id => id !== itemToDelete));
       setOpenDialog(false);
       setItemToDelete(null);
@@ -107,7 +107,7 @@ const CartPage = () => {
           "Content-Type": "application/json",
         },
       });
-      console.log('Change Quantity Cake called with ' + row.quantity);
+      console.log('Change Quantity Cake called with ' + row?.quantity);
       if (response) {
         // alert('Cart updated successfully!');
         router.push('/cart');
@@ -121,7 +121,7 @@ const CartPage = () => {
 
   const handleOrder = async () => {
     try {
-      if(rows.length <= 0) {
+      if(rows?.length <= 0) {
         router.push('/home');
         return;
       }
@@ -130,7 +130,7 @@ const CartPage = () => {
         return;
       }
       for (let id of selectedItems) {
-        const row = rows.find(row => row.cartID === id);
+        const row = rows?.find(row => row?.cartID === id);
         const data = await fetchWithAuth(router, '/cart/buying', {
           method: "POST",
           body: JSON.stringify(row),
@@ -179,7 +179,7 @@ const CartPage = () => {
     setOpenDialog(true);
   };
 
-  const isAllSelected = rows.length > 0 && selectedItems.length === rows.length;
+  const isAllSelected = rows?.length > 0 && selectedItems?.length === rows?.length;
 
   return (
     <Layout>
@@ -199,18 +199,18 @@ const CartPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.cartID}>
+              {rows?.map((row) => (
+                <TableRow key={row?.cartID}>
                   <TableCell>
                     <Checkbox 
-                      checked={selectedItems.includes(row.cartID)}
-                      onChange={(event) => handleSelectItem(event, row.cartID)} 
+                      checked={selectedItems.includes(row?.cartID)}
+                      onChange={(event) => handleSelectItem(event, row?.cartID)} 
                     />
-                    {"Bánh kem nhân " + row.Cake.cakeFilling.title + " kích thước" + row.Cake.cakeSize.title}
+                    {"Bánh kem nhân " + row?.Cake.cakeFilling.title + " kích thước" + row?.Cake.cakeSize.title}
                   </TableCell>
                   <TableCell align="right">
                     {/* {row.price.toLocaleString()} VND */}
-                    {row.Cake.cakeSize.priceSize + row.Cake.cakeFilling.priceCakeFilling} VND
+                    {row?.Cake.cakeSize.priceSize + row?.Cake.cakeFilling.priceCakeFilling} VND
                     {/* <Typography variant="body2" color="textSecondary">
                       Kho: {row.stockLimit}
                     </Typography> */}
@@ -220,24 +220,24 @@ const CartPage = () => {
                       <Button 
                         variant="outlined" 
                         sx={{ minWidth: '30px' }} 
-                        onClick={() => decreaseQuantity(row.cartID) & setValue(row)}
+                        onClick={() => decreaseQuantity(row?.cartID) & setValue(row)}
                       >
                         -
                       </Button>
-                      <Box component="span" sx={{ mx: 2 }}>{row.quantity}</Box>
+                      <Box component="span" sx={{ mx: 2 }}>{row?.quantity}</Box>
                       <Button 
                         variant="outlined" 
                         sx={{ minWidth: '30px' }} 
-                        onClick={() => increaseQuantity(row.cartID) & setValue(row)}
+                        onClick={() => increaseQuantity(row?.cartID) & setValue(row)}
                         // disabled={row.quantity >= row.stockLimit}
                       >
                         +
                       </Button>
                     </Box>
                   </TableCell>
-                  <TableCell align="right">{((row.Cake.cakeSize.priceSize + row.Cake.cakeFilling.priceCakeFilling) * row.quantity).toLocaleString()} VND</TableCell>
+                  <TableCell align="right">{((row?.Cake.cakeSize.priceSize + row?.Cake.cakeFilling.priceCakeFilling) * row?.quantity).toLocaleString()} VND</TableCell>
                   <TableCell align="center">
-                    <Button color="error" onClick={() => handleDeleteClick(row.cartID)}>Xóa</Button>
+                    <Button color="error" onClick={() => handleDeleteClick(row?.cartID)}>Xóa</Button>
                   
                   </TableCell>
                   <TableCell align="center">
@@ -253,13 +253,13 @@ const CartPage = () => {
         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginTop: '40px', maxWidth: '1170px', margin: '40px auto' }}>
           <Box display="flex" alignItems="center">
             <Checkbox 
-              indeterminate={selectedItems.length > 0 && selectedItems.length < rows.length}
+              indeterminate={selectedItems.length > 0 && selectedItems.length < rows?.length}
               checked={isAllSelected}
               onChange={handleSelectAll} 
             />
             <Typography variant="body1">Chọn tất cả</Typography>
           </Box>
-          <Typography variant="h6">Tổng thanh toán: {calculateTotal().toLocaleString()} VND</Typography>
+          <Typography variant="h6">Tổng thanh toán: {calculateTotal()?.toLocaleString()} VND</Typography>
           <Button variant="contained" 
                   sx={{ 
                         marginRight: '100px',
