@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const model = require('../models');
+const { Op } = require("sequelize");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -48,20 +49,21 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-router.get("/purpose",  async (req, res, next) =>{
-  try{
+router.get("/purpose/all", async (req, res, next) => {
+  try {
     const purpose = await model.Purpose.findAll({
       where: {
-        purposeID_ref: null
+        purposeID_ref: {
+          [Op.is]: null // This should translate to IS NULL in SQL
+        }
       }
     });
 
-    if(!purpose){
-      return res.status(404).json({message: "No purpose found"});
+    if (!purpose || purpose.length === 0) {
+      return res.status(404).json({ message: "No purpose found" });
     }
     return res.status(200).json(purpose);
-  }
-  catch (err) {
+  } catch (err) {
     next(err);
   }
 });

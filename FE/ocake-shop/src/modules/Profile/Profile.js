@@ -305,7 +305,7 @@ const Profile = () => {
               fontWeight: "bold",
               fontFamily: "Montserrat, sans-serif",
             }}>
-              Phương thức thanh toán
+              Tên ngân hàng
             </Typography>
             <Box sx={{
               display: "flex",
@@ -313,7 +313,7 @@ const Profile = () => {
             }}>
               <TextField
                 name="paymentMethod"
-                value={formData.CreditCard?.paymentMethod}
+                value={formData.CreditCard?.bankName}
                 onChange={handleChange}
                 sx={{
                   width: "100%",
@@ -332,7 +332,7 @@ const Profile = () => {
           }}>
             <TextField
               name="accountNumber"
-              value={formData.CreditCard?.accountNumber}
+              value={formData.CreditCard?.creditSerialNumber}
               onChange={handleChange}
               sx={{
                 width: "600px",
