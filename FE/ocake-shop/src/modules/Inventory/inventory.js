@@ -14,15 +14,14 @@ import Link from 'next/link';
 const Ingredient = () => {
   const [formData, setFormData] = useState(null); // Initial state as null
   const [error, setError] = useState('');
-  // const [rows, setRows] = useState([]); // State to hold table data
-  const [openDialog, setOpenDialog] = useState(false); // State for dialog visibility
+  const [editingRow, setEditingRow] = useState(null); // State to track which row is being edited
   const router = useRouter();
 
   useEffect(() => {
     const fetchIngredient = async () => {
       try {
         const data = await fetchWithAuth(router, '/ingredient');
-        setFormData(data || {});
+        setFormData(data || []);
       } catch (err) {
         setError('SOS ' + err.message);
       }
@@ -31,52 +30,47 @@ const Ingredient = () => {
     fetchIngredient();
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = async (id) => {
     try {
-      const data = await fetchWithAuth(router, '/ingredient/update', {
-        method: "POST",
-        body: JSON.stringify(formData),
+      const data = await fetchWithAuth(router, `/ingredient/update-quantity/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ quantity: formData.find(item => item.ingredientID === id).quantity }),
         headers: {
           "Content-Type": "application/json",
         },
       });
-
+  
       if (data) {
-        alert('Ingredient updated successfully!');
-        router.push('/ingredients'); // Redirect to ingredient list page
+        alert('Cập nhật số lượng thành công!');
+        setEditingRow(null); // Exit edit mode
       }
     } catch (err) {
-      setError('Error updating ingredient: ' + err.message);
+      setError('Lỗi khi cập nhật số lượng: ' + err.message);
     }
+  };
+  
+  const handleEditClick = (id) => {
+    setEditingRow(id); // Enter edit mode for this row
   };
 
   const handleCancel = () => {
-    console.log('Changes cancelled');
-    router.push('/ingredients'); // Redirect to ingredient list page
+    setEditingRow(null); // Exit edit mode
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  const decreaseQuantity = (id) => {
+    setFormData((prevState) => prevState.map(item =>
+      item.ingredientID === id && item.quantity > 0
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    ));
   };
 
-  const handleDateChange = (date) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      expirationDate: dayjs(date).format('YYYY-MM-DD'),
-    }));
-  };
-
-  const handleEditClick = (id) => {
-    // Handle logic to edit row with specific id
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const increaseQuantity = (id) => {
+    setFormData((prevState) => prevState.map(item =>
+      item.ingredientID === id
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    ));
   };
 
   if (!formData) {
@@ -114,9 +108,9 @@ const Ingredient = () => {
           <Table>
             <TableHead>
               <TableRow>
-              <TableCell align="center">STT</TableCell>
-                <TableCell align="center">Tên sản phẩm</TableCell>
-                <TableCell align="right">Số lượng</TableCell>
+                <TableCell align="left">STT</TableCell>
+                <TableCell align="left">Tên sản phẩm</TableCell>
+                <TableCell align="center">Số lượng</TableCell>
                 <TableCell align="center">Đơn vị</TableCell>
                 <TableCell align="center">Hạn sử dụng</TableCell>
                 <TableCell align="center">Thao tác</TableCell>
@@ -124,39 +118,52 @@ const Ingredient = () => {
             </TableHead>
             <TableBody>
               {formData.map((row) => (
-                <TableRow key={row.id}>
-                <TableCell>{row.ingredientID}</TableCell>
+                <TableRow key={row.ingredientID}>
+                  <TableCell>{row.ingredientID}</TableCell>
                   <TableCell>{row.title}</TableCell>
-                  <TableCell align="right">{row.quantity}</TableCell>
+                  <TableCell align="center">
+                    <Box display="flex" justifyContent="center" alignItems="center" sx={{ minWidth: '100px' }}>
+                      <Button 
+                        variant="outlined" 
+                        sx={{ minWidth: '30px', visibility: editingRow === row.ingredientID ? 'visible' : 'hidden' }}
+                        onClick={() => decreaseQuantity(row.ingredientID)}
+                      >
+                        -
+                      </Button>
+                      <Box component="span" sx={{ mx: 2 }}>{row.quantity}</Box>
+                      <Button 
+                        variant="outlined" 
+                        sx={{ minWidth: '30px', visibility: editingRow === row.ingredientID ? 'visible' : 'hidden' }}
+                        onClick={() => increaseQuantity(row.ingredientID)}
+                      >
+                        +
+                      </Button>
+                    </Box>
+                  </TableCell>
                   <TableCell align="center">{row.unit}</TableCell>
                   <TableCell align="center">{row.expirationDate}</TableCell>
                   <TableCell align="center">
-                    <Button
-                      sx={{
-                        color: "#e82652",
-                      }}
-                      onClick={() => handleEditClick(row.id)}
-                    >
-                      Chỉnh sửa
-                    </Button>
+                    {editingRow === row.ingredientID ? (
+                      <Button
+                        sx={{ color: "#e82652" }}
+                        onClick={() => handleSave(row.ingredientID)}
+                      >
+                        Lưu
+                      </Button>
+                    ) : (
+                      <Button
+                        sx={{ color: "#e82652" }}
+                        onClick={() => handleEditClick(row.ingredientID)}
+                      >
+                        Chỉnh sửa
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle>Chỉnh sửa sản phẩm</DialogTitle>
-          <DialogContent>
-            <DialogContentText>Chỉnh sửa thông tin sản phẩm tại đây.</DialogContentText>
-            {/* Form chỉnh sửa sản phẩm */}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary">Hủy</Button>
-            <Button color="primary">Xác nhận</Button>
-          </DialogActions>
-        </Dialog>
       </Box>
     </Layout>
   );
