@@ -10,24 +10,27 @@ const SelectCake = () => {
   const [selectedSize, setSelectedSize] = useState(''); // State for size selection
   const [selectedFloors, setSelectedFloors] = useState(1);
   const [note, setNote] = useState("");
-
-  useEffect(() => {
-    const fetchCakeInfo = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/cake/1`); // Replace '1' with the actual cake ID
-        if (!response.ok) {
-          throw new Error('Failed to fetch cake information');
+  const cakeId = 1;
+  if (cakeId){
+    useEffect(() => {
+      const fetchCakeInfo = async () => {
+        try {
+          const response = await fetch(router, `/cake/${cakeId}`); // Replace '1' with the actual cake ID
+          if (!response.ok) {
+            throw new Error('Failed to fetch cake information');
+          }
+          const data = await response.json();
+          setCake(data);
+          setSelectedSize(data.cakeSizeID); // Initialize size from API data
+        } catch (error) {
+          console.error('Error fetching cake info:', error);
         }
-        const data = await response.json();
-        setCake(data);
-        setSelectedSize(data.cakeSizeID); // Initialize size from API data
-      } catch (error) {
-        console.error('Error fetching cake info:', error);
-      }
-    };
-
-    fetchCakeInfo();
-  }, []); // Empty dependency array means this runs once when the component mounts
+      };
+  
+      fetchCakeInfo();
+    }, []);
+  }
+   // Empty dependency array means this runs once when the component mounts
 
   const handleChangeSize = (event) => {
     setSelectedSize(event.target.value);
