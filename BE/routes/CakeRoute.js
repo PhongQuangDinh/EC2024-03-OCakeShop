@@ -25,6 +25,29 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+
+router.get("/:id", async (req, res, next) => {
+  try {
+    const cakes = await model.Cake.findByPk(req.params.id, {
+      include: {
+        model:  model.CakeImage,
+        as: "cakeImages",
+        required: true,
+        include: 
+        {
+          model: model.ImageDetail,
+          as: "imageDetail",
+          required: true,
+        }
+      }
+    });
+
+    res.status(200).json(cakes);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get("/purpose",  async (req, res, next) =>{
   try{
     const purpose = await model.Purpose.findAll({
@@ -88,28 +111,6 @@ router.get('/cake-sizes', async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res, next) => {
-    try {
-        const cake = await model.Cake.findByPk(req.params.id, {
-            include:
-                {
-                    model: model.CakeImage,
-                    as: "cakeImages",
-                    required: true,
-                    include: 
-                    {
-                      model: model.ImageDetail,
-                      as: "imageDetail",
-                      required: true,
-                    }
-                }
-        });
-            
-        res.status(200).json(cake.cakeImages);
-        // );
-    }
-    catch (err) { next(err); }
-});
 
 // thêm loại bánh mới (admin)
 // Route để thêm loại bánh mới
