@@ -12,7 +12,8 @@ import { Box, Button, IconButton, Tab, Tabs } from "@mui/material";
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 import { useEffect } from "react";
 import { useState } from "react";
-import { getApiUrl } from '../../../WebConfig';
+import { getApiUrl, fetchWithAuth } from '../../../WebConfig';
+import { useRouter } from 'next/navigation';
 
 export default function ProcessOrder() {
   const [rows, setRows] = useState([]);
@@ -20,6 +21,7 @@ export default function ProcessOrder() {
   const [movingRowIndex, setMovingRowIndex] = useState(null);
   const apiUrl = getApiUrl();
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -27,35 +29,42 @@ export default function ProcessOrder() {
 
   const handleUpdate = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('No token found, please log in again.');
-        router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
-        return;
-      }
-      const response = await fetch(`${apiUrl}/ordercake/manage/update`, {
+      const data = await fetchWithAuth(router, '/ordercake/manage/update', {
         method: "POST",
+        body: JSON.stringify(rows),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(rows),
       });
+      // const token = localStorage.getItem('token');
+      // if (!token) {
+      //   setError('No token found, please log in again.');
+      //   router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+      //   return;
+      // }
+      // const response = await fetch(`${apiUrl}/ordercake/manage/update`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "Authorization": `Bearer ${token}`
+      //   },
+      //   body: JSON.stringify(rows),
+      // });
 
-      if (!response.ok) {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await response.json();
-          setError(errorData.message || 'Failed to update profile.');
-        } else {
-          const errorText = await response.text();
-          setError(errorText || 'An error occurred.');
-        }
-        return;
-      }
+      // if (!response.ok) {
+      //   const contentType = response.headers.get("content-type");
+      //   if (contentType && contentType.includes("application/json")) {
+      //     const errorData = await response.json();
+      //     setError(errorData.message || 'Failed to update profile.');
+      //   } else {
+      //     const errorText = await response.text();
+      //     setError(errorText || 'An error occurred.');
+      //   }
+      //   return;
+      // }
 
-      const data = await response.json();
-      alert('Cập nhật thành công!');
+      // const data = await response.json();
+      // alert('Cập nhật thành công!');
       window.location.reload();
       // router.push('/profile');
     } catch (error) {
@@ -65,34 +74,34 @@ export default function ProcessOrder() {
 
   const fetchOrder = async() => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${apiUrl}/ordercake/manage`, {
-        method: "GET",
-          headers: {
-            "authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-      });
+      const data = await fetchWithAuth(router, '/ordercake/manage');
+      // const token = localStorage.getItem('token');
+      // const response = await fetch(`${apiUrl}/ordercake/manage`, {
+      //   method: "GET",
+      //     headers: {
+      //       "authorization": `Bearer ${token}`,
+      //       "Content-Type": "application/json",
+      //     },
+      // });
 
-      if (!response.ok) {
-        if (response.status === 403) {
-          setError('Session expired. Please log in again.');
-          localStorage.removeItem('token');
-          router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
-        } else {
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            const errorData = await response.json();
-            setError(errorData.message || 'Get order failed');
-          } else {
-            const errorText = await response.text();
-            setError(errorText || 'An error occurred');
-          }
-        }
-        return;
-      }
+      // if (!response.ok) {
+      //   if (response.status === 403) {
+      //     setError('Session expired. Please log in again.');
+      //     router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+      //   } else {
+      //     const contentType = response.headers.get("content-type");
+      //     if (contentType && contentType.includes("application/json")) {
+      //       const errorData = await response.json();
+      //       setError(errorData.message || 'Get order failed');
+      //     } else {
+      //       const errorText = await response.text();
+      //       setError(errorText || 'An error occurred');
+      //     }
+      //   }
+      //   return;
+      // }
 
-      const data = await response.json();
+      // const data = await response.json();
       console.log(data);
       setRows(data || '');
 

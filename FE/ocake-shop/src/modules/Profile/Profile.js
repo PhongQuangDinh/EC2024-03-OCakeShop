@@ -26,45 +26,6 @@ const Profile = () => {
       } catch (err) {
         setError('SOS ' + err.message);
       }
-      // const token = localStorage.getItem('token');
-      // if (!token) {
-      //   console.log('No token found');
-      //   return;
-      // }
-
-      // try {
-      //   const response = await fetch(`${apiUrl}/customer/myinfo`, {
-      //     method: "GET",
-      //     headers: {
-      //       "authorization": `Bearer ${token}`,
-      //       "Content-Type": "application/json",
-      //     },
-      //   });
-
-      //   if (!response.ok) {
-      //     if (response.status === 403) {
-      //       setError('Session expired. Please log in again.');
-      //       localStorage.removeItem('token');
-      //       router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
-      //     } else {
-      //       const contentType = response.headers.get("content-type");
-      //       if (contentType && contentType.includes("application/json")) {
-      //         const errorData = await response.json();
-      //         setError(errorData.message || 'Get profile failed');
-      //       } else {
-      //         const errorText = await response.text();
-      //         setError(errorText || 'An error occurred');
-      //       }
-      //     }
-      //     return;
-      //   }
-
-      //   const data = await response.json();
-      //   setFormData(data?.Customer || '');
-      // } catch (err) {
-      //   setError('SOS ' + err.message);
-      //   console.log('SOS ' + err.message);
-      // }
     };
 
     fetchProfile();

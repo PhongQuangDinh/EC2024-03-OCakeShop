@@ -18,118 +18,80 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import Layout from "../layout";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { fetchWithAuth } from '../../../WebConfig';
 
 const Payment = () => {
   const router = useRouter();
-  const [inforCustomer, setInforCustomer] = useState([
-    "Phạm Uyễn Nhi",
-    "0123456789",
-    "191 Nguyễn Trãi phường 1 quận 5 TP.HCM",
-  ]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const today = dayjs();
+  const minDate = today.add(2, 'day');
+  const [inforCustomer, setInforCustomer] = useState('');
   const [error, setError] = useState('');
-  const [inforCake, setInforCake] = useState([
-    {
-      id: 1,
-      name: "Bánh kem sinh nhật hồng cho bé gái",
-      floor: "2 tầng",
-      size: "24cm, 20cm",
-      filling: "Chocolate",
-      quantity: 2,
-      price: 120000,
-    },
-    {
-      id: 2,
-      name: "Bánh kem sinh nhật hồng cho bé gái",
-      floor: "1 tầng",
-      size: "24cm, 20cm",
-      filling: "Chocolate",
-      quantity: 1,
-      price: 100000,
-    },
-    {
-      id: 3,
-      name: "Bánh kem sinh nhật hồng cho bé gái",
-      floor: "1 tầng",
-      size: "24cm, 20cm",
-      filling: "Chocolate",
-      quantity: 1,
-      price: 100000,
-    },
-    {
-      id: 3,
-      name: "Bánh kem sinh nhật hồng cho bé gái",
-      floor: "1 tầng",
-      size: "24cm, 20cm",
-      filling: "Chocolate",
-      quantity: 1,
-      price: 100000,
-    },
-    {
-      id: 3,
-      name: "Bánh kem sinh nhật hồng cho bé gái",
-      floor: "1 tầng",
-      size: "24cm, 20cm",
-      filling: "Chocolate",
-      quantity: 1,
-      price: 100000,
-    },
-    {
-      id: 3,
-      name: "Bánh kem sinh nhật hồng cho bé gái",
-      floor: "1 tầng",
-      size: "24cm, 20cm",
-      filling: "Chocolate",
-      quantity: 1,
-      price: 100000,
-    },
-    {
-      id: 3,
-      name: "Bánh kem sinh nhật hồng cho bé gái",
-      floor: "1 tầng",
-      size: "24cm, 20cm",
-      filling: "Chocolate",
-      quantity: 1,
-      price: 100000,
-    },
-    {
-      id: 3,
-      name: "Bánh kem sinh nhật hồng cho bé gái",
-      floor: "1 tầng",
-      size: "24cm, 20cm",
-      filling: "Chocolate",
-      quantity: 1,
-      price: 100000,
-    },
-    {
-      id: 3,
-      name: "Bánh kem sinh nhật hồng cho bé gái",
-      floor: "1 tầng",
-      size: "24cm, 20cm",
-      filling: "Chocolate",
-      quantity: 1,
-      price: 100000,
-    },
-  ]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      
+      try {
+        const data = await fetchWithAuth(router, '/customer/myinfo');  // if method not defined it would be GET by default
+        setInforCustomer(data?.Customer || '');
+      } catch (err) {
+        setError('SOS ' + err.message);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  useEffect(() => {
+    const fetchCake = async () => {
+      
+      try {
+        const data = await fetchWithAuth(router, '/cart/buying');  // if method not defined it would be GET by default
+        setInfoCake(data);
+      } catch (err) {
+        setError('SOS ' + err.message);
+      }
+    };
+
+    fetchCake();
+  }, []);
+
+  const [infoCake, setInfoCake] = useState([]);
 
   const costDelivery = 35000;
 
   const calculateTotal = () => {
-    return inforCake.reduce((acc, row) => {
-      return acc + row.price * row.quantity + costDelivery;
+    return infoCake.reduce((acc, row) => {
+      return acc + ((row.Cake.cakeSize.priceSize + row.Cake.cakeFilling.priceCakeFilling) * row.quantity) + costDelivery;
     }, 0);
   };
-
-  const [selectedDate, setSelectedDate] = useState(null);
-  const today = dayjs();
-  const minDate = today.add(2, 'day');
 
   const handleChange = () => {
     alert("Hello");
     // router.push('/home');
   };
+
+  const handleComeBack = async () => {
+    try{
+      const data = await fetchWithAuth(router, '/cart/return-cart', {
+        method: "POST",
+        body: JSON.stringify(infoCake),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (data) {
+        router.push('/cart');
+      }
+    }
+    catch(err){
+      console.log(err);
+      setError('Error order: ' + err)
+    }
+  }
 
   const handleSetOrder = async() => {
     try {
@@ -228,17 +190,30 @@ const Payment = () => {
                 alignContent: "center",  
                 marginLeft: "3%"
               }}>
-                {inforCustomer.map((info, index) => (
                   <Typography
-                    key={index}
                     sx={{
                       alignContent: "center",
                       fontFamily: "Montserrat, sans-serif",
                     }}
                   >
-                    {info}
+                    {inforCustomer?.name}
                   </Typography>
-                ))}
+                  <Typography
+                    sx={{
+                      alignContent: "center",
+                      fontFamily: "Montserrat, sans-serif",
+                    }}
+                  >
+                    {inforCustomer?.phoneNumber}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      alignContent: "center",
+                      fontFamily: "Montserrat, sans-serif",
+                    }}
+                  >
+                    {inforCustomer?.address}
+                  </Typography>
               </Box>
               <Box sx={{ marginRight: "4%" }}>
                 <Button onClick={handleChange} sx={{}}>
@@ -294,23 +269,24 @@ const Payment = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {inforCake.map((cake) => (
+                  {infoCake.map((cake) => (
                     <TableRow key={cake.id}>
                       <TableCell
                         sx={{ paddingLeft: "3%" }}
                         align="left"
                       >
-                        {cake.name} | {cake.floor} | {cake.size} |{" "}
-                        {cake.filling}
+                        {/* {cake.name} | {cake.floor} | {cake.size} |{" "}
+                        {cake.} */}
+                        {"Bánh kem nhân " + cake.Cake.cakeFilling.title + " kích thước" + cake.Cake.cakeSize.title}
                       </TableCell>
                       <TableCell align="center">
                         {cake.quantity}
                       </TableCell>
                       <TableCell align="center">
-                        {cake.price}
+                        {cake.Cake.cakeSize.priceSize + cake.Cake.cakeFilling.priceCakeFilling}
                       </TableCell>
                       <TableCell align="center">
-                        {cake.price * cake.quantity}
+                        {((cake.Cake.cakeSize.priceSize + cake.Cake.cakeFilling.priceCakeFilling) * cake.quantity).toLocaleString()}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -504,6 +480,7 @@ const Payment = () => {
                   fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
                   outline: "none",
                 }}
+                onClick={handleComeBack}
               >
                 Quay lại
               </Button>
@@ -518,7 +495,7 @@ const Payment = () => {
                     backgroundColor: "#FFC0CB",
                     color: "#000000",
                   },
-                  fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
+                  fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho butn
                   outline: "none",
                 }} onClick={handleSetOrder}
               >

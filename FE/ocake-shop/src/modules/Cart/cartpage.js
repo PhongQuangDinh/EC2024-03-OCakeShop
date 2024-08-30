@@ -119,14 +119,30 @@ const CartPage = () => {
 
   const handleOrder = async () => {
     try {
-      // console.log('handleOrder + SOSSSSSSSSSSSSS')
       if(rows.length <= 0) {
         router.push('/home');
+        return;
       }
       if(selectedItems.length <= 0) {
         setError('Chọn bánh kem muốn mua');
+        return;
       }
-      
+      for (let id of selectedItems) {
+        const row = rows.find(row => row.cartID === id);
+        const data = await fetchWithAuth(router, '/cart/buying', {
+          method: "POST",
+          body: JSON.stringify(row),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if(!data){
+          console.log("Is not buying");
+          return;
+        }
+        console.log("Buying")
+      }
+      router.push('/payment')
     }
     catch(err){
       console.log(err);

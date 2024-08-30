@@ -110,9 +110,6 @@ router.get("/:id", async (req, res, next) => {
     }
     catch (err) { next(err); }
 });
-
-// thêm loại bánh mới (admin)
-// Route để thêm loại bánh mới
 router.post('/', async (req, res, next) => {
   try {
     const cakeData = req.body;
@@ -125,40 +122,5 @@ router.post('/', async (req, res, next) => {
     next(err);
   }
 });
-
-
-
-// // trả về 1 loại bánh theo nhân, size được cus
-// // Route để lấy danh sách tất cả các loại bánh và kích thước bánh, có thể lọc theo ID
-// router.get('/cakes-with-sizes/:ID?', async (req, res) => {
-//   const { ID } = req.params; // Lấy ID từ URL parameters
-
-//   try {
-//     const queryOptions = {
-//       include: [
-//         { model: cakeSizes, as: 'cakeSize' },
-//         { model: CakeFilling, as: 'cakeFilling' }
-//       ]
-//     };
-
-//     if (ID) {
-//       queryOptions.where = { cakeFillingID: ID }; // Lọc theo cakeFillingID nếu ID có giá trị
-//     }
-
-//     // Lấy danh sách tất cả các loại bánh cùng với thông tin kích thước và nhân bánh
-//     const cakes = await  model.Cake.findAll(queryOptions);
-
-//     // Lấy danh sách tất cả các kích thước bánh
-//     const cakeSizes = await CakeSize.findAll();
-
-//     // Trả về kết quả bao gồm cả các loại bánh và kích thước bánh
-//     res.json({
-//       cakes,
-//       cakeSizes
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: `Error retrieving cakes and sizes: ${error.message}` });
-//   }
-// });
 
 module.exports = router;
