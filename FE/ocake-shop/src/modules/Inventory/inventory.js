@@ -1,42 +1,87 @@
-"use client"
-import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
-import Layout from '../layout';
+"use client";
 
-const InventoryPage = () => {
-  // const [rows, setRows] = useState([
-  //   { id: 1, name: 'Bột mì', quantity: 50, unit: 'Kg', expiryDate: '12/12/2024' },
-  //   { id: 2, name: 'Trứng', quantity: 200, unit: 'Quả', expiryDate: '12/12/2024' },
-  //   { id: 3, name: 'Máy nướng', quantity: 2, unit: 'Cái', expiryDate: '' },
-  //   { id: 4, name: 'Máy đánh trứng', quantity: 2, unit: 'Cái', expiryDate: '' },
-  // ]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [itemToEdit, setItemToEdit] = useState(null);
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import Layout from "../layout";
+import dayjs from 'dayjs';
+import { fetchWithAuth } from '../../../WebConfig';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
+const Ingredient = () => {
+  const [formData, setFormData] = useState(null); // Initial state as null
+  const [error, setError] = useState('');
+  // const [rows, setRows] = useState([]); // State to hold table data
+  const [openDialog, setOpenDialog] = useState(false); // State for dialog visibility
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchInv = async () => {
-      
+    const fetchIngredient = async () => {
       try {
-        const data = await fetchWithAuth(router, '/ingredient');  // if method not defined it would be GET by default
+        const data = await fetchWithAuth(router, '/ingredient');
+        setFormData(data || {});
       } catch (err) {
         setError('SOS ' + err.message);
       }
     };
 
-    fetchInv();
+    fetchIngredient();
   }, []);
 
+  const handleSave = async () => {
+    try {
+      const data = await fetchWithAuth(router, '/ingredient/update', {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (data) {
+        alert('Ingredient updated successfully!');
+        router.push('/ingredients'); // Redirect to ingredient list page
+      }
+    } catch (err) {
+      setError('Error updating ingredient: ' + err.message);
+    }
+  };
+
+  const handleCancel = () => {
+    console.log('Changes cancelled');
+    router.push('/ingredients'); // Redirect to ingredient list page
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleDateChange = (date) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      expirationDate: dayjs(date).format('YYYY-MM-DD'),
+    }));
+  };
+
   const handleEditClick = (id) => {
-    setItemToEdit(id);
+    // Handle logic to edit row with specific id
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setItemToEdit(null);
   };
+
+  if (!formData) {
+    return <Typography>Loading...</Typography>;
+  }
 
   return (
     <Layout>
@@ -47,22 +92,24 @@ const InventoryPage = () => {
             Ocake Shop | Nguyên liệu và trang thiết bị
           </Typography>
           <Link href="/addIngredient" passHref>
-            <Button variant="contained" 
-                      sx={{ 
-                        backgroundColor: "#FFDFE7", 
-                        color: "#000000", 
-                        border: "1px solid #e82652", 
-                        "&:hover": { 
-                          backgroundColor: "#FFC0CB", 
-                          color: "#000000" 
-                        },
-                        outline: "none",
-                      }}
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#FFDFE7",
+                color: "#000000",
+                border: "1px solid #e82652",
+                "&:hover": {
+                  backgroundColor: "#FFC0CB",
+                  color: "#000000"
+                },
+                outline: "none",
+              }}
             >
               Thêm
             </Button>
           </Link>
         </Box>
+
         <TableContainer component={Paper} sx={{ margin: 'auto', maxWidth: '1200px', marginTop: '30px' }}>
           <Table>
             <TableHead>
@@ -75,17 +122,17 @@ const InventoryPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {formData.map((row) => (
                 <TableRow key={row.id}>
-                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.title}</TableCell>
                   <TableCell align="right">{row.quantity}</TableCell>
                   <TableCell align="center">{row.unit}</TableCell>
-                  <TableCell align="center">{row.expiryDate}</TableCell>
+                  <TableCell align="center">{row.expirationDate}</TableCell>
                   <TableCell align="center">
-                    <Button 
-                      sx={{ 
+                    <Button
+                      sx={{
                         color: "#e82652",
-                      }} 
+                      }}
                       onClick={() => handleEditClick(row.id)}
                     >
                       Chỉnh sửa
@@ -96,6 +143,7 @@ const InventoryPage = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
         <Dialog open={openDialog} onClose={handleCloseDialog}>
           <DialogTitle>Chỉnh sửa sản phẩm</DialogTitle>
           <DialogContent>
@@ -112,4 +160,4 @@ const InventoryPage = () => {
   );
 };
 
-export default InventoryPage;
+export default Ingredient;
