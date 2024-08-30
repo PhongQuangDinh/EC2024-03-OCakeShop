@@ -13,7 +13,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // Route để thêm nguyên liệu mới
-router.post('/', async (req, res, next) => {
+router.post('/add-ingredient', async (req, res, next) => {
   try {
     // Lấy dữ liệu nguyên liệu từ body của yêu cầu
     const ingredientData = req.body;
@@ -29,5 +29,51 @@ router.post('/', async (req, res, next) => {
   }
 });
 
+// Route để thay đổi số lượng của nguyên liệu
+router.put('/update-quantity/:ingredientID', async (req, res, next) => {
+  try {
+    const { ingredientID } = req.params;
+    const { quantity } = req.body;
+
+    // Tìm nguyên liệu dựa trên ingredientID
+    const ingredient = await model.Ingredient.findByPk(ingredientID);
+
+    if (!ingredient) {
+      return res.status(404).json({ message: 'Ingredient not found' });
+    }
+
+    // Cập nhật số lượng nguyên liệu
+    ingredient.quantity = quantity;
+    await ingredient.save();
+
+    // Gửi phản hồi với nguyên liệu đã được cập nhật
+    res.status(200).json(ingredient);
+  } catch (err) {
+    // Chuyển lỗi cho middleware xử lý lỗi toàn cục
+    next(err);
+  }
+});
+// Route để xóa nguyên liệu
+router.delete('/delete-ingredient/:ingredientID', async (req, res, next) => {
+  try {
+    const { ingredientID } = req.params;
+
+    // Tìm nguyên liệu dựa trên ingredientID
+    const ingredient = await model.Ingredient.findByPk(ingredientID);
+
+    if (!ingredient) {
+      return res.status(404).json({ message: 'Ingredient not found' });
+    }
+
+    // Xóa nguyên liệu
+    await ingredient.destroy();
+
+    // Gửi phản hồi xác nhận xóa thành công
+    res.status(200).json({ message: 'Ingredient deleted successfully' });
+  } catch (err) {
+    // Chuyển lỗi cho middleware xử lý lỗi toàn cục
+    next(err);
+  }
+});
 
 module.exports = router;

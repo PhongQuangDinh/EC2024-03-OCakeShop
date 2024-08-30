@@ -1,256 +1,330 @@
-"use client"
-import { Box, Typography, TextField, FormControl, InputLabel, Select, MenuItem, Button } from "@mui/material";
-import Layout from "../layout";
-import Image from "next/image";
-import logo from "./../../app/image/logo.png";
-import React, { useState } from 'react';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, Box, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import Layout from "../layout";
+import dayjs from 'dayjs';
+// ----------- IMPORTANT
+import { fetchWithAuth } from '../../../WebConfig';
+import { useRouter } from 'next/navigation';
 
-const AddIngredient = () => {
+const addIngredient = () => {
+  const [formData, setFormData] = useState(null); // Initial state as null
+  const [error, setError] = useState('');
+  const router = useRouter();
 
-  const [selectedFilling, setSelectedFilling] = useState([]);
+  useEffect(() => {
+    const fetchIngredient = async () => {
+      try {
+        const data = await fetchWithAuth(router, '/ingredient'); // Fetch ingredient with ID 1 (example)
+        setFormData(data || {});
+      } catch (err) {
+        setError('SOS ' + err.message);
+      }
+    };
 
-  const handleChangeFilling = (event) => {
-    setSelectedFilling(event.target.value);
+    fetchIngredient();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const data = await fetchWithAuth(router, '/ingredient/add-ingredient', {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (data) {
+        alert('Ingredient added successfully!');
+        router.push('/inventory'); // Redirect to ingredient list page
+      }
+    } catch (err) {
+      setError('Error adding ingredient: ' + err.message);
+    }
+  };
+
+  const handleCancel = () => {
+    console.log('Changes cancelled');
+    router.push('/inventory'); // Redirect to ingredient list page
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleDateChange = (date) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      expirationDate: dayjs(date).format('YYYY-MM-DD'), // Adjust to only keep the date
+    }));
+  };
+
+  if (!formData) {
+    return <Typography>Loading...</Typography>;
   }
 
   return (
     <Layout>
       <Box sx={{
         background: "#fff",
-        // height: "175px",
         gap: "20px",
         marginTop: "100px",
-      }}
-      >  
+      }}>
         <Box sx={{
-          display: "flex", 
+          display: "flex",
           alignItems: "center",
           marginLeft: "200px",
+        }}>
+          <Typography sx={{
+            display: "flex",
+            alignItems: "center",
+            color: "#E82552",
+            fontSize: "40px",
+            fontWeight: "bold",
+            fontFamily: "Montserrat, sans-serif",
           }}>
-           {/* <Image priority src={logo} alt="logo" width={100} /> */}
-           <Typography sx={{
-              display:"flex",
-              alignItems: "center",
-              color: "#E82552",
-              fontSize:"40px",
-              fontWeight:"bold",
-              fontFamily: "Montserrat, sans-serif",
-            }}
-            >
-              OcakeShop | Thêm nguyên vật liệu
-            </Typography>
+            OcakeShop | Thêm nguyên liệu
+          </Typography>
         </Box>
       </Box>
-      <Box
-        sx={{
-          background: "#E5E5E5",
-          alignItems: "center",
-          flexDirection: "column",
-          fontFamily: "Monospace, sans-serif",
-          display: "flex",
-        }}
-      >
+
+      <Box sx={{
+        background: "#E5E5E5",
+        alignItems: "center",
+        paddingLeft: "10%", paddingRight: "10%",
+        paddingTop: "1%", paddingBottom: "5%"
+      }}>
+
         <Box sx={{
-          background: "#fff",
-          width: "85%",
-          marginTop: "50px",
-          marginBottom: "50px",
+          display: "flex",
+          flexDirection: "column",
+          background: "white",
+          alignContent: "space-between",
+          paddingTop: "40px",
+          paddingBottom: "40px",
+          paddingRight: "230px",
+          gap: "30px",
         }}>
+
+          {/* Tên nguyên liệu */}
           <Box sx={{
             display: "flex",
-            justifyContent: "space-between",
-            margin: "30px 200px 30px 100px",
-          }}>
-            <Box>
-              <Typography sx={{
-                color: "#000",
-                fontSize:"30px",
-                fontWeight:"bold",
-                fontFamily: "Montserrat, sans-serif",
-              }}>
-                Tên nguyên liệu
-              </Typography>
-            </Box>
-            <Box>
-              <FormControl sx={{
-                  width: "500px",
-                }}>
-                  <InputLabel sx={{
-                      fontSize:"20px",
-                    }} 
-                    id="select-filling">Chọn nguyên liệu</InputLabel>
-                  <Select
-                    labelId="select-filling"
-                    id="select-filling"
-                    label="Filling"
-                    value={selectedFilling}
-                    onChange={handleChangeFilling}
-                  >
-                    <MenuItem value={"Chocolate"}>Sô cô la</MenuItem>
-                    <MenuItem value={"Strawberry"}>Dâu tây</MenuItem>
-                    <MenuItem value={"Matcha"}>Trà xanh</MenuItem>
-                    <MenuItem value={"Pineapple"}>Dứa</MenuItem>
-                    <MenuItem value={"Coffee"}>Cà phê</MenuItem>
-                    <MenuItem value={"Cream Cheese"}>Kem phô mai</MenuItem>
-                  </Select>
-                </FormControl>
-            </Box>
-          </Box>
-
-          <Box sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            margin: "30px 200px 30px 100px",
-          }}>
-            <Box>
-              <Typography sx={{
-                color: "#000",
-                fontSize:"30px",
-                fontWeight:"bold",
-                fontFamily: "Montserrat, sans-serif",
-              }}>
-                Số lượng
-              </Typography>
-            </Box>
-            <Box>
-              <TextField sx={{
-                id:"outlined-basic",
-                width: "500px"
-                }}
-                label="Số lượng" />
-            </Box>
-          </Box>
-
-          <Box sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            margin: "30px 200px 30px 100px",
-          }}>
-            <Box>
-              <Typography sx={{
-                color: "#000",
-                fontSize:"30px",
-                fontWeight:"bold",
-                fontFamily: "Montserrat, sans-serif",
-              }}>
-                Đơn vị
-              </Typography>
-            </Box>
-            <Box>
-              <TextField sx={{
-                id:"outlined-basic",
-                width: "500px"
-                }}
-                label="Đơn vị" />
-            </Box>
-          </Box>
-
-          <Box sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            margin: "30px 200px 30px 100px",
-          }}>
-            <Box>
-              <Typography sx={{
-                color: "#000",
-                fontSize:"30px",
-                fontWeight:"bold",
-                fontFamily: "Montserrat, sans-serif",
-              }}>
-                Giá nguyên liệu
-              </Typography>
-            </Box>
-            <Box>
-              <TextField sx={{
-                id:"outlined-basic",
-                width: "500px"
-                }}
-                label="Giá nguyên liệu" />
-            </Box>
-          </Box>
-
-          {/* <Box sx={{
-            display: "flex"
+            justifyContent: "end",
+            alignItems: "center",
+            gap: "30px",
           }}>
             <Typography sx={{
               color: "#000",
-              fontSize:"30px",
-              fontWeight:"bold",
+              fontSize: "20px",
+              fontWeight: "bold",
               fontFamily: "Montserrat, sans-serif",
             }}>
-              Hạn sử dụng
+              Tên nguyên liệu
             </Typography>
-            <TextField sx={{
-              id:"outlined-basic",
-              }}
-              label="Hạn sử dụng" />
-          </Box> */}
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                margin: "30px 200px 30px 100px",
-                // marginRight: "100px"
-                // marginTop: "30px",
-                // marginBottom: "30px",
-                // marginLeft: "40px",
-              }}
-            >
-              <Box>
-                <Typography
-                  sx={{
-                    color: "#000",
-                    fontSize: "30px",
-                    fontWeight: "bold",
-                    fontFamily: "Montserrat, sans-serif",
-                  }}
-                >
-                  Hạn sử dụng
-                </Typography>
-              </Box>
-              <DatePicker
-                sx={{width: "500px"}}
-                label="Hạn sử dụng"
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    sx={{
-                      marginLeft: 2,
-                    }}
-                  />
-                )}
+            <Box sx={{
+              width: "600px",
+            }}>
+              <TextField
+                name="title"
+                value={formData?.title || ''}
+                onChange={handleChange}
+                sx={{
+                  width: "100%",
+                  fontSize: "40px",
+                  color: "#E5E5E5",
+                }}
               />
             </Box>
-          </LocalizationProvider>
+          </Box>
 
+          {/* Số lượng */}
           <Box sx={{
             display: "flex",
+            justifyContent: "end",
             alignItems: "center",
-            justifyContent: "center"
+            gap: "30px",
           }}>
-            <Button
-              variant="contained"
-              sx={{
-                marginBottom: 2,
-                backgroundColor: "#FFDFE7",
-                color: "#000000",
-                border: "1px solid #e82652",
-                "&:hover": {
-                  backgroundColor: "#FFC0CB",
-                  color: "#000000",
-                },
-                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
-                outline: "none",
-                
-              }}
-            >
-              Thêm
-            </Button>
+            <Typography sx={{
+              color: "#000",
+              fontSize: "20px",
+              fontWeight: "bold",
+              fontFamily: "Montserrat, sans-serif",
+            }}>
+              Số lượng
+            </Typography>
+            <Box sx={{
+              width: "600px",
+            }}>
+              <TextField
+                name="quantity"
+                value={formData?.quantity || ''}
+                onChange={handleChange}
+                sx={{
+                  width: "100%",
+                  fontSize: "40px",
+                  color: "#E5E5E5",
+                }}
+                type="number"
+              />
+            </Box>
+          </Box>
+
+          {/* Đơn vị */}
+          <Box sx={{
+            display: "flex",
+            justifyContent: "end",
+            alignItems: "center",
+            gap: "30px",
+          }}>
+            <Typography sx={{
+              color: "#000",
+              fontSize: "20px",
+              fontWeight: "bold",
+              fontFamily: "Montserrat, sans-serif",
+            }}>
+              Đơn vị
+            </Typography>
+            <Box sx={{
+              width: "600px",
+            }}>
+              <TextField
+                name="unit"
+                value={formData?.unit || ''}
+                onChange={handleChange}
+                sx={{
+                  width: "100%",
+                  fontSize: "40px",
+                  color: "#E5E5E5",
+                }}
+              />
+            </Box>
+          </Box>
+
+          {/* Giá */}
+          <Box sx={{
+            display: "flex",
+            justifyContent: "end",
+            alignItems: "center",
+            gap: "30px",
+          }}>
+            <Typography sx={{
+              color: "#000",
+              fontSize: "20px",
+              fontWeight: "bold",
+              fontFamily: "Montserrat, sans-serif",
+            }}>
+              Giá
+            </Typography>
+            <Box sx={{
+              width: "600px",
+            }}>
+              <TextField
+                name="price"
+                value={formData?.price || ''}
+                onChange={handleChange}
+                sx={{
+                  width: "100%",
+                  fontSize: "40px",
+                  color: "#E5E5E5",
+                }}
+                type="number"
+              />
+            </Box>
+          </Box>
+
+          {/* Ngày hết hạn */}
+          <Box sx={{
+            display: "flex",
+            justifyContent: "end",
+            alignItems: "center",
+            gap: "30px",
+          }}>
+            <Typography sx={{
+              color: "#000",
+              fontSize: "20px",
+              fontWeight: "bold",
+              fontFamily: "Montserrat, sans-serif",
+            }}>
+              Ngày hết hạn
+            </Typography>
+            <Box sx={{
+              width: "600px",
+            }}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  value={formData?.expirationDate ? dayjs(formData.expirationDate) : null} // Convert string to dayjs object
+                  onChange={handleDateChange}
+                  format="DD/MM/YYYY"
+                  sx={{
+                    width: "100%",
+                    fontSize: "40px",
+                    color: "#E5E5E5",
+                  }}
+                />
+              </LocalizationProvider>
+            </Box>
+          </Box>
+
+          {/* Mô tả */}
+          <Box sx={{
+            display: "flex",
+            justifyContent: "end",
+            alignItems: "center",
+            gap: "30px",
+          }}>
+            <Typography sx={{
+              color: "#000",
+              fontSize: "20px",
+              fontWeight: "bold",
+              fontFamily: "Montserrat, sans-serif",
+            }}>
+              Mô tả
+            </Typography>
+            <Box sx={{
+              width: "600px",
+            }}>
+              <TextField
+                name="description"
+                value={formData?.description || ''}
+                onChange={handleChange}
+                sx={{
+                  width: "100%",
+                  fontSize: "40px",
+                  color: "#E5E5E5",
+                }}
+                multiline
+                rows={4}
+              />
+            </Box>
+          </Box>
+
+          {/* Buttons */}
+          <Box sx={{
+            display: 'flex', justifyContent: 'end', gap: "270px", paddingRight: "100px",
+          }}>
+            <Button sx={{
+              width: "150px",
+              background: "#FFDFE7",
+              color: "black",
+            }}
+              variant="contained" color="primary" onClick={handleSave}> Lưu thay đổi </Button>
+
+            <Button sx={{
+              width: "150px",
+              background: "#FFDFE7",
+              color: "black",
+            }}
+              variant="contained" color="primary" onClick={handleCancel}> Hủy </Button>
           </Box>
         </Box>
       </Box>
@@ -258,4 +332,4 @@ const AddIngredient = () => {
   );
 };
 
-export default AddIngredient;
+export default addIngredient;
