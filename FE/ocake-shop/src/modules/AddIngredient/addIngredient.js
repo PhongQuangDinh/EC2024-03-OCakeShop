@@ -31,7 +31,7 @@ const addIngredient = () => {
 
   const handleSave = async () => {
     try {
-      const data = await fetchWithAuth(router, '/ingredient/update', {
+      const data = await fetchWithAuth(router, '/ingredient/add-ingredient', {
         method: "POST",
         body: JSON.stringify(formData),
         headers: {
@@ -40,17 +40,17 @@ const addIngredient = () => {
       });
 
       if (data) {
-        alert('Ingredient updated successfully!');
-        router.push('/ingredients'); // Redirect to ingredient list page
+        alert('Ingredient added successfully!');
+        router.push('/inventory'); // Redirect to ingredient list page
       }
     } catch (err) {
-      setError('Error updating ingredient: ' + err.message);
+      setError('Error adding ingredient: ' + err.message);
     }
   };
 
   const handleCancel = () => {
     console.log('Changes cancelled');
-    router.push('/ingredients'); // Redirect to ingredient list page
+    router.push('/inventory'); // Redirect to ingredient list page
   };
 
   const handleChange = (e) => {

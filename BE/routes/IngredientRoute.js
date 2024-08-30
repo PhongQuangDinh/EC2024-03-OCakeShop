@@ -13,7 +13,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // Route để thêm nguyên liệu mới
-router.post('/', async (req, res, next) => {
+router.post('/add-ingredient', async (req, res, next) => {
   try {
     // Lấy dữ liệu nguyên liệu từ body của yêu cầu
     const ingredientData = req.body;

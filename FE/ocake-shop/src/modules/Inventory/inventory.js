@@ -91,7 +91,7 @@ const Ingredient = () => {
           <Typography variant="h4" align="left" gutterBottom sx={{ color: '#E82552', fontWeight: 'bold' }}>
             Ocake Shop | Nguyên liệu và trang thiết bị
           </Typography>
-          <Link href="/addIngredient" passHref>
+          <Link href="/add-ingredient" passHref>
             <Button
               variant="contained"
               sx={{
