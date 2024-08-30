@@ -6,7 +6,7 @@ import logo from "./../../app/image/logo.png";
 import React, { useState, useEffect } from 'react';
 
 const SelectCake = () => {
-  const [cake, setCake] = useState(null); // State to hold cake information
+  const [cake, setCake] = useState(''); // State to hold cake information
   const [selectedSize, setSelectedSize] = useState(''); // State for size selection
   const [selectedFloors, setSelectedFloors] = useState(1);
   const [note, setNote] = useState("");
