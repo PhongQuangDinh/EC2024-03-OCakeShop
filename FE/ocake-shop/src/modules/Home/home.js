@@ -5,7 +5,6 @@ import {
   Tab,
   Box,
   Typography,
-  Grid,
   TextField,
 } from "@mui/material";
 import Layout from "../layout";
@@ -13,11 +12,9 @@ import { useState, useEffect } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import CakeCard from "./components/cakeCard";
-import Image from "next/image";
-import arrow from "../../assets/arrow.png";
-import { getApiUrl } from '../../../WebConfig';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
+import { getApiUrl } from '../../../WebConfig';
 
 const HomePage = () => {
   const [category, setCategory] = useState(["Tất cả"]);
@@ -30,9 +27,6 @@ const HomePage = () => {
 
   useEffect(() => {
     GetCategory();
-  }, []);
-
-  useEffect(() => {
     GetInforCake();
   }, []);
 
@@ -50,16 +44,16 @@ const HomePage = () => {
                 "Content-Type": "application/json",
               },
             });
-            if(!response.ok) {
+            if (!response.ok) {
               const errorData = await response.json();
               setError(errorData.message || 'Get cake by purpose is failed');
               return;
             }
             const data = await response.json();
             setCake(Array.isArray(data) ? data : []);
-          } catch(err) {
+          } catch (err) {
             console.error('An error occurred:', err);
-            setError('An error occurred while get cake');
+            setError('An error occurred while getting cake');
           }
         };
         getCakesByCategory();
@@ -86,7 +80,7 @@ const HomePage = () => {
           "Content-Type": "application/json",
         },
       });
-      if(!response.ok) {
+      if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.message || 'Load dữ liệu thất bại');
         return;
@@ -95,7 +89,7 @@ const HomePage = () => {
       const allCategory = { purposeID: 0, title: "Tất cả" };
       const updatedData = [allCategory, ...data];
       setCategory(Array.isArray(updatedData) ? updatedData : []);
-    } catch(err) {
+    } catch (err) {
       console.error(err);
       setError('Có lỗi khi lấy danh mục sản phẩm');
     }
@@ -103,13 +97,13 @@ const HomePage = () => {
 
   const GetInforCake = async () => {
     try {
-      const response = await fetch(`${apiUrl}/cake/`, {
+      const response = await fetch(`${apiUrl}/cake`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      if(!response.ok) {
+      if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.message || 'Get cake failed');
         return;
@@ -117,9 +111,9 @@ const HomePage = () => {
       const data = await response.json();
       setAllCake(Array.isArray(data) ? data : []);
       setCake(Array.isArray(data) ? data : []);
-    } catch(err) {
+    } catch (err) {
       console.error('An error occurred:', err);
-      setError('An error occurred while get cake');
+      setError('An error occurred while getting cake');
     }
   };
 
@@ -153,7 +147,7 @@ const HomePage = () => {
     width: 50,
     height: 50,
     borderRadius: "50%",
-    background: `linear-gradient(90deg, #e82451 0%, #f1858f 100%)`,
+    background: "linear-gradient(90deg, #e82451 0%, #f1858f 100%)",
     color: "white",
     display: "flex",
     alignItems: "center",
@@ -225,34 +219,33 @@ const HomePage = () => {
         </MyTabs>
         
         <TextField
-        sx={{
-          margin: "1rem 0",
-          backgroundColor: "#FFFFFF", // Màu nền trắng
-          width: "calc(100% - 40px)", // Giảm độ rộng của trường nhập liệu đi 50px
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: "#FFC0CB", // Màu hồng của viền ngoài
+          sx={{
+            margin: "1rem 0",
+            backgroundColor: "#FFFFFF",
+            width: "calc(100% - 40px)",
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#FFC0CB",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#FF1493",
+              },
             },
-            "&.Mui-focused fieldset": {
-              borderColor: "#FF1493", // Màu hồng đậm hơn khi trường được chọn
-            },
-          },
-        }}
-        label={!isFocused ? "Tìm kiếm bánh" : ""}
-        variant="outlined"
-        value={searchTerm}
-        onChange={handleSearchChange}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <SearchIcon sx={{ color: "#FF1493" }} /> {/* Màu hồng đậm của biểu tượng */}
-            </InputAdornment>
-          ),
-        }}
-      />
-
+          }}
+          label={!isFocused ? "Tìm kiếm bánh" : ""}
+          variant="outlined"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon sx={{ color: "#FF1493" }} />
+              </InputAdornment>
+            ),
+          }}
+        />
 
         <Carousel
           swipeable={false}
@@ -321,6 +314,7 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
 const MyTabs = styled(MuiTabs)(() => ({
   "& .MuiTabs-flexContainer": {
     gap: "1rem",
@@ -345,4 +339,3 @@ const MyTabs = styled(MuiTabs)(() => ({
     color: "white !important",
   },
 }));
-

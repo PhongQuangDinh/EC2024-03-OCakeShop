@@ -27,46 +27,24 @@ router.get("/", async (req, res, next) => {
 });
 
 
-router.get("/:id", async (req, res, next) => {
-  try {
-    const cakes = await model.Cake.findByPk(req.params.id, {
-      include: {
-        model:  model.CakeImage,
-        as: "cakeImages",
-        required: true,
-        include: 
-        {
-          model: model.ImageDetail,
-          as: "imageDetail",
-          required: true,
-        }
-      }
-    });
-
-    res.status(200).json(cakes);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get("/purpose/all", async (req, res, next) => {
+router.get("/purpose", async (req, res, next) => {
   try {
     const purpose = await model.Purpose.findAll({
       where: {
-        purposeID_ref: {
-          [Op.is]: null // This should translate to IS NULL in SQL
-        }
+        purposeID_ref: null
       }
     });
 
-    if (!purpose || purpose.length === 0) {
+    if (purpose.length === 0) {
       return res.status(404).json({ message: "No purpose found" });
     }
+
     return res.status(200).json(purpose);
   } catch (err) {
     next(err);
   }
 });
+
 
 router.get("/purpose/:purposeID", async (req, res, next) => {
   try {
@@ -101,7 +79,27 @@ router.get("/purpose/:purposeID", async (req, res, next) => {
   }
   catch (err) { next(err); }
 });
+router.get("/:id", async (req, res, next) => {
+  try {
+    const cakes = await model.Cake.findByPk(req.params.id, {
+      include: {
+        model:  model.CakeImage,
+        as: "cakeImages",
+        required: true,
+        include: 
+        {
+          model: model.ImageDetail,
+          as: "imageDetail",
+          required: true,
+        }
+      }
+    });
 
+    res.status(200).json(cakes);
+  } catch (err) {
+    next(err);
+  }
+});
 // lấy kích thước bánh s
 router.get('/cake-sizes', async (req, res) => {
   try {
