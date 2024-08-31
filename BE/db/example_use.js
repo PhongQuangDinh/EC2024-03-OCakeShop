@@ -18,24 +18,25 @@ const model = require('../models');
 
 
 // USE REQUIRED: TRUE TO TURN ON INNER JOIN
-model.Customer.findByPk(1,{ include: { model: model.Cart, as: 'Carts', required: true } }).then(res => {
-  if (res) {
-    const customerData = { ...res.dataValues };
-    delete customerData.Carts;
-    console.log(customerData);
+// model.Customer.findByPk(1,{ include: { model: model.Cart, as: 'Carts', required: true } }).then(res => {
+//   if (res) {
+//     const customerData = { ...res.dataValues };
+//     delete customerData.Carts;
+//     console.log(customerData);
 
-    res.Carts.forEach(cart => {
-      delete cart.dataValues._previousDataValues;
-    });
-    console.log(res.Carts.map(cart => cart.dataValues));
-  } else {
-    console.log('Customer not found');
-  }
+//     res.Carts.forEach(cart => {
+//       delete cart.dataValues._previousDataValues;
+//     });
+//     console.log(res.Carts.map(cart => cart.dataValues));
+//   } else {
+//     console.log('Customer not found');
+//   }
+// })
+
+
+model.Purpose.findAll({ where }).then(res => {
+  console.log(res.map(res => res.dataValues));
 })
-
-
-
-
 
 
 // joining 3 tables

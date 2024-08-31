@@ -47,6 +47,9 @@ const Payment = () => {
     const fetchCake = async () => {
       try {
         const data = await fetchWithAuth(router, "/cart/buying"); // if method not defined it would be GET by default
+        if(!data){
+          router.push('/cart');
+        }
         setInfoCake(data);
       } catch (err) {
         setError("SOS " + err.message);
@@ -68,6 +71,7 @@ const Payment = () => {
           row.quantity +
         costDelivery
       );
+      return acc + ((row.priceCake) * row.quantity) + costDelivery;
     }, 0);
   };
 
@@ -96,6 +100,10 @@ const Payment = () => {
   };
 
   const handleSetOrder = async () => {
+  const handleSetOrder = async() => {
+    if(!selectedDate){
+      setError('Chọn ngày nhận hàng');
+    }
     try {
       const data = await fetchWithAuth(router, "/payment/pay", {
         method: "POST",
@@ -104,9 +112,11 @@ const Payment = () => {
           "Content-Type": "application/json",
         },
       }); // Save the updated profile using POST
+      });
 
       if (data) {
         alert("Order is set successfully!");
+        // alert('Order is set successfully!');
         window.location.href = data.paypal_link; // redirect to Paypal page
       }
     } catch (err) {
@@ -276,6 +286,11 @@ const Payment = () => {
                           cake.Cake.cakeFilling.title +
                           " kích thước" +
                           cake.Cake.cakeSize.title}
+                      <TableCell
+                        sx={{ paddingLeft: "3%" }}
+                        align="left"
+                      >
+                        {"Bánh kem nhân " + cake.cakeFilling.title + " kích thước" + cake.cakeSize.title}
                       </TableCell>
                       <TableCell align="center">{cake.quantity}</TableCell>
                       <TableCell align="center">
@@ -283,11 +298,10 @@ const Payment = () => {
                           cake.Cake.cakeFilling.priceCakeFilling}
                       </TableCell>
                       <TableCell align="center">
-                        {(
-                          (cake.Cake.cakeSize.priceSize +
-                            cake.Cake.cakeFilling.priceCakeFilling) *
-                          cake.quantity
-                        ).toLocaleString()}
+                        {cake.priceCake}
+                      </TableCell>
+                      <TableCell align="center">
+                        {((cake.priceCake) * cake.quantity).toLocaleString()}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -506,6 +520,9 @@ const Payment = () => {
                 Đặt hàng
               </Button>
             </Box>
+          </Box>
+          <Box>
+          {error && !selectedDate && <Typography color="error">{error}</Typography>}
           </Box>
         </Box>
       </Box>

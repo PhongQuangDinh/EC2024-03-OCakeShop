@@ -18,6 +18,11 @@ const CakeCard = ({ id, img, title, onClick }) => {
     </ArticleBox>
   );
 };
+// const router = useRouter();
+// const handleClickCake = (id) => {
+//   console.log('Card clicked :' + id);
+//   router.push(`/home/${id}`);
+// }
 
 CakeCard.propTypes = {
   id: PropTypes.number.isRequired,

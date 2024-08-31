@@ -12,12 +12,51 @@ const PaymentStatus = () => {
 
   const renderStatusMessage = () => {
     if (status === "CONTINUE-ORDER" && token && PayerID) {
+      
       return <Typography sx={{ fontSize: "30px", fontWeight: "bold", textDecoration: "underline", color: "#EA365F" }}>
         Đã hoàn thành</Typography>;
     } else if (status === "CANCEL-ORDER") {
+      async () => {
+        try{
+          const data = await fetchWithAuth(router, '/cart/return-cart', {
+            method: "POST",
+            body: JSON.stringify(infoCake),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+    
+          if (data) {
+            router.push('/cart');
+          }
+        }
+        catch(err){
+          console.log(err);
+          setError('Error order: ' + err)
+        }
+      }
       return <Typography sx={{ fontSize: "30px", fontWeight: "bold", textDecoration: "underline", color: "#EA365F" }}>
         Đã hủy đơn hàng</Typography>;
     } else {
+      async () => {
+        try{
+          const data = await fetchWithAuth(router, '/cart/return-cart', {
+            method: "POST",
+            body: JSON.stringify(infoCake),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+    
+          if (data) {
+            router.push('/cart');
+          }
+        }
+        catch(err){
+          console.log(err);
+          setError('Error order: ' + err)
+        }
+      }
       return <Typography sx={{ fontSize: "30px", fontWeight: "bold", textDecoration: "underline", color: "#EA365F" }}>
         Trạng thái đơn hàng không hợp lệ</Typography>;
     }

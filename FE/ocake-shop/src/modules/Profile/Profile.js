@@ -95,18 +95,18 @@ const Profile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
+  
     setFormData((prevState) => {
       const updatedFormData = { ...prevState };
-
-      // Check if the field belongs to the CreditCard object
-      if (updatedFormData.CreditCard && name in updatedFormData.CreditCard) {
-        updatedFormData.CreditCard[name] = value;
+  
+      // Check if the field belongs to the CreditCards array
+      if (updatedFormData.CreditCards && updatedFormData.CreditCards.length > 0 && name in updatedFormData.CreditCards[0]) {
+        updatedFormData.CreditCards[0][name] = value;
       } else {
         // Update top-level Customer fields
         updatedFormData[name] = value;
       }
-
+  
       return updatedFormData;
     });
   };
@@ -305,15 +305,15 @@ const Profile = () => {
               fontWeight: "bold",
               fontFamily: "Montserrat, sans-serif",
             }}>
-              Phương thức thanh toán
+              Tên ngân hàng
             </Typography>
             <Box sx={{
               display: "flex",
               width: "600px",
             }}>
               <TextField
-                name="paymentMethod"
-                value={formData.CreditCard?.paymentMethod}
+                name="bankName"
+                value={formData.CreditCards?.[0]?.bankName}
                 onChange={handleChange}
                 sx={{
                   width: "100%",
@@ -331,8 +331,8 @@ const Profile = () => {
             alignItems: "center",
           }}>
             <TextField
-              name="accountNumber"
-              value={formData.CreditCard?.accountNumber}
+              name="creditSerialNumber"
+              value={formData.CreditCards?.[0]?.creditSerialNumber}
               onChange={handleChange}
               sx={{
                 width: "600px",

@@ -18,6 +18,8 @@ import arrow from "../../assets/arrow.png";
 import { getApiUrl } from '../../../WebConfig';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
+import { useRouter } from "next/navigation";
+import SelectCake from "./cake";
 
 const HomePage = () => {
   const [category, setCategory] = useState(["Tất cả"]);
@@ -27,6 +29,8 @@ const HomePage = () => {
   const [value, setValue] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const apiUrl = getApiUrl();
+  const router = useRouter();
+  const [selectCake, setSelectCake] = useState('');
 
   useEffect(() => {
     GetCategory();
@@ -80,7 +84,7 @@ const HomePage = () => {
 
   const GetCategory = async () => {
     try {
-      const response = await fetch(`${apiUrl}/cake/purpose`, {
+      const response = await fetch(`${apiUrl}/cake/purpose/all`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -123,13 +127,27 @@ const HomePage = () => {
     }
   };
 
-  const handleChange = (event, newValue) => {
+  const handleChangePurpose = (event, newValue) => {
     setValue(newValue);
+  };
+
+  const handleChangeCake = (id) => {
+    // console.log("Cake: " + newValue);
+    // setSelectCake(newValue);
+    router.push(`home/${id}`)
+    // event.onClick()
   };
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
+
+  // const handleCardClick = async (id) => {
+  //   // if(onClick){
+  //   console.log('Card clicked :' + id);
+  //   await router.push(`/home/${id}`);
+  //   // }
+  // }
 
   const responsive = {
     desktop: {
@@ -218,7 +236,7 @@ const HomePage = () => {
             Sản phẩm của chúng tôi
           </Typography>
         </Box>
-        <MyTabs value={value} onChange={handleChange}>
+        <MyTabs value={value} onChange={handleChangePurpose}>
           {category.map((category) => (
             <Tab key={category.purposeID} label={category.title} />
           ))}
@@ -270,6 +288,8 @@ const HomePage = () => {
               key={cakeItem.cakeID}
               title={cakeItem.description}
               img={cakeItem.cakeImages.length > 0 ? cakeItem.cakeImages[0].imageDetail.imagePath : ""}
+              // selectCake={cakeItem.cakeID} onClick={handleChangeCake}
+              onClick={handleChangeCake(cakeItem.cakeID)}
             />
           ))}
         </Carousel>

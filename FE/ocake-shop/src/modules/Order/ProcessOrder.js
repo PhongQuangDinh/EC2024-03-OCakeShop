@@ -67,36 +67,7 @@ export default function ProcessOrder() {
 
   const fetchOrder = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/ordercake/manage`, {
-        method: "GET",
-        headers: {
-          authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 403) {
-          setError("Session expired. Please log in again.");
-          localStorage.removeItem("token");
-          router.push(
-            `/signin?message=${encodeURIComponent("Your session has expired")}`
-          );
-        } else {
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            const errorData = await response.json();
-            setError(errorData.message || "Get order failed");
-          } else {
-            const errorText = await response.text();
-            setError(errorText || "An error occurred");
-          }
-        }
-        return;
-      }
-
-      const data = await response.json();
+      const data = await fetchWithAuth(router, "/ordercake/manage");
       console.log(data);
       setRows(data || "");
     } catch (err) {
@@ -190,12 +161,9 @@ export default function ProcessOrder() {
                   </TableCell>
                   <TableCell component="th" scope="row">
                     {"Bánh kem nhân " +
-                      row.OrderCart?.Cake.cakeFilling.title +
+                      row.OrderCart?.cakeFilling.title +
                       " kích thước " +
-                      row.OrderCart?.Cake.cakeSize.title}
-                  </TableCell>
-                  <TableCell align="center">
-                    {row.OrderCart?.quantity}
+                      row.OrderCart?.cakeSize.title}
                   </TableCell>
                   <TableCell align="center">{row.handleStatus}</TableCell>
                   <TableCell align="center">

@@ -4,9 +4,10 @@ module.exports = (sequelize, DataTypes) => {
     class Cart extends Model {
       static associate(models) {
         Cart.belongsTo(models.Customer, { foreignKey: 'customerID', as: 'customer'});
-
         Cart.belongsTo(models.Cake, { foreignKey: 'cakeID'});
         Cart.hasMany(models.OrderCakeDetail, { foreignKey: 'cartID', as: 'OrderDetails'});
+        Cart.belongsTo(models.CakeSize, { foreignKey: 'cakeSizeID', as: 'cakeSize' });
+        Cart.belongsTo(models.CakeFilling, { foreignKey: 'cakeFillingID', as: 'cakeFilling' });
       }
     }
   
@@ -28,6 +29,15 @@ module.exports = (sequelize, DataTypes) => {
             validated:{
                 len:[0, 255]
             },
+        },
+        cakeSizeID: {
+          type: DataTypes.INTEGER,
+        },
+        cakeFillingID: {
+          type: DataTypes.INTEGER,
+        },
+        priceCake: {
+          type: DataTypes.INTEGER,
         },
         pickUpTime:{
             type: DataTypes.DATE,

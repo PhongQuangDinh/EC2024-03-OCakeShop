@@ -20,26 +20,23 @@ router.get('/', authenticateToken, async (req, res, next) => {
                 {
                     model: model.Cake,
                     required: true,
-                    include: 
-                    [
-                    {
+                },
+                {
                     model: model.CakeSize,
                     as: "cakeSize",
                     required: true,
-                    },
-                    {
-                        model: model.CakeFilling,
-                        as: "cakeFilling",
-                        required: true,
-                    }
-                    ]
+                },
+                {
+                    model: model.CakeFilling,
+                    as: "cakeFilling",
+                    required: true,
                 }
             ]
         });
 
         if(!cart){
             return res.status(404).json({
-                message: "User is not exist"
+                message: "Cart is not exist"
             });
         }
         else{
@@ -125,19 +122,16 @@ router.get('/buying', authenticateToken, async (req, res, next) => {
                 {
                     model: model.Cake,
                     required: true,
-                    include: 
-                    [
-                    {
+                },
+                {
                     model: model.CakeSize,
                     as: "cakeSize",
                     required: true,
-                    },
-                    {
-                        model: model.CakeFilling,
-                        as: "cakeFilling",
-                        required: true,
-                    }
-                    ]
+                },
+                {
+                    model: model.CakeFilling,
+                    as: "cakeFilling",
+                    required: true,
                 }
             ]
         });

@@ -58,9 +58,6 @@ router.post("/manage/update", authenticateToken, async (req, res, next) => {
   try {
     const orderCakeDetails = req.body;
     console.log(orderCakeDetails);
-    // const { OrderCakeDetailID, bakingStatus, handleStatus, cartID, OrderCakeID, arrange} = OrderCakeDetail;
-    // const order = await model.OrderCakeDetail.findAll({
-    // });
     for (const orderCakeDetail of orderCakeDetails) {
       const { orderCakeDetailID, arrange } = orderCakeDetail;
 
@@ -97,7 +94,6 @@ router.post("/manage/update", authenticateToken, async (req, res, next) => {
   }
 });
 
-// thông tin đã/chưa giao hàng của admin
 router.get("/admin-delivered", async (req, res, next) => {
   try {
     // Tìm các đơn hàng đã được giao
