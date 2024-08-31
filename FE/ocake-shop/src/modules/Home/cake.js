@@ -1,5 +1,5 @@
 "use client";
-import { Box, Typography, TextField, FormControl, InputLabel, Select, MenuItem, Button, CardMedia, styled } from "@mui/material";
+import { Box, Typography, TextField, FormControl, InputLabel, Select, MenuItem, Button, CardMedia } from "@mui/material";
 import Layout from "../layout";
 import Image from "next/image";
 import logo from "./../../app/image/logo.png";
@@ -18,7 +18,26 @@ const SelectCake = () => {
   const [filling, setFilling] = useState([]);
   const router = useRouter();
   const cakeID = 1;
+  // if (cakeId){
+  //   useEffect(() => {
+  //     const fetchCakeInfo = async () => {
+  //       try {
+  //         const response = await fetch(router, `/cake/${cakeId}`); // Replace '1' with the actual cake ID
+  //         if (!response.ok) {
+  //           throw new Error('Failed to fetch cake information');
+  //         }
+  //         const data = await response.json();
+  //         setCake(data);
+  //         setSelectedSize(data.cakeSizeID); // Initialize size from API data
+  //       } catch (error) {
+  //         console.error('Error fetching cake info:', error);
+  //       }
+  //     };
   
+  //     fetchCakeInfo();
+  //   }, []);
+  // }
+
   useEffect(()=>{
     const fetchCake = async () => {
       try {
@@ -87,23 +106,10 @@ const SelectCake = () => {
   }
 
   const handleAddCart = async () => {
-    if(!selectedFilling){
-      console.log("Bạn hãy chọn nhân bánh");
-      setError("Bạn hãy chọn nhân bánh");
-      alert("Please select")
-    }
-    if(!selectedFloors){
-      console.log("Bạn hãy nhập số tầng của bánh");
-      setError("Bạn hãy nhập số tầng của bánh");
-    }
-    if(!selectedSize){
-      console.log("Bạn hãy chọn kích thước bánh");
-      setError("Bạn hãy chọn kích thước bánh");
-    }
-    console.log("Size: " + selectedSize + " Nhân: " + selectedFilling + " Tầng: " + selectedFloors);
+
   }
 
-  const priceCake = cake ? cake.priceCake : 0;
+  const priceCake = cake ? cake.priceCake : 0; // Use price from cake data if available
 
   const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
     width: "100%",
@@ -150,20 +156,9 @@ const SelectCake = () => {
             paddingTop: "20px",
             display: "flex",
             justifyContent: "center",
-            paddingBottom: "30px"
           }}
         >
-          <CardMedia
-            component="img"
-            sx={{
-              width: "60%",
-              height: "60%",
-              borderRadius: "6px",
-            }}
-            image={cake?.cakeImages?.[0]?.imageDetail?.imagePath || logo}
-            alt="cake image"
-          />
-
+          <Image priority src={logo} alt="logo" width={600} />
         </Box>
         <Box sx={{
           background: "#fff",
@@ -193,39 +188,57 @@ const SelectCake = () => {
               <Typography
                 sx={{
                   width: "20vw",
-                  fontSize: "20px",
+                  fontSize: "30px",
                 }}
               >
                 {cake ? cake.description : 'Loading...'}
               </Typography>
             </Box>
-
             <Box sx={{
               display: "flex",
               alignContent: "center",
               paddingTop: "40px",
-              gap: "140px"
+              gap: "90px"
             }}>
-              <Typography sx={{
-                color: "#000",
-                fontSize: "30px",
-                fontWeight: "bold",
-                fontFamily: "Montserrat, sans-serif",
+              <Box sx={{
+                display: "flex",
+                gap: "140px"
               }}>
-                Số tầng
-              </Typography>
-              <TextField
-                sx={{
-                  width: "20vw",
+                <Typography sx={{
+                  color: "#000",
                   fontSize: "30px",
-                }}
-                id="floor"
-                label="Số tầng"
-                value={selectedFloors}
-                onChange={handleChangeFloors}
-              />
+                  fontWeight: "bold",
+                  fontFamily: "Montserrat, sans-serif",
+                }}>
+                  Số tầng
+                </Typography>
+                <FormControl sx={{
+                  width: "20vw",
+                }}>
+                  <InputLabel sx={{
+                    fontSize: "20px",
+                    id: "select-tang",
+                  }}>
+                    Tầng
+                  </InputLabel>
+                  <Select
+                    sx={{
+                      fontSize: "16px",
+                    }}
+                    labelId="select-floor"
+                    id="select-floor"
+                    value={selectedFloors}
+                    label="Floor"
+                    onChange={handleChangeFloors}
+                  >
+                    <MenuItem value={1}>Một tầng</MenuItem>
+                    <MenuItem value={2}>Hai tầng</MenuItem>
+                    <MenuItem value={3}>Ba tầng</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
             </Box>
-            
+
             <Box sx={{
               display: "flex",
               paddingTop: "20px",
@@ -239,28 +252,14 @@ const SelectCake = () => {
               }}>
                 Nhân bánh kem
               </Typography>
-              <FormControl sx={{
+              <Typography sx={{
                 width: "20vw",
+                fontSize: "30px",
               }}>
-                <InputLabel sx={{
-                    fontSize: "20px",
-                }} 
-                   id="select-size">Nhân</InputLabel>
-                <Select
-                  labelId="select-size"
-                  id="select-size"
-                  label="Size"
-                  value={selectedFilling}
-                  onChange={handleChangeFilling}
-                >
-                  {filling.map((item) => (
-                    <MenuItem key={item.cakeFillingID} value={item.title}>
-                      {item.title}
-                    </MenuItem>))}
-                </Select>
-              </FormControl>
+                {cake ? cake.cakeFillingID : 'Loading...'}
+              </Typography>
             </Box>
-
+            
             <Box sx={{
               display: "flex",
               paddingTop: "20px",
@@ -288,10 +287,11 @@ const SelectCake = () => {
                   value={selectedSize}
                   onChange={handleChangeSize}
                 >
-                  {size.map((item) => (
-                    <MenuItem key={item.cakeSizeID} value={item.title}>
-                      {item.title} cm
-                    </MenuItem>))}
+                  <MenuItem value={16}>16 cm</MenuItem>
+                  <MenuItem value={18}>18 cm</MenuItem>
+                  <MenuItem value={20}>20 cm</MenuItem>
+                  <MenuItem value={22}>22 cm</MenuItem>
+                  <MenuItem value={24}>24 cm</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -321,7 +321,6 @@ const SelectCake = () => {
                 onChange={handleNoteChange}
               />
             </Box>
-
           </Box>
 
           <Box sx={{
@@ -344,14 +343,6 @@ const SelectCake = () => {
               {priceCake}
             </Typography>
           </Box>
-          
-            <Box sx={{
-              display: "flex",
-              alignContent: "center",
-              justifyContent: "center"
-            }}>
-              {error && (!selectedFloors || !selectedFilling  || !selectedSize) &&<Typography color="error">{error}</Typography>}
-            </Box>
 
           <Box sx={{
             marginTop: "30px",
@@ -367,10 +358,10 @@ const SelectCake = () => {
                   backgroundColor: "#FFC0CB",
                   color: "#000000",
                 },
-                fontFamily: "Montserrat, sans-serif",
+                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho button
                 outline: "none",
               }}
-              onClick={handleAddCart}
+              onclick={handleAddCart}
             >
               Thêm vào giỏ
             </Button>
