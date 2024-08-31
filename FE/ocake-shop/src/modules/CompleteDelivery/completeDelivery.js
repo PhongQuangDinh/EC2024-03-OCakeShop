@@ -1,7 +1,7 @@
 "use client"; // Đảm bảo đây là một component phía client
 
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import Layout from "../layout";
 import Link from "next/link";
 import { fetchWithAuth } from '../../../WebConfig'; // Đảm bảo bạn đã import hàm fetchWithAuth
@@ -122,22 +122,15 @@ const CompleteDelivery = () => {
                         <TableCell align="center">{item.customerPhone}</TableCell>
                         <TableCell align="center">{item.pickUpTime}</TableCell>
                         <TableCell align="center">
-                          <Button
-                            variant="contained"
+                          <Typography
                             sx={{
-                              backgroundColor: "#FFDFE7",
-                              color: "#000000",
-                              border: "1px solid #e82652",
-                              "&:hover": {
-                                backgroundColor: "#FFC0CB",
-                                color: "#000000",
-                              },
                               fontFamily: "Montserrat, sans-serif",
-                              outline: "none",
+                              color: "#EA365F",
+                              fontWeight: "bold",
                             }}
                           >
                             Đã xác nhận
-                          </Button>
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     ))
