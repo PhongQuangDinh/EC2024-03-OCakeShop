@@ -1,13 +1,13 @@
 "use client";
-import { Box, CardMedia, Grid, styled, Typography } from "@mui/material";
+import { Box, CardMedia, Chip, Grid, styled, Typography } from "@mui/material";
 import PropTypes from "prop-types";
-
-const CakeCard = ({ id, img, title, onClick }) => {
+const CakeCard = ({ img, title }) => {
+  
   return (
     <ArticleBox>
       <GridCard sx={{ border: "none" }} direction="column" container>
         <Grid item xs={10} sx={{ width: "100%" }}>
-          <StyledCardMedia image={img} title="" />
+          <StyledCardMedia image={img} title=""></StyledCardMedia>
         </Grid>
         <Grid item xs={2} sx={{ color: "#000" }}>
           <TitleTypo component="h1" size="18px" weight="bold">
@@ -24,13 +24,6 @@ const CakeCard = ({ id, img, title, onClick }) => {
 //   router.push(`/home/${id}`);
 // }
 
-CakeCard.propTypes = {
-  id: PropTypes.number.isRequired,
-  img: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-};
-
 export default CakeCard;
 
 const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
@@ -39,9 +32,7 @@ const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
   borderRadius: "6px",
 }));
 
-const ArticleBox = styled("div")(({ theme }) => ({
-  cursor: "pointer",
-}));
+const ArticleBox = styled("div")(({ theme }) => ({}));
 
 const GridCard = styled(Grid)(({ theme }) => ({
   height: "21rem",
