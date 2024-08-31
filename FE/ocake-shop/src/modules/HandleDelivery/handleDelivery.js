@@ -15,7 +15,7 @@ const Handling = () => {
   useEffect(() => {
     const fetchHandlingData = async () => {
       try {
-        const data = await fetchWithAuth(router, '/ordercake/admin-delivered');
+        const data = await fetchWithAuth(router, '/ordercake/admin-not-delivered');
         setInforDelivery(data || []);
       } catch (err) {
         setError('Lỗi khi tải dữ liệu: ' + err.message);
