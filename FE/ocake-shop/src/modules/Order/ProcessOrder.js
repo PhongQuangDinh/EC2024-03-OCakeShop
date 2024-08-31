@@ -75,34 +75,7 @@ export default function ProcessOrder() {
   const fetchOrder = async() => {
     try {
       const data = await fetchWithAuth(router, '/ordercake/manage');
-      // const token = localStorage.getItem('token');
-      // const response = await fetch(`${apiUrl}/ordercake/manage`, {
-      //   method: "GET",
-      //     headers: {
-      //       "authorization": `Bearer ${token}`,
-      //       "Content-Type": "application/json",
-      //     },
-      // });
-
-      // if (!response.ok) {
-      //   if (response.status === 403) {
-      //     setError('Session expired. Please log in again.');
-      //     router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
-      //   } else {
-      //     const contentType = response.headers.get("content-type");
-      //     if (contentType && contentType.includes("application/json")) {
-      //       const errorData = await response.json();
-      //       setError(errorData.message || 'Get order failed');
-      //     } else {
-      //       const errorText = await response.text();
-      //       setError(errorText || 'An error occurred');
-      //     }
-      //   }
-      //   return;
-      // }
-
-      // const data = await response.json();
-      console.log(data);
+            console.log(data);
       setRows(data || '');
 
     } catch (err) {
@@ -201,7 +174,7 @@ export default function ProcessOrder() {
                     </Box>
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {"Bánh kem nhân " + row.OrderCart?.Cake.cakeFilling.title + " kích thước "+ row.OrderCart?.Cake.cakeSize.title}
+                    {"Bánh kem nhân " + row.OrderCart?.cakeFilling.title + " kích thước "+ row.OrderCart?.cakeSize.title}
                   </TableCell>
                   <TableCell align="center">{row.OrderCart?.quantity}</TableCell>
                   <TableCell align="center">{row.handleStatus}</TableCell>

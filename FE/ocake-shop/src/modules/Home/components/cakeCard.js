@@ -1,10 +1,12 @@
 "use client";
 import { Box, CardMedia, Grid, styled, Typography } from "@mui/material";
 import PropTypes from 'prop-types';
+// import { useRouter } from "next/navigation";
 
-const CakeCard = ({ id, img, title, onClick }) => {
+
+const CakeCard = ({ id, img, title, onClick}) => {
   return (
-    <ArticleBox>
+    <ArticleBox onClick={() => onClick(id)}>
       <GridCard sx={{ border: "none" }} direction="column" container>
         <Grid item xs={10} sx={{ width: "100%" }}>
           <StyledCardMedia image={img} title="" />
@@ -18,6 +20,11 @@ const CakeCard = ({ id, img, title, onClick }) => {
     </ArticleBox>
   );
 };
+// const router = useRouter();
+// const handleClickCake = (id) => {
+//   console.log('Card clicked :' + id);
+//   router.push(`/home/${id}`);
+// }
 
 CakeCard.propTypes = {
   id: PropTypes.number.isRequired,

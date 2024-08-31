@@ -3,11 +3,9 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class CakeFilling extends Model {
       static associate(models) {
-        CakeFilling.hasMany(models.Cake, { foreignKey: 'cakeFillingID', as: 'cakes' });
+        // CakeFilling.hasMany(models.Cake, { foreignKey: 'cakeFillingID', as: 'cakes' });
+        CakeFilling.hasMany(models.Cart, { foreignKey: 'cakeFillingID'});
         CakeFilling.hasMany(models.CakeRecipes, { foreignKey: 'cakeFillingID', as: 'recipes' });
-        // CakeFilling.belongsToMany(models.Genre, { through: models.GenreCakeFilling, foreignKey: 'CakeFilling' });
-        // CakeFilling.hasMany(models.CakeFillingTrailer, { foreignKey: 'CakeFilling'})
-        // CakeFilling.belongsToMany(models.Award, { through: models.AwardCakeFilling, foreignKey: 'CakeFilling_id' });
       }
       static async createCakeFilling(cakeFilling){
           try {

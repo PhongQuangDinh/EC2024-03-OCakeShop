@@ -27,7 +27,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/size", authenticateToken, async (req, res, next) => {
+router.get("/size", async (req, res, next) => {
   try {
     const sizes = await model.CakeSize.findAll();
 
@@ -41,7 +41,7 @@ router.get("/size", authenticateToken, async (req, res, next) => {
   }
 });
 
-router.get("/filling", authenticateToken, async (req, res, next) => {
+router.get("/filling", async (req, res, next) => {
   try {
     const fillings = await model.CakeFilling.findAll();
 
@@ -55,7 +55,7 @@ router.get("/filling", authenticateToken, async (req, res, next) => {
   }
 });
 
-router.get("/:id", authenticateToken, async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const cakes = await model.Cake.findByPk(req.params.id, {
       include: {
@@ -97,7 +97,7 @@ router.get("/purpose/all", async (req, res, next) => {
   }
 });
 
-router.get("/purpose/:purposeID", authenticateToken, async (req, res, next) => {
+router.get("/purpose/:purposeID", async (req, res, next) => {
   try {
       const purposeID = req.params.purposeID;
       const cake = await model.Cake.findAll({

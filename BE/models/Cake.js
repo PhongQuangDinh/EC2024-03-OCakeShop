@@ -8,8 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       
       Cake.hasMany(models.CakeImage, { foreignKey: "cakeID", as: "cakeImages"});
       // Cake.belongsTo(models.Cart, { foreignKey: 'cartID', as: 'cart' });
-      Cake.belongsTo(models.CakeSize, { foreignKey: 'cakeSizeID', as: 'cakeSize' });
-      Cake.belongsTo(models.CakeFilling, { foreignKey: 'cakeFillingID', as: 'cakeFilling' });
+      // Cake.belongsTo(models.CakeSize, { foreignKey: 'cakeSizeID', as: 'cakeSize' });
+      // Cake.belongsTo(models.CakeFilling, { foreignKey: 'cakeFillingID', as: 'cakeFilling' });
       Cake.belongsTo(models.Purpose, {foreignKey: "purposeID", as: "purpose"});
 
     }
@@ -67,15 +67,15 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      cakeSizeID: {
-        type: DataTypes.INTEGER,
-      },
-      cakeFillingID: {
-        type: DataTypes.INTEGER,
-      },
-      priceCake: {
-        type: DataTypes.INTEGER,
-      },
+      // cakeSizeID: {
+      //   type: DataTypes.INTEGER,
+      // },
+      // cakeFillingID: {
+      //   type: DataTypes.INTEGER,
+      // },
+      // priceCake: {
+      //   type: DataTypes.INTEGER,
+      // },
       purposeID: {
         type: DataTypes.INTEGER,
       },

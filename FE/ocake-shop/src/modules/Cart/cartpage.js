@@ -39,7 +39,7 @@ const CartPage = () => {
   const calculateTotal = () => {
     return rows?.reduce((acc, row) => {
       if (selectedItems.includes(row?.cartID)) {
-        return acc + (row?.Cake.cakeSize.priceSize + row?.Cake.cakeFilling.priceCakeFilling) * row?.quantity;
+        return acc + (row?.priceCake) * row?.quantity;
       }
       return acc;
       }, 0);
@@ -206,11 +206,11 @@ const CartPage = () => {
                       checked={selectedItems.includes(row?.cartID)}
                       onChange={(event) => handleSelectItem(event, row?.cartID)} 
                     />
-                    {"Bánh kem nhân " + row?.Cake.cakeFilling.title + " kích thước" + row?.Cake.cakeSize.title}
+                    {"Bánh kem nhân " + row?.cakeFilling.title + " kích thước " + row?.cakeSize.title}
                   </TableCell>
                   <TableCell align="right">
                     {/* {row.price.toLocaleString()} VND */}
-                    {row?.Cake.cakeSize.priceSize + row?.Cake.cakeFilling.priceCakeFilling} VND
+                    {row?.priceCake} VND
                     {/* <Typography variant="body2" color="textSecondary">
                       Kho: {row.stockLimit}
                     </Typography> */}
@@ -235,7 +235,7 @@ const CartPage = () => {
                       </Button>
                     </Box>
                   </TableCell>
-                  <TableCell align="right">{((row?.Cake.cakeSize.priceSize + row?.Cake.cakeFilling.priceCakeFilling) * row?.quantity).toLocaleString()} VND</TableCell>
+                  <TableCell align="right">{((row?.priceCake) * row?.quantity).toLocaleString()} VND</TableCell>
                   <TableCell align="center">
                     <Button color="error" onClick={() => handleDeleteClick(row?.cartID)}>Xóa</Button>
                   

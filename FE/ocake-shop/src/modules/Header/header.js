@@ -96,7 +96,7 @@ const NavBar = () => {
             alt="Avatar"
             onClick={handleOpenUserMenu}
             sx={{ cursor: "pointer"}}
-            href="/profile"
+            // href="/profile"
           />
         </Tooltip>
 
@@ -108,9 +108,6 @@ const NavBar = () => {
           onClose={handleCloseUserMenu}
         >
           <MenuItem onClick={handleGetProfile}>
-            Profile
-          </MenuItem>
-          <MenuItem>
             <UploadFileOutlined />
             Upload
           </MenuItem>
