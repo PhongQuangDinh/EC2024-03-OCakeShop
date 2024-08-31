@@ -1,4 +1,4 @@
-import CompleteDelivery from "@/modules/CompleteDelivery/completeDelivery";
+import CompleteDelivery from "../../modules/CompleteDelivery/completeDelivery";
 import Head from "next/head";
 
 export default function Home() {
