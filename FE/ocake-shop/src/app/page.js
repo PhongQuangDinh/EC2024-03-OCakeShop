@@ -1,4 +1,4 @@
-import HomePage from "@/modules/Home/home";
+import HomePage from "./../modules/Home/home";
 import Head from "next/head";
 
 export const metadata = {
