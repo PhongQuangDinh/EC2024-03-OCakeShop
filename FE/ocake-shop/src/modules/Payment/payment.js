@@ -112,7 +112,7 @@ const Payment = () => {
           "Content-Type": "application/json",
         },
       }); // Save the updated profile using POST
-      });
+      // });
 
       if (data) {
         alert("Order is set successfully!");
@@ -286,6 +286,7 @@ const Payment = () => {
                           cake.Cake.cakeFilling.title +
                           " kích thước" +
                           cake.Cake.cakeSize.title}
+                        </TableCell>
                       <TableCell
                         sx={{ paddingLeft: "3%" }}
                         align="left"
@@ -528,6 +529,5 @@ const Payment = () => {
       </Box>
     </Layout>
   );
-};
-
+}};
 export default Payment;
