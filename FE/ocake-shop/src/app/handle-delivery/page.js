@@ -1,4 +1,5 @@
-import HandleDelivery from "@/modules/HandleDelivery/handleDelivery";
+
+import HandleDelivery from "../../modules/HandleDelivery/handleDelivery";
 import Head from "next/head";
 
 export default function Home() {
