@@ -1,4 +1,4 @@
-import SignIn from "@/modules/SignIn/signin";
+import SignIn from "../../modules/SignIn/signin";
 import Head from "next/head";
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <SignIn/>
+        <SignIn />
       </main>
     </div>
   );
