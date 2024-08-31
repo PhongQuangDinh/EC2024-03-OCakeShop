@@ -1,4 +1,4 @@
-import StatisticsPage from "@/modules/Stats/Stats";
+import StatisticsPage from "../..Stats/modules/Stats/Stats";
 import Head from "next/head";
 
 export const metadata = {

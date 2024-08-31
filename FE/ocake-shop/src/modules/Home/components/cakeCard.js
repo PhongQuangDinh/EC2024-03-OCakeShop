@@ -1,12 +1,10 @@
 "use client";
 import { Box, CardMedia, Grid, styled, Typography } from "@mui/material";
-import PropTypes from 'prop-types';
-// import { useRouter } from "next/navigation";
+import PropTypes from "prop-types";
 
-
-const CakeCard = ({ id, img, title, onClick}) => {
+const CakeCard = ({ id, img, title, onClick }) => {
   return (
-    <ArticleBox onClick={() => onClick(id)}>
+    <ArticleBox>
       <GridCard sx={{ border: "none" }} direction="column" container>
         <Grid item xs={10} sx={{ width: "100%" }}>
           <StyledCardMedia image={img} title="" />
