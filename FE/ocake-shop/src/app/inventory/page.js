@@ -1,4 +1,4 @@
-import InventoryPage from "@/modules/Inventory/inventory";
+import InventoryPage from "../../modules/Inventory/inventory";
 import Head from "next/head";
 
 export default function Home() {

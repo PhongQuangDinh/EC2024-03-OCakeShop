@@ -1,6 +1,6 @@
 "use client";
 import { Box, CardMedia, Chip, Grid, styled, Typography } from "@mui/material";
-
+import PropTypes from "prop-types";
 const CakeCard = ({ img, title }) => {
   
   return (
@@ -18,6 +18,11 @@ const CakeCard = ({ img, title }) => {
     </ArticleBox>
   );
 };
+// const router = useRouter();
+// const handleClickCake = (id) => {
+//   console.log('Card clicked :' + id);
+//   router.push(`/home/${id}`);
+// }
 
 export default CakeCard;
 

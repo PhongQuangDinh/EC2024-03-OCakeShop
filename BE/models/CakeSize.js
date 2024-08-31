@@ -3,7 +3,8 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class CakeSize extends Model {
       static associate(models) {
-        CakeSize.hasMany(models.Cake, { foreignKey: 'cakeSizeID'})
+        // CakeSize.hasMany(models.Cake, { foreignKey: 'cakeSizeID'})
+        CakeSize.hasMany(models.Cart, { foreignKey: 'cakeSizeID'})
         CakeSize.hasMany(models.CakeRecipes, { foreignKey: 'cakeSizeID'})
       }
       static async createCakeSize(cakeSize){

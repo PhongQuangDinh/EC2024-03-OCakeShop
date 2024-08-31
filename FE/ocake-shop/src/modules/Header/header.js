@@ -18,29 +18,63 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  ShoppingCartOutlined ,
+  ShoppingCartOutlined,
   KeyboardArrowUp,
   LogoutOutlined,
   UploadFileOutlined,
 } from "@mui/icons-material";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import logo from "./../../app/image/logo.png";
+import { fetchWithAuth } from "../../../WebConfig";
 
-const homeData = [
+const CustomerData = [
   { title: "Trang chủ", link: "/home" },
   { title: "Đơn mua", link: "/handle-delivery" },
-  { title: "Giỏ hàng", link: "/cart"}
+  { title: "Giỏ hàng", link: "/cart" },
+];
+
+const AdminData = [
+  { title: "Trang chủ", link: "/home" },
+  { title: "Dashboard", link: "/admin" },
+  { title: "Thông tin kho", link: "/inventory" },
+  { title: "Doanh thu", link: "/stats" },
+  { title: "Giao hàng", link: "/handle-delivery" },
+  { title: "Xử lý đơn", link: "/process-order" },
+];
+
+const ChefData = [
+  { title: "Trang chủ", link: "/home" },
+  { title: "Đơn mua", link: "/handle-delivery" },
+  { title: "Giỏ hàng", link: "/cart" },
+  { title: "Thêm bánh", link: "/add-cake" },
 ];
 
 const NavBar = () => {
   const [open, setOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const [inforCustomer, setInforCustomer] = useState("");
+  const [error, setError] = useState(null);
+  const [items, setItems] = useState([]);
   const [prior, setPrior] = useState(false);
   const router = useRouter();
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 50,
   });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await fetchWithAuth(router, "/customer/myinfo");
+        console.log(data);
+        setInforCustomer(data || "");
+      } catch (err) {
+        setError("SOS " + err.message);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   useEffect(() => {
     if (open) setPrior(true);
@@ -50,9 +84,19 @@ const NavBar = () => {
       }, 500);
   }, [open]);
 
+  useEffect(() => {
+    if (inforCustomer.role == "khách hàng") {
+      setItems(AdminData);
+    } else if (inforCustomer.role == "đầu bếp") {
+      setItems(ChefData);
+    } else {
+      setItems(CustomerData);
+    }
+  }, [inforCustomer]);
+
   const handleGetProfile = (event) => {
-    router.push('/profile');
-  }
+    router.push("/profile");
+  };
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -63,7 +107,7 @@ const NavBar = () => {
   const openUser = Boolean(anchorElUser);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setAnchorElUser(null);
     router.push("/signin");
   };
@@ -73,11 +117,11 @@ const NavBar = () => {
       <AppBarDesktop trigger={trigger} prior={prior}>
         <Link href="/">
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Image priority src={logo} alt="logo" width={100} href="/home"/>
+            <Image priority src={logo} alt="logo" width={100} href="/home" />
           </Box>
         </Link>
         <StyledNavContainer>
-          {homeData.map((item, i) => (
+          {items.map((item, i) => (
             <NavItem trigger={trigger} key={i} content={item}></NavItem>
           ))}
           {/* <StyledNavItem
@@ -95,7 +139,7 @@ const NavBar = () => {
             src={null}
             alt="Avatar"
             onClick={handleOpenUserMenu}
-            sx={{ cursor: "pointer"}}
+            sx={{ cursor: "pointer" }}
             href="/profile"
           />
         </Tooltip>
@@ -107,9 +151,7 @@ const NavBar = () => {
           onClick={handleCloseUserMenu}
           onClose={handleCloseUserMenu}
         >
-          <MenuItem onClick={handleGetProfile}>
-            Profile
-          </MenuItem>
+          <MenuItem onClick={handleGetProfile}>Profile</MenuItem>
           <MenuItem>
             <UploadFileOutlined />
             Upload

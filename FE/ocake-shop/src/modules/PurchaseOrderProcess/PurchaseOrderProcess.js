@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Box, Typography, Tab, Tabs } from '@mui/material';
 import Layout from "../layout";
 import Table from "@mui/material/Table";
@@ -9,6 +9,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { getApiUrl, fetchWithAuth } from '../../../WebConfig';
+import { useRouter } from 'next/navigation';
 
 function createData(name, quantity, deliveryDate) {
   return { name, quantity, deliveryDate };
@@ -35,24 +37,62 @@ const initialRows = [
 export default function PurchaseOrderProcess() {
   const [rows, setRows] = useState(initialRows);
   const [value, setValue] = useState(0);
+  const [valueHandleDelivery, setValueHandleDelivery] = useState([]);
+  const [valueCompleteDelivery, setValueCompleteDelivery] = useState([]);
+  const [error, setError] = useState('');  
+  const router = useRouter();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const moveRow = (index, direction) => {
-    const newRows = [...rows];
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
+  useEffect(()=>{
+    const fetchHandleDelivery = async () => {
+      try {
+        const response = await fetchWithAuth(router, 'ordercake/admin-not-delivered');
+        if(!response){
+          setError('Error fetching data');
+        }
+        setValueHandleDelivery(response);
+      }
+      catch (error) {
+        setError(error);
+        console.log(error+" Not get handleDelivery");
+      }
+    };
+      fetchHandleDelivery();
+  }, []);
 
-    if (targetIndex >= 0 && targetIndex < newRows.length) {
-      const temp = newRows[targetIndex];
-      newRows[targetIndex] = newRows[index];
-      newRows[index] = temp;
-      setRows(newRows);
-      setMovingRowIndex(targetIndex);
-      setTimeout(() => setMovingRowIndex(null), 300);
-    }
-  };
+  useEffect(()=>{
+    const fetchCompleteDelivery = async () => {
+      try {
+        const response = await fetchWithAuth(router, 'ordercake/admin-delivered');
+        if(!response){
+          setError('Error fetching data');
+        }
+        setValueCompleteDelivery(response);
+      }
+      catch (error) {
+        setError(error);
+        console.log(error+" Not get handleDelivery");
+      }
+    };
+    fetchCompleteDelivery();
+  }, []);
+
+  // const moveRow = (index, direction) => {
+  //   const newRows = [...rows];
+  //   const targetIndex = direction === "up" ? index - 1 : index + 1;
+
+  //   if (targetIndex >= 0 && targetIndex < newRows.length) {
+  //     const temp = newRows[targetIndex];
+  //     newRows[targetIndex] = newRows[index];
+  //     newRows[index] = temp;
+  //     setRows(newRows);
+  //     setMovingRowIndex(targetIndex);
+  //     setTimeout(() => setMovingRowIndex(null), 300);
+  //   }
+  // };
 
   return (
     <Layout>

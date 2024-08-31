@@ -1,4 +1,4 @@
-import LandingPage from "@/modules/Landing/landing";
+import LandingPage from "../..//modules/Landing/landing";
 import Head from "next/head";
 
 export const metadata = {

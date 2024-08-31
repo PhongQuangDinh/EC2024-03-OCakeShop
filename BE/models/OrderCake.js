@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         pickUpTime:{
             type: DataTypes.DATE,
-            defaultValue: Date.now,
+            // defaultValue: Date.now,
             allowNull: false,
         },
         note:{

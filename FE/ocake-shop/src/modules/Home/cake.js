@@ -17,11 +17,14 @@ const SelectCake = () => {
   const [size, setSize] = useState([]);
   const [filling, setFilling] = useState([]);
   const router = useRouter();
-  const cakeID = 1;
+  // const cakeID = 1;
+  const searchParams = useSearchParams();
+  const cakeID = searchParams.get('cakeID');
   
   useEffect(()=>{
     const fetchCake = async () => {
       try {
+        console.log("CakeID: "+ cakeID);
         const data = await fetchWithAuth(router, `/cake/${cakeID}`);
         if(!data){
           console.log("Not get Cake");
@@ -34,7 +37,7 @@ const SelectCake = () => {
       }
     };
     fetchCake();
-  }, []);
+  }, [cakeID]);
 
   useEffect(()=>{
     const fetchSize = async () => {
