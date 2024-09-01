@@ -2,64 +2,55 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, TextField, Button, Select, MenuItem } from '@mui/material';
 import Layout from '../layout';
+import { fetchWithAuth } from '../../../WebConfig';
+import { useRouter } from 'next/navigation';
 
 const AddCakePage = () => {
+  const router = useRouter();
   const [cakeName, setCakeName] = useState('');
   const [size, setSize] = useState('');
   const [filling, setFilling] = useState('');
-  const [price, setPrice] = useState('');
+  const [price, setPrice] = useState(0);
   const [image, setImage] = useState(null);
+  const [error, setError] = useState('');
 
-  // State để lưu trữ danh sách kích thước và nhân bánh
   const [cakeSizes, setCakeSizes] = useState([]);
   const [cakeFillings, setCakeFillings] = useState([]);
 
-  // Dữ liệu mặc định cho kích thước và nhân bánh
-  const defaultSizes = [
-    { cakeSizeID: 1, title: "16" },
-    { cakeSizeID: 2, title: "18" },
-    { cakeSizeID: 3, title: "20" },
-    { cakeSizeID: 4, title: "22" },
-    { cakeSizeID: 5, title: "24" },
-  ];
-
-  const defaultFillings = [
-    { cakeFillingID: 1, title: "Cafe" },
-    { cakeFillingID: 2, title: "Phô mai" },
-    { cakeFillingID: 3, title: "Matcha" },
-    { cakeFillingID: 4, title: "Vani" },
-    { cakeFillingID: 5, title: "Dâu" },
-    { cakeFillingID: 6, title: "Dứa" },
-    { cakeFillingID: 7, title: "Chocolate" },
-  ];
-
-  // Fetch dữ liệu kích thước và nhân bánh từ server
   useEffect(() => {
     const fetchCakeSizes = async () => {
       try {
-        const response = await fetch('/api/cakesizes'); // Đổi endpoint nếu cần
-        const data = await response.json();
-        setCakeSizes(data.length ? data : defaultSizes); // Sử dụng dữ liệu mặc định nếu không lấy được
-      } catch (error) {
-        console.error('Error fetching cake sizes:', error);
-        setCakeSizes(defaultSizes); // Sử dụng dữ liệu mặc định khi có lỗi
+        const data = await fetchWithAuth(router, '/cake/size');
+        setCakeSizes(data || []);
+      } catch (err) {
+        setError('SOS ' + err.message);
       }
     };
 
     const fetchCakeFillings = async () => {
       try {
-        const response = await fetch('/api/cakefillings'); // Đổi endpoint nếu cần
-        const data = await response.json();
-        setCakeFillings(data.length ? data : defaultFillings); // Sử dụng dữ liệu mặc định nếu không lấy được
-      } catch (error) {
-        console.error('Error fetching cake fillings:', error);
-        setCakeFillings(defaultFillings); // Sử dụng dữ liệu mặc định khi có lỗi
+        const data = await fetchWithAuth(router, '/cake/filling');
+        setCakeFillings(data || []);
+      } catch (err) {
+        setError('SOS ' + err.message);
       }
     };
 
     fetchCakeSizes();
     fetchCakeFillings();
-  }, []);
+  }, [router]);
+
+  useEffect(() => {
+    // Calculate the total price when size or filling changes
+    const selectedSize = cakeSizes.find(s => s.title === size);
+    const selectedFilling = cakeFillings.find(f => f.title === filling);
+
+    const calculatedPrice =
+      (selectedSize ? selectedSize.priceSize : 0) +
+      (selectedFilling ? selectedFilling.priceCakeFilling : 0);
+
+    setPrice(calculatedPrice);
+  }, [size, filling, cakeSizes, cakeFillings]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -68,15 +59,15 @@ const AddCakePage = () => {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Code to handle form submission goes here
+    alert("Đã thêm bánh thành công");
   };
 
   return (
     <Layout>
       <Box sx={{ background: '#E5E5E5', minHeight: '100vh', padding: '0px' }}>
-        <Box sx={{ height: '90px', backgroundColor: '#FBF0D4' }} /> {/* Viền màu vàng trên đầu */}
+        <Box sx={{ height: '90px', backgroundColor: '#FBF0D4' }} />
         <Typography variant="h4" align="left" gutterBottom sx={{ marginTop: '30px', marginLeft: '320px', color: '#E82552', fontWeight: 'bold' }}>
           Ocake Shop | Thêm bánh kem
         </Typography>
@@ -103,21 +94,21 @@ const AddCakePage = () => {
             fullWidth
             margin="normal"
             required
-            sx={{ 
-              marginBottom: 2, 
+            sx={{
+              marginBottom: 2,
               width: "100%",
-              "& .MuiOutlinedInput-root": { 
+              "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#e82652", 
+                  borderColor: "#e82652",
                 },
-                "&:hover fieldset": { 
-                  borderColor: "#FFC0CB", 
+                "&:hover fieldset": {
+                  borderColor: "#FFC0CB",
                 },
-                "& input": { 
+                "& input": {
                   color: "#000000",
-                  fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho input
+                  fontFamily: "Montserrat, sans-serif",
                 },
-                "&:hover input": { 
+                "&:hover input": {
                   color: "#000000",
                 },
                 "&.Mui-focused fieldset": {
@@ -129,7 +120,7 @@ const AddCakePage = () => {
               },
               "& label.Mui-focused": {
                 color: "#e82652",
-                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+                fontFamily: "Montserrat, sans-serif",
               },
             }}
           />
@@ -142,28 +133,28 @@ const AddCakePage = () => {
             fullWidth
             margin="normal"
             required
-            sx={{ 
-              marginBottom: 2, 
+            sx={{
+              marginBottom: 2,
               width: "100%",
-              "& .MuiOutlinedInput-notchedOutline": { // Thay đổi đường viền bên ngoài
-                borderColor: "#e82652", // Màu hồng
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#e82652",
               },
               "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#FFC0CB", // Màu hồng nhạt khi hover
+                borderColor: "#FFC0CB",
               },
               "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#FFC0CB", // Màu hồng khi focus
+                borderColor: "#FFC0CB",
               },
-              "& input": { 
+              "& input": {
                 color: "#000000",
-                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho input
+                fontFamily: "Montserrat, sans-serif",
               },
-              "&:hover input": { 
+              "&:hover input": {
                 color: "#000000",
               },
               "& label.Mui-focused": {
                 color: "#e82652",
-                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+                fontFamily: "Montserrat, sans-serif",
               },
             }}
           >
@@ -185,28 +176,28 @@ const AddCakePage = () => {
             fullWidth
             margin="normal"
             required
-            sx={{ 
-              marginBottom: 2, 
+            sx={{
+              marginBottom: 2,
               width: "100%",
-              "& .MuiOutlinedInput-notchedOutline": { // Thay đổi đường viền bên ngoài
-                borderColor: "#e82652", // Màu hồng
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#e82652",
               },
               "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#FFC0CB", // Màu hồng nhạt khi hover
+                borderColor: "#FFC0CB",
               },
               "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#FFC0CB", // Màu hồng khi focus
+                borderColor: "#FFC0CB",
               },
-              "& input": { 
+              "& input": {
                 color: "#000000",
-                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho input
+                fontFamily: "Montserrat, sans-serif",
               },
-              "&:hover input": { 
+              "&:hover input": {
                 color: "#000000",
               },
               "& label.Mui-focused": {
                 color: "#e82652",
-                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+                fontFamily: "Montserrat, sans-serif",
               },
             }}
           >
@@ -227,21 +218,21 @@ const AddCakePage = () => {
             fullWidth
             margin="normal"
             required
-            sx={{ 
-              marginBottom: 2, 
+            sx={{
+              marginBottom: 2,
               width: "100%",
-              "& .MuiOutlinedInput-root": { 
+              "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#e82652", 
+                  borderColor: "#e82652",
                 },
-                "&:hover fieldset": { 
-                  borderColor: "#FFC0CB", 
+                "&:hover fieldset": {
+                  borderColor: "#FFC0CB",
                 },
-                "& input": { 
+                "& input": {
                   color: "#000000",
-                  fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho input
+                  fontFamily: "Montserrat, sans-serif",
                 },
-                "&:hover input": { 
+                "&:hover input": {
                   color: "#000000",
                 },
                 "&.Mui-focused fieldset": {
@@ -253,9 +244,10 @@ const AddCakePage = () => {
               },
               "& label.Mui-focused": {
                 color: "#e82652",
-                fontFamily: "Montserrat, sans-serif", // Áp dụng font Montserrat cho label khi focus
+                fontFamily: "Montserrat, sans-serif",
               },
             }}
+            disabled
           />
           <Box sx={{ width: '100%', margin: '20px 0' }}>
             <Button
@@ -264,7 +256,7 @@ const AddCakePage = () => {
               sx={{ width: '100%', padding: '20px', border: '2px dashed #E82552', color: '#E82552' }}
             >
               Thêm hình ảnh bánh kem
-              <input type="file" hidden onChange={handleImageUpload} />
+              <input type="file" hidden onChange={handleImageUpload} required/>
             </Button>
             {image && <Typography sx={{ marginTop: '10px' }}>{image.name}</Typography>}
           </Box>
