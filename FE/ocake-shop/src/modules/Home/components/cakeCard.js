@@ -8,7 +8,7 @@ const CakeCard = ({ id, img, title, onClick}) => {
   return (
     <ArticleBox onClick={() => onClick(id)}>
       <GridCard sx={{ border: "none" }} direction="column" container>
-        <Grid item xs={8} sx={{ width: "100%" }}>
+        <Grid item xs={10} sx={{ width: "100%" }}>
           <StyledCardMedia image={img} title="" />
         </Grid>
         <Grid item xs={2} sx={{ color: "#000" }}>
