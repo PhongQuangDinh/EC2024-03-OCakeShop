@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         paymentTime:{
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
+            allowNull: false,
         },
         orderCakeID:{
             type: DataTypes.INTEGER,

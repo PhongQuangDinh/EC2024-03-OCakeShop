@@ -50,7 +50,6 @@ const Payment = () => {
 
   useEffect(() => {
     const fetchCake = async () => {
-
       try {
         const data = await fetchWithAuth(router, '/cart/buying');  // if method not defined it would be GET by default
         if (!data) {
@@ -61,7 +60,6 @@ const Payment = () => {
         setError('SOS ' + err.message);
       }
     };
-
     fetchCake();
   }, []);
 
