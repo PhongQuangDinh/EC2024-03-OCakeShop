@@ -29,16 +29,19 @@ router.get("/manage", async (req, res, next) => {
             {
               model: model.Cake,
               required: true,
-            },
-            {
-              model: model.CakeSize,
-              as: "cakeSize",
-              required: true,
-            },
-            {
-              model: model.CakeFilling,
-              as: "cakeFilling",
-              required: true,
+              include: 
+              [
+                {
+                model: model.CakeSize,
+                as: "cakeSize",
+                required: true,
+                },
+                {
+                  model: model.CakeFilling,
+                  as: "cakeFilling",
+                  required: true,
+                }
+              ]
             }
           ]
         }
@@ -56,6 +59,9 @@ router.post("/manage/update", authenticateToken, async (req, res, next) => {
   try {
     const orderCakeDetails = req.body;
     console.log(orderCakeDetails);
+    // const { OrderCakeDetailID, bakingStatus, handleStatus, cartID, OrderCakeID, arrange} = OrderCakeDetail;
+    // const order = await model.OrderCakeDetail.findAll({
+    // });
     for (const orderCakeDetail of orderCakeDetails) {
       const { orderCakeDetailID, arrange } = orderCakeDetail;
     
@@ -91,59 +97,112 @@ router.post("/manage/update", authenticateToken, async (req, res, next) => {
 });
 
 router.get("/admin-delivered", async (req, res, next) => {
-    try {
-      const deliveredOrders = await model.OrderCake.findAll({
-        where: {
-          deliveryStatus: 'Đã vận chuyển'
+  try {
+    const deliveredOrders = await model.OrderCake.findAll({
+      where: {
+        deliveryStatus: "Đã vận chuyển",
+      },
+      include: [
+        {
+          model: model.OrderCakeDetail,
+          as: 'OrderDetails',
+          include: [
+            {
+              model: model.Cart,
+              as: 'OrderCart',
+              include: [
+                {
+                  model: model.Customer,
+                  as: 'customer',
+                  attributes: ['name', 'phoneNumber']
+                }
+              ],
+              attributes: ['priceCake', 'pickUpTime', 'status']
+            }
+          ]
         },
-        include: [
-          {
-            model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
-          },
-          {
-            model: model.Payment,
-            as: 'Payment'
-          }
-        ]
-      });
-  
-      // Trả về kết quả dưới dạng JSON
-      res.status(200).json(deliveredOrders);
-    } catch (err) {
-      // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
-      next(err);
-    }
-  });
+        {
+          model: model.Payment,
+          as: 'Payment',
+        }
+      ],
+    });
 
-  router.get("/admin-not-delivered", async (req, res, next) => {
-    try {
-      const deliveredOrders = await model.OrderCake.findAll({
-        where: {
-          deliveryStatus: 'Chưa vận chuyển' // Hoặc giá trị tương ứng với trạng thái đã giao
+    // Định dạng dữ liệu để trả về
+    const formattedOrders = deliveredOrders.map(order => {
+      return {
+        orderCakeID: order.orderCakeID,
+        customerName: order.OrderDetails[0]?.OrderCart?.customer?.name || 'N/A',
+        customerPhone: order.OrderDetails[0]?.OrderCart?.customer?.phoneNumber || 'N/A',
+        pickUpTime: order.OrderDetails[0]?.OrderCart?.pickUpTime,
+        receiveStatus: order.receiveStatus,
+        orderDetails: order.OrderDetails,
+        payment: order.Payment
+      };
+    });
+
+    res.status(200).json(formattedOrders);
+  } catch (err) {
+    next(err);
+  }
+});
+router.get("/admin-not-delivered", async (req, res, next) => {
+  try {
+    const notDeliveredOrders = await model.OrderCake.findAll({
+      where: {
+        deliveryStatus: "Chưa vận chuyển", // Hoặc giá trị tương ứng với trạng thái chưa giao
+      },
+      include: [
+        {
+          model: model.OrderCakeDetail,
+          as: "OrderDetails",
+          include: [
+            {
+              model: model.Cart,
+              as: "OrderCart",
+              include: [
+                {
+                  model: model.Customer,
+                  as: "customer",
+                  attributes: ['name', 'phoneNumber']
+                }
+              ],
+              attributes: ['priceCake', 'pickUpTime', 'status']
+            }
+          ]
         },
-        include: [
-          {
-            model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
-          },
-          {
-            model: model.Payment,
-            as: 'Payment'
-          }
-        ]
-      });
-  
-      // Trả về kết quả dưới dạng JSON
-      res.status(200).json(deliveredOrders);
-    } catch (err) {
-      // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
-      next(err);
-    }
-  });
+        {
+          model: model.Payment,
+          as: "Payment",
+        }
+      ],
+    });
+
+    // Định dạng dữ liệu để trả về
+    const formattedOrders = notDeliveredOrders.map(order => {
+      return {
+        orderCakeID: order.orderCakeID,
+        customerName: order.OrderDetails[0]?.OrderCart?.customer?.name || 'N/A',
+        customerPhone: order.OrderDetails[0]?.OrderCart?.customer?.phoneNumber || 'N/A',
+        pickUpTime: order.OrderDetails[0]?.OrderCart?.pickUpTime,
+        receiveStatus: order.receiveStatus,
+        orderDetails: order.OrderDetails,
+        payment: order.Payment
+      };
+    });
+
+    // Trả về kết quả dưới dạng JSON
+    res.status(200).json(formattedOrders);
+  } catch (err) {
+    // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
+    next(err);
+  }
+});
+
 
   router.get("/cus-received", async (req, res, next) => {
     try {
+      // Tìm các đơn hàng đã được giao
       const deliveredOrders = await model.OrderCake.findAll({
         where: {
           receiveStatus: 'Đã nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
@@ -160,50 +219,13 @@ router.get("/admin-delivered", async (req, res, next) => {
         ]
       });
   
+      // Trả về kết quả dưới dạng JSON
       res.status(200).json(deliveredOrders);
     } catch (err) {
+      // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
       next(err);
     }
   });
-
-  router.post("/buying", authenticateToken, async (req, res, next) => {
-    try {
-      const orderCakeDetails = req.body;
-      console.log(orderCakeDetails);
-      for (const orderCakeDetail of orderCakeDetails) {
-        const { orderCakeDetailID, arrange } = orderCakeDetail;
-      
-        try {
-          const [updateRows] = await model.OrderCakeDetail.update(
-            {
-              handleStatus: "Đã xử lý",
-              arrange: arrange
-            },
-            {
-              where: {orderCakeDetailID: orderCakeDetailID }
-            }
-          );
-          if(updateRows === 0){
-            return res.status(400).json({message: "OrderCakeDetail not found"})
-          }
-          const updatedOrderCakeDetail = await model.OrderCakeDetail.findOne({
-            where: {orderCakeDetailID: orderCakeDetailID}
-          });
-          res.status(200).json(updatedOrderCakeDetail);
-        } catch (err) {
-          console.error(`Failed to update OrderCakeDetailID ${orderCakeDetailID}:`, err);
-        }
-      }
-  
-      // const order = await fetch(`http://localhost:8080/ordercake/manage`)
-  
-  
-      res.status(200).json({"Message": "Success"});
-    } catch (err) {
-      next(err);
-    }
-  });
-  
 
   router.get("/cus-not-received", async (req, res, next) => {
     try {
