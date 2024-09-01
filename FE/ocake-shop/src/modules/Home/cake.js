@@ -87,10 +87,6 @@ const SelectCake = () => {
           setError(errorData.message || 'Get filling is failed');
           return;
         }
-        // const data = await fetchWithAuth(router, `/cake/${cakeID}`);
-        // if(!data){
-        //   console.log("Not get filling");
-        // }
         const data = await response.json();
         setFilling(data);
       }
@@ -135,10 +131,37 @@ const SelectCake = () => {
       console.log("Bạn hãy chọn kích thước bánh");
       setError("Bạn hãy chọn kích thước bánh");
     }
-    console.log("Size: " + selectedSize + " Nhân: " + selectedFilling + " Tầng: " + selectedFloors);
+    console.log("Size: " + selectedSize.cakeSizeID + " Nhân: " + selectedFilling.cakeFillingID + " Tầng: " + selectedFloors);
+    const floor = selectedFloors;
+    const quantity = selectedQuantity;
+    const additionalDetail = note;
+    const cakeSizeID = selectedSize.cakeSizeID;
+    const cakeFillingID = selectedFilling.cakeFillingID;
+    const formData = {floor, quantity, additionalDetail, cakeSizeID, cakeFillingID, cakeID}; 
+    console.log(formData);
+    try{
+      const data = await fetchWithAuth(router, '/cart/add-to-cart', {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if(!data){
+        console.log("Error SOSSSSSSSSSS");
+        return;
+      }
+      console.log("Successful" + data);
+      router.push('/cart');
+    }
+    catch(error){
+      setError(error);
+      console.log("Error: " + error);
+    }
+  
   }
 
-  const priceCake = cake ? cake.priceCake : 0;
+  const priceCake = (selectedFilling && selectedSize)  ? (selectedFilling.priceCakeFilling + selectedSize.priceSize) * selectedQuantity * selectedFloors : 0;
 
   const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
     width: "100%",
@@ -316,7 +339,7 @@ const SelectCake = () => {
                   onChange={handleChangeFilling}
                 >
                   {filling.map((item) => (
-                    <MenuItem key={item?.cakeFillingID} value={item?.title}>
+                    <MenuItem key={item?.cakeFillingID} value={item}>
                       {item.title}
                     </MenuItem>))}
                 </Select>
@@ -351,7 +374,7 @@ const SelectCake = () => {
                   onChange={handleChangeSize}
                 >
                   {size.map((item) => (
-                    <MenuItem key={item?.cakeSizeID} value={item?.title}>
+                    <MenuItem key={item?.cakeSizeID} value={item}>
                       {item.title} cm
                     </MenuItem>))}
                 </Select>
