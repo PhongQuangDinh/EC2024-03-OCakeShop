@@ -1,68 +1,53 @@
-"use client"
+'use client'; // Đảm bảo đây là một component phía client
+
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Typography, Tab, Tabs} from '@mui/material';
+import { Box, Typography, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Layout from "../layout";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { getApiUrl, fetchWithAuth } from '../../../WebConfig';
-import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { fetchWithAuth } from '../../../WebConfig'; // Đảm bảo bạn đã import hàm fetchWithAuth
+import { useRouter } from 'next/navigation';
+import { format, isValid } from 'date-fns'; // Import thêm hàm isValid
 
-function createData(name, quantity, deliveryDate) {
-  return { name, quantity, deliveryDate };
-}
-
-const handleConfirm = () => {
-  // Handle save changes
-  // console.log('Changes saved:', formData);
+// Hàm để định dạng thời gian
+const formatDateTime = (dateTime) => {
+  const date = new Date(dateTime);
+  if (isValid(date)) {
+    return format(date, "dd/MM/yyyy - HH:mm");
+  } else {
+    return "Ngày giờ không hợp lệ";
+  }
 };
 
-const initialRows = [
-  createData(
-    "Bánh kem sinh nhật hồng cho bé gái | 2 tầng | 24cm, 20cm | Chocolate",
-    1
-  ),
-  createData(
-    "Bánh kem xanh cho bé trai | 1 tầng | 24cm | Phô mai",
-    1
-  ),
-  createData("Bánh kem 8/3 | 1 tầng | 22cm | Chocolate", 1),
-  createData("Bánh kem 14/2 | 1 tầng | 20cm | Vani", 1),
-];
-
-export default function PurchaseOrderProcess() {
-  const [rows, setRows] = useState(initialRows);
-  const [value, setValue] = useState(0);
+const PurchaseOrderProcess = () => {
   const [valueHandleDelivery, setValueHandleDelivery] = useState([]);
-  // const [valueCompleteDelivery, setValueCompleteDelivery] = useState([]);
-  const [error, setError] = useState('');  
+  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
-  useEffect(()=>{
+  useEffect(() => {
     const fetchHandleDelivery = async () => {
       try {
-        const response = await fetchWithAuth(router, '/ordercake/cus-not-received');
-        if(!response){
-          setError('Error fetching data');
-        }
-        setValueHandleDelivery(response);
-      }
-      catch (error) {
-        setError(error);
-        console.log(error+" Not get handleDelivery");
+        const data = await fetchWithAuth(router, '/ordercake/cus-not-received');
+        setValueHandleDelivery(data || []);
+      } catch (err) {
+        setError('Lỗi khi tải dữ liệu: ' + err.message);
       }
     };
-      fetchHandleDelivery();
-  }, []);
+
+    fetchHandleDelivery();
+  }, [router]);
+
+  const handleConfirm = async (orderID) => {
+    try {
+      console.log('Order confirmed:', orderID);
+      await fetchWithAuth(router, `/ordercake/confirm/${orderID}`, {
+        method: 'POST',
+      });
+      const data = await fetchWithAuth(router, '/ordercake/cus-not-received');
+      setValueHandleDelivery(data || []);
+    } catch (err) {
+      setError('Lỗi khi xác nhận đơn hàng: ' + err.message);
+    }
+  };
 
   return (
     <Layout>
@@ -70,8 +55,7 @@ export default function PurchaseOrderProcess() {
         background: "#fff",
         gap: "20px",
         marginTop: "100px",
-      }}
-      >
+      }}>
         <Box sx={{
           display: "flex",
           alignItems: "center",
@@ -84,94 +68,124 @@ export default function PurchaseOrderProcess() {
             fontSize: "40px",
             fontWeight: "bold",
             fontFamily: "Montserrat, sans-serif",
-          }}
-          >
-            OcakeShop | Đơn mua
+          }}>
+            OcakeShop | Đơn hàng đang xử lý
           </Typography>
         </Box>
       </Box>
 
-      {/* Grey Box */}
       <Box sx={{
         background: "#E5E5E5",
-        alignItems: "center",
-        paddingLeft: "10%", paddingRight: "10%",
-        paddingTop: "1%", paddingBottom: "5%"
+        paddingTop: "50px",
+        fontFamily: "Monospace, sans-serif",
       }}>
         <Box sx={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "20px",
+        }}>
+          <Box sx={{
+            backgroundColor: "#fff",
+            height: "70px",
+            width: "45%",
             display: "flex",
             justifyContent: "center",
-            gap: "20px",
+            alignItems: "center",
           }}>
-            <Box sx={{
-              backgroundColor: "#fff",
-              height: "70px",
-              width: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
-              <Typography sx={{
-                fontSize: "30px",
-                fontWeight: "bold",
-                textDecoration: "underline",
-                color: "#EA365F"
-              }}>Đang xử lý</Typography>
-            </Box>
-            <Box sx={{
-              backgroundColor: "#fff",
-              height: "70px",
-              width: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
-              <Link href="/purchaseorder-complete" passHref>
-              <Typography sx={{
-                fontSize: "30px",
-                fontWeight: "bold",
-                // textDecoration: "underline",
-                // color: "#00000"
-              }}>Đã hoàn thành</Typography></Link>
-            </Box>
+            <Typography sx={{
+              fontSize: "30px",
+              fontWeight: "bold",
+              textDecoration: "underline",
+              color: "#EA365F"
+            }}>Đang xử lý</Typography>
           </Box>
+          <Box sx={{
+            backgroundColor: "#fff",
+            height: "70px",
+            width: "45%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+            <Link href="/purchaseorder-complete" passHref>
+              <Typography sx={{
+                fontSize: "30px",
+                fontWeight: "bold",
+                color: "#000",
+                textDecoration: "none",
+              }}>Đã hoàn thành</Typography>
+            </Link>
+          </Box>
+        </Box>
+
         <Box sx={{
+          display: "flex",
+          justifyContent: "center",
           marginTop: "20px",
-        }}></Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 850 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                <TableCell align="left">Tên sản phẩm</TableCell>
-                <TableCell align="center">Số lượng</TableCell>
-                <TableCell align="center">Xác nhận giao hàng</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {valueHandleDelivery.map((row, index) => (
-                <TableRow
-                  // key={row.OrderDetails.OrderCart.cakeSize.title}
-                >
-                  <TableCell align="center"></TableCell>
-                  <TableCell component="th" scope="row">
-                    {row?.OrderDetails?.OrderCart?.cakeSize?.title}
-                  </TableCell>
-                  <TableCell align="center">{row.quantity}</TableCell>
-                  <TableCell align="center">
-                    <Button sx={{
-                      width: "150px",
-                      background: "#FFDFE7",
-                      color: "black",
-                    }}
-                      variant="contained" color="primary" onClick={handleConfirm}> Xác nhận </Button>
-                  </TableCell>
+        }}>
+          <TableContainer component={Paper} sx={{ width: '91%', backgroundColor: "#fff" }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">STT</TableCell>
+                  <TableCell align="center">Đơn hàng</TableCell>
+                  <TableCell align="center">Tên bánh</TableCell>
+                  <TableCell align="center">Kích thước bánh</TableCell>
+                  <TableCell align="center">Nhân bánh</TableCell>
+                  <TableCell align="center">Số lượng</TableCell>
+                  <TableCell align="center">Ngày giao</TableCell>
+                  <TableCell align="center">Trạng thái nhận hàng</TableCell>
+                  <TableCell align="center">Xác nhận giao hàng</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {valueHandleDelivery.length > 0 ? (
+                  valueHandleDelivery.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell align="center">{index + 1}</TableCell> {/* Số thứ tự */}
+                      <TableCell align="center">{item.orderCakeID}</TableCell>
+                      <TableCell align="center">{item.cakeName}</TableCell>
+                      <TableCell align="center">{item.cakeSize}</TableCell>
+                      <TableCell align="center">{item.cakeFilling}</TableCell>
+                      <TableCell align="center">{item.quantity}</TableCell>
+                      <TableCell align="center">{formatDateTime(item.pickUpTime)}</TableCell>
+                      <TableCell align="center">
+                          <Typography
+                            sx={{
+                              fontFamily: "Montserrat, sans-serif",
+                              color: "#EA365F",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {item.receiveStatus}
+                          </Typography>
+                        </TableCell>
+                      <TableCell align="center">
+                        <Button sx={{
+                          width: "150px",
+                          background: "#FFDFE7",
+                          color: "black",
+                        }}
+                          variant="contained" color="primary" onClick={() => handleConfirm(item.orderCakeID)}> Xác nhận </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell align="center" colSpan={8}>
+                      {error ? error : "Không có dữ liệu"}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Box>
-    </Layout >
+      <Box sx={{ paddingTop: "20px", background: "#E5E5E5" }}></Box>
+    </Layout>
+
   );
 };
+
+export default PurchaseOrderProcess;
