@@ -4,7 +4,7 @@ import Layout from "../layout";
 import Image from "next/image";
 import logo from "./../../app/image/logo.png";
 import React, { useState, useEffect } from 'react';
-import { fetchWithAuth } from '../../../WebConfig';
+import { fetchWithAuth, getApiUrl } from '../../../WebConfig';
 import { useRouter, useParams, useSearchParams  } from 'next/navigation';
 
 const SelectCake = () => {
@@ -12,24 +12,31 @@ const SelectCake = () => {
   const [selectedSize, setSelectedSize] = useState(''); // State for size selection
   const [selectedFilling, setSelectedFilling] = useState('');
   const [selectedFloors, setSelectedFloors] = useState(1);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [note, setNote] = useState("");
   const [error, setError] = useState(''); 
   const [size, setSize] = useState([]);
   const [filling, setFilling] = useState([]);
   const router = useRouter();
-  // const cakeID = 1;
   const {cakeID} = useParams();
-  // const searchParams = useSearchParams();
-  // const cakeID = searchParams.get('cakeID');
+  const apiUrl = getApiUrl();
   
   useEffect(()=>{
     const fetchCake = async () => {
       try {
-        console.log("CakeID: "+ cakeID);
-        const data = await fetchWithAuth(router, `/cake/${cakeID}`);
-        if(!data){
-          console.log("Not get Cake");
+        const response = await fetch(`${apiUrl}/cake/${cakeID}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(`${apiUrl}/cake/${cakeID}`);
+        if(!response.ok) {
+          const errorData = await response.json();
+          setError(errorData.message || 'Get cake by id is failed');
+          return;
         }
+        const data = await response.json();
         setCake(data);
       }
       catch (error) {
@@ -43,12 +50,20 @@ const SelectCake = () => {
   useEffect(()=>{
     const fetchSize = async () => {
       try {
-        const data = await fetchWithAuth(router, `/cake/size`);
-        if(!data){
-          router.push('/home')
+        const response = await fetch(`${apiUrl}/cake/size`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(`${apiUrl}/cake/size`);
+        if(!response.ok) {
+          const errorData = await response.json();
+          setError(errorData.message || 'Get size is failed');
+          return;
         }
+        const data = await response.json();
         setSize(data);
-        console.log("Size: " + data);
       }
       catch(error){
         setError(error);
@@ -60,12 +75,24 @@ const SelectCake = () => {
   useEffect(()=>{
     const fetchFilling = async () => {
       try {
-        const data = await fetchWithAuth(router, `/cake/filling`);
-        if(!data){
-          router.push('/home')
+        const response = await fetch(`${apiUrl}/cake/filling`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(`${apiUrl}/cake/filling`);
+        if(!response.ok) {
+          const errorData = await response.json();
+          setError(errorData.message || 'Get filling is failed');
+          return;
         }
+        // const data = await fetchWithAuth(router, `/cake/${cakeID}`);
+        // if(!data){
+        //   console.log("Not get filling");
+        // }
+        const data = await response.json();
         setFilling(data);
-        console.log("Filling: " + data);
       }
       catch(error){
         setError(error);
@@ -88,6 +115,10 @@ const SelectCake = () => {
 
   const handleNoteChange = (event) => {
     setNote(event.target.value);
+  }
+  
+  const handleChangeQuantity = (event) => {
+    setSelectedQuantity(event.target.value);
   }
 
   const handleAddCart = async () => {
@@ -229,6 +260,33 @@ const SelectCake = () => {
                 onChange={handleChangeFloors}
               />
             </Box>
+
+            <Box sx={{
+              display: "flex",
+              alignContent: "center",
+              paddingTop: "40px",
+              gap: "115px"
+            }}>
+              <Typography sx={{
+                color: "#000",
+                fontSize: "30px",
+                fontWeight: "bold",
+                fontFamily: "Montserrat, sans-serif",
+              }}>
+                Số lượng
+              </Typography>
+              <TextField
+                sx={{
+                  width: "20vw",
+                  fontSize: "30px",
+                }}
+                id="floor"
+                label="Số lượng"
+                value={selectedQuantity}
+                onChange={handleChangeQuantity}
+              />
+            </Box>
+
             
             <Box sx={{
               display: "flex",
@@ -258,7 +316,7 @@ const SelectCake = () => {
                   onChange={handleChangeFilling}
                 >
                   {filling.map((item) => (
-                    <MenuItem key={item.cakeFillingID} value={item.title}>
+                    <MenuItem key={item?.cakeFillingID} value={item?.title}>
                       {item.title}
                     </MenuItem>))}
                 </Select>
@@ -293,7 +351,7 @@ const SelectCake = () => {
                   onChange={handleChangeSize}
                 >
                   {size.map((item) => (
-                    <MenuItem key={item.cakeSizeID} value={item.title}>
+                    <MenuItem key={item?.cakeSizeID} value={item?.title}>
                       {item.title} cm
                     </MenuItem>))}
                 </Select>
