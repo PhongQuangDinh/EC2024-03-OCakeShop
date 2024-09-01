@@ -1,11 +1,11 @@
-import CakePage from "@/modules/Home/cake";
+import SelectCake from "../../modules/Home/cake";
 import Head from "next/head";
 
-export const metadata = {
-  title: "Home",
-};
+// export const metadata = {
+//   title: "Home",
+// };
 
-export default function Home() {
+export default function CakeSelectPage() {
   return (
     <div>
       <Head>
@@ -13,7 +13,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <CakePage />
+        <SelectCake />
       </main>
     </div>
   );
