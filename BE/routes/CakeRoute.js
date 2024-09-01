@@ -165,7 +165,7 @@ router.get('/cake-sizes', async (req, res) => {
 //     catch (err) { next(err); }
 // });
 
-router.post('/', async (req, res, next) => {
+router.post('/add-cake', async (req, res, next) => {
   try {
     const cakeData = req.body;
 
