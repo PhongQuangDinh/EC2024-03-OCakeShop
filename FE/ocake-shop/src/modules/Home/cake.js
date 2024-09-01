@@ -18,8 +18,9 @@ const SelectCake = () => {
   const [filling, setFilling] = useState([]);
   const router = useRouter();
   // const cakeID = 1;
-  const searchParams = useSearchParams();
-  const cakeID = searchParams.get('cakeID');
+  const {cakeID} = useParams();
+  // const searchParams = useSearchParams();
+  // const cakeID = searchParams.get('cakeID');
   
   useEffect(()=>{
     const fetchCake = async () => {

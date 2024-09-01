@@ -289,7 +289,7 @@ const HomePage = () => {
               title={cakeItem.description}
               img={cakeItem.cakeImages.length > 0 ? cakeItem.cakeImages[0].imageDetail.imagePath : ""}
               // selectCake={cakeItem.cakeID} onClick={handleChangeCake}
-              onClick={handleChangeCake(cakeItem.cakeID)}
+              onClick={() => handleChangeCake(cakeItem.cakeID)}
             />
           ))}
         </Carousel>
