@@ -216,59 +216,120 @@ router.get("/admin-not-delivered", async (req, res, next) => {
 
 
 
-  router.get("/cus-received", async (req, res, next) => {
-    try {
-      // Tìm các đơn hàng đã được giao
-      const deliveredOrders = await model.OrderCake.findAll({
-        where: {
-          receiveStatus: 'Đã nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
+router.get("/cus-received", async (req, res, next) => {
+  try {
+    // Tìm các đơn hàng đã được giao
+    const receivedOrders = await model.OrderCake.findAll({
+      where: {
+        receiveStatus: 'Đã nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
+      },
+      include: [
+        {
+          model: model.OrderCakeDetail,
+          as: 'OrderDetails', // Đảm bảo tên alias khớp với tên trong định nghĩa
+          include: [
+            {
+              model: model.Cart,
+              as: 'OrderCart',
+              include: [
+                {
+                  model: model.Customer,
+                  as: 'customer',
+                  attributes: ['name', 'phoneNumber']
+                }
+              ],
+              attributes: ['priceCake', 'pickUpTime', 'status']
+            }
+          ]
         },
-        include: [
-          {
-            model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
-          },
-          {
-            model: model.Payment,
-            as: 'Payment'
-          }
-        ]
-      });
-  
-      // Trả về kết quả dưới dạng JSON
-      res.status(200).json(deliveredOrders);
-    } catch (err) {
-      // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
-      next(err);
-    }
-  });
+        {
+          model: model.Payment,
+          as: 'Payment'
+        }
+      ]
+    });
 
-  router.get("/cus-not-received", async (req, res, next) => {
-    try {
-      // Tìm các đơn hàng đã được giao
-      const deliveredOrders = await model.OrderCake.findAll({
-        where: {
-          receiveStatus: 'Chưa nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
+    // Định dạng dữ liệu và lọc đơn hàng không đầy đủ thông tin
+    const formattedOrders = receivedOrders.map(order => {
+      const customerName = order.OrderDetails[0]?.OrderCart?.customer?.name;
+      const customerPhone = order.OrderDetails[0]?.OrderCart?.customer?.phoneNumber;
+
+      // Kiểm tra nếu customerName và customerPhone đều không phải 'N/A'
+      if (customerName && customerPhone) {
+        return {
+          orderCakeID: order.orderCakeID,
+          customerName: customerName,
+          customerPhone: customerPhone,
+          pickUpTime: order.OrderDetails[0]?.OrderCart?.pickUpTime,
+          receiveStatus: order.receiveStatus,
+          orderDetails: order.OrderDetails,
+          payment: order.Payment
+        };
+      }
+
+      return null; // Trả về null nếu thông tin không đầy đủ
+    }).filter(order => order !== null); // Lọc bỏ các đơn hàng có giá trị null
+
+    res.status(200).json(formattedOrders);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/cus-not-received", async (req, res, next) => {
+  try {
+    // Tìm các đơn hàng chưa nhận hàng
+    const deliveredOrders = await model.OrderCake.findAll({
+      where: {
+        receiveStatus: 'Chưa nhận hàng' // Hoặc giá trị tương ứng với trạng thái chưa nhận hàng
+      },
+      include: [
+        {
+          model: model.OrderCakeDetail,
+          as: 'OrderDetails',
+          include: [
+            {
+              model: model.Cart,
+              as: 'OrderCart',
+              include: [
+                {
+                  model: model.Cake,
+                  as: 'Cake',
+                  attributes: ['name'] // Lấy tên bánh từ model Cake
+                }
+              ],
+              attributes: ['quantity'] // Lấy số lượng từ model Cart
+            }
+          ]
         },
-        include: [
-          {
-            model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
-          },
-          {
-            model: model.Payment,
-            as: 'Payment'
-          }
-        ]
-      });
-  
-      // Trả về kết quả dưới dạng JSON
-      res.status(200).json(deliveredOrders);
-    } catch (err) {
-      // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
-      next(err);
-    }
-  });
+        {
+          model: model.Payment,
+          as: 'Payment'
+        }
+      ]
+    });
+
+    // Định dạng dữ liệu
+    const formattedOrders = deliveredOrders.map(order => {
+      return {
+        orderCakeID: order.orderCakeID,
+        pickUpTime: order.pickUpTime,
+        receiveStatus: order.receiveStatus,
+        orderDetails: order.OrderDetails.map(detail => ({
+          cakeName: detail.OrderCart.Cake.name, // Tên bánh
+          quantity: detail.OrderCart.quantity // Số lượng
+        })),
+        payment: order.Payment
+      };
+    });
+
+    res.status(200).json(formattedOrders);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 
 // Lấy danh sách đơn hàng đã được thanh toán
 router.get("/paid-order", async (req, res, next) => {
