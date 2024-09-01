@@ -1,4 +1,4 @@
-import SelectCake from "../../modules/Home/cake";
+import SelectCake from "@/modules/Home/cake";
 import Head from "next/head";
 
 // export const metadata = {
