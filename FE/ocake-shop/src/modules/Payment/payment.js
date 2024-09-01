@@ -136,9 +136,9 @@ const Payment = () => {
       items,
       amount,
       customer: {
-        name: inforCustomer?.name,
-        phoneNumber: inforCustomer?.phoneNumber,
-        address: inforCustomer?.address
+        name: infoCustomer?.name,
+        phoneNumber: infoCustomer?.phoneNumber,
+        address: infoCustomer?.address
       },
       delivery_date: selectedDate.format('YYYY-MM-DD'),
       shipping_preference: 'NO_SHIPPING'
@@ -147,7 +147,7 @@ const Payment = () => {
     console.log('Order Data:', JSON.stringify(orderData, null, 2)); // Add this to debug the full orderData structure
   
     try {
-      alter("click me please")
+      console.log("click me please");
       const data = await fetchWithAuth(router, '/payment/pay', {
         method: "POST",
         body: JSON.stringify(orderData),
@@ -159,7 +159,7 @@ const Payment = () => {
       if (data) {
         console.log("Hello");
         await handleAddOrderCake();
-        window.location.href = data.paypal_link; // redirect to Paypal page
+        window.location.href = data.paypal_link;
       }
     } catch (err) {
       setError('Error: ' + err.message);
@@ -169,8 +169,8 @@ const Payment = () => {
 
   const handleAddOrderCake = async() => {
     try {
-      const orderTime = selectedDate;
-      const orderCake = {orderTime};
+      const pickUpTime = selectedDate;
+      const orderCake = {pickUpTime};
       const data = await fetchWithAuth(router, '/ordercake/add-order', {
         method: "POST",
         body: JSON.stringify(orderCake),
@@ -195,7 +195,6 @@ const Payment = () => {
     try{
       const cart = infoCake;
       const orderCakeID = orderCake.orderCakeID;  
-      // const formData = {cart, orderCakeID}
       const formData = cart.map(cartItem => ({
         cartItem,
         orderCakeID
@@ -207,15 +206,15 @@ const Payment = () => {
           "Content-Type": "application/json",
         },
       });
+      
       if (!data) {
         console.log("add order cake detail failed");
         return;
       }
-      alter("Successful")
     }
     catch(error){
       setError('Error: ' + err.message);
-      console.log(error+ "Add order cake detail");
+      console.log(error + "Add order cake detail");
     }
   }
 
@@ -465,16 +464,6 @@ const Payment = () => {
                   >
                     Thời gian nhận hàng
                   </Typography>
-                  {/* <Box sx={{ marginRight: "50px" }}>
-                    <DatePicker
-                      value={selectedDate}
-                      onChange={(newValue) => setSelectedDate(newValue)}
-                      minDate={minDate} // Đặt ngày tối thiểu
-                      renderInput={(params) => <TextField {...params} />}
-                      disablePast // Vô hiệu hóa các ngày trong quá khứ
-                      format="DD/MM/YYYY"
-                    />
-                  </Box> */}
                   <Box sx={{ marginRight: "50px" }}>
                     <DateTimePicker
                       value={selectedDate}

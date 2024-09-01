@@ -109,7 +109,6 @@ router.post("/add-order", authenticateToken, async (req, res, next) => {
     // console.log(orderCake);
     const {pickUpTime} = orderCake;
     const orderCakes = await model.OrderCake.findAll();
-    // const arrange = Math.max(...orderCakes.map(order => order.arrange)) + 1;
     const newOrderCake = await model.OrderCake.create({pickUpTime, deliveryStatus: "Chưa vận chuyển", receiveStatus: "Chưa nhận hàng", handleStatus: "Chưa xử lý"})
     if(!newOrderCake){
       return res.status(400).json({message: "Failed to create order"})
