@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Typography, Tab, Tabs} from '@mui/material';
+import { Button, Box, Typography, Tab, Tabs } from '@mui/material';
 import Layout from "../layout";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -38,8 +38,8 @@ const initialRows = [
 export default function PurchaseOrderProcess() {
   const [rows, setRows] = useState(initialRows);
   const [value, setValue] = useState(0);
-  const [valueHandleDelivery, setValueHandleDelivery] = useState([]);
-  // const [valueCompleteDelivery, setValueCompleteDelivery] = useState([]);
+  // const [valueHandleDelivery, setValueHandleDelivery] = useState([]);
+  const [valueCompleteDelivery, setValueCompleteDelivery] = useState([]);
   const [error, setError] = useState('');  
   const router = useRouter();
 
@@ -48,20 +48,21 @@ export default function PurchaseOrderProcess() {
   };
 
   useEffect(()=>{
-    const fetchHandleDelivery = async () => {
+    const fetchCompleteDelivery = async () => {
       try {
-        const response = await fetchWithAuth(router, '/ordercake/cus-not-received');
+        const response = await fetchWithAuth(router, '/ordercake/cus-received');
         if(!response){
           setError('Error fetching data');
         }
-        setValueHandleDelivery(response);
+        setValueCompleteDelivery(response);
+        console.log(response);
       }
       catch (error) {
         setError(error);
         console.log(error+" Not get handleDelivery");
       }
     };
-      fetchHandleDelivery();
+    fetchCompleteDelivery();
   }, []);
 
   return (
@@ -111,12 +112,14 @@ export default function PurchaseOrderProcess() {
               justifyContent: "center",
               alignItems: "center",
             }}>
-              <Typography sx={{
-                fontSize: "30px",
-                fontWeight: "bold",
-                textDecoration: "underline",
-                color: "#EA365F"
-              }}>Đang xử lý</Typography>
+              <Link href="/purchaseorder-process" passHref>
+                <Typography sx={{
+                  fontSize: "30px",
+                  fontWeight: "bold",
+                  // textDecoration: "underline",
+                  // color: "#EA365F"
+                }}>Đang xử lý</Typography>
+              </Link>
             </Box>
             <Box sx={{
               backgroundColor: "#fff",
@@ -126,18 +129,17 @@ export default function PurchaseOrderProcess() {
               justifyContent: "center",
               alignItems: "center",
             }}>
-              <Link href="/purchaseorder-complete" passHref>
               <Typography sx={{
                 fontSize: "30px",
                 fontWeight: "bold",
-                // textDecoration: "underline",
-                // color: "#00000"
-              }}>Đã hoàn thành</Typography></Link>
+                textDecoration: "underline",
+                color: "#EA365F"
+              }}>Đã hoàn thành</Typography>
             </Box>
           </Box>
-        <Box sx={{
+          <Box sx={{
           marginTop: "20px",
-        }}></Box>
+          }}></Box>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 850 }} aria-label="simple table">
             <TableHead>
@@ -149,15 +151,15 @@ export default function PurchaseOrderProcess() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {valueHandleDelivery.map((row, index) => (
+              {valueCompleteDelivery.map((row, index) => (
                 <TableRow
-                  // key={row.OrderDetails.OrderCart.cakeSize.title}
+                  key={row.OrderDetails.OrderCart.cakeSize.title}
                 >
                   <TableCell align="center"></TableCell>
                   <TableCell component="th" scope="row">
                     {row?.OrderDetails?.OrderCart?.cakeSize?.title}
                   </TableCell>
-                  <TableCell align="center">{row.quantity}</TableCell>
+                  <TableCell align="center">{row.OrderDetails.OrderCart.quantity}</TableCell>
                   <TableCell align="center">
                     <Button sx={{
                       width: "150px",
