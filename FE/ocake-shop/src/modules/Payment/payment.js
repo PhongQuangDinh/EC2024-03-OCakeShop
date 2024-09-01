@@ -32,7 +32,7 @@ const Payment = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      
+
       try {
         const data = await fetchWithAuth(router, '/customer/myinfo');  // if method not defined it would be GET by default
         setInforCustomer(data?.Customer || '');
@@ -46,10 +46,10 @@ const Payment = () => {
 
   useEffect(() => {
     const fetchCake = async () => {
-      
+
       try {
         const data = await fetchWithAuth(router, '/cart/buying');  // if method not defined it would be GET by default
-        if(!data){
+        if (!data) {
           router.push('/cart');
         }
         setInfoCake(data);
@@ -77,7 +77,7 @@ const Payment = () => {
   };
 
   const handleComeBack = async () => {
-    try{
+    try {
       const data = await fetchWithAuth(router, '/cart/return-cart', {
         method: "POST",
         body: JSON.stringify(infoCake),
@@ -90,35 +90,80 @@ const Payment = () => {
         router.push('/cart');
       }
     }
-    catch(err){
+    catch (err) {
       console.log(err);
       setError('Error order: ' + err)
     }
   }
 
-  const handleSetOrder = async() => {
-    if(!selectedDate){
+  const handleSetOrder = async () => {
+    if (!selectedDate) {
       setError('Chọn ngày nhận hàng');
       return;
     }
+  
+    const conversionRate = 25000;
+  
+    const items = infoCake.map(cake => ({
+      name: `Bánh kem nhân ${cake.cakeFilling.title} kích thước ${cake.cakeSize.title}`,
+      description: `Bánh kem nhân ${cake.cakeFilling.title} kích thước ${cake.cakeSize.title}`,
+      quantity: cake.quantity,
+      unit_amount: {
+        currency_code: 'USD',
+        value: (cake.priceCake / conversionRate).toFixed(2).toString()  // Convert VND to USD
+      }
+    }));
+  
+    const itemTotalValue = infoCake.reduce((acc, row) => acc + (row.priceCake * row.quantity) / conversionRate, 0).toFixed(2);
+    const shippingValue = (costDelivery / conversionRate).toFixed(2);
+    const totalValue = (parseFloat(itemTotalValue) + parseFloat(shippingValue)).toFixed(2);
+  
+    const amount = {
+      currency_code: 'USD',
+      value: totalValue,
+      breakdown: {
+        item_total: {
+          currency_code: 'USD',
+          value: itemTotalValue
+        },
+        shipping: {
+          currency_code: 'USD',
+          value: shippingValue
+        }
+      }
+    };
+  
+    const orderData = {
+      items,
+      amount,
+      customer: {
+        name: inforCustomer?.name,
+        phoneNumber: inforCustomer?.phoneNumber,
+        address: inforCustomer?.address
+      },
+      delivery_date: selectedDate.format('YYYY-MM-DD'),
+      shipping_preference: 'NO_SHIPPING'
+    };
+  
+    console.log('Order Data:', JSON.stringify(orderData, null, 2)); // Add this to debug the full orderData structure
+  
     try {
-      localStorage.setItem('paymentInProgress', 'true');
       const data = await fetchWithAuth(router, '/payment/pay', {
         method: "POST",
-        body: JSON.stringify(inforCustomer),
+        body: JSON.stringify(orderData),
         headers: {
           "Content-Type": "application/json",
         },
       });
-
+  
       if (data) {
-        // alert('Order is set successfully!');
         window.location.href = data.paypal_link; // redirect to Paypal page
       }
     } catch (err) {
       setError('Error: ' + err.message);
     }
   };
+  
 
   return (
     <Layout>
@@ -192,36 +237,36 @@ const Payment = () => {
               }}
             >
               <Box sx={{
-                justifyContent: "space-between", 
+                justifyContent: "space-between",
                 gap: "100px",
                 display: "flex",
-                alignContent: "center",  
+                alignContent: "center",
                 marginLeft: "3%"
               }}>
-                  <Typography
-                    sx={{
-                      alignContent: "center",
-                      fontFamily: "Montserrat, sans-serif",
-                    }}
-                  >
-                    {inforCustomer?.name}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      alignContent: "center",
-                      fontFamily: "Montserrat, sans-serif",
-                    }}
-                  >
-                    {inforCustomer?.phoneNumber}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      alignContent: "center",
-                      fontFamily: "Montserrat, sans-serif",
-                    }}
-                  >
-                    {inforCustomer?.address}
-                  </Typography>
+                <Typography
+                  sx={{
+                    alignContent: "center",
+                    fontFamily: "Montserrat, sans-serif",
+                  }}
+                >
+                  {inforCustomer?.name}
+                </Typography>
+                <Typography
+                  sx={{
+                    alignContent: "center",
+                    fontFamily: "Montserrat, sans-serif",
+                  }}
+                >
+                  {inforCustomer?.phoneNumber}
+                </Typography>
+                <Typography
+                  sx={{
+                    alignContent: "center",
+                    fontFamily: "Montserrat, sans-serif",
+                  }}
+                >
+                  {inforCustomer?.address}
+                </Typography>
               </Box>
               <Box sx={{ marginRight: "4%" }}>
                 <Button onClick={handleChange} sx={{}}>
@@ -318,11 +363,11 @@ const Payment = () => {
                   Phí vận chuyển
                 </Typography>
               </Box>
-              <Box sx={{ 
+              <Box sx={{
                 marginRight: "5%",
                 fontSize: "30px",
                 fontWeight: "bold",
-               }}>
+              }}>
                 <Typography align="right">
                   {costDelivery.toLocaleString()}
                 </Typography>
@@ -349,7 +394,7 @@ const Payment = () => {
               sx={{
                 display: "flex",
                 marginLeft: "3%",
-                justifyContent: "space-between", 
+                justifyContent: "space-between",
                 marginBottom: "20px",
               }}
             >
@@ -421,7 +466,7 @@ const Payment = () => {
                 </Typography>
                 <Button>Thay đổi</Button>
               </Box>
-              
+
             </Box>
 
             <Box
@@ -514,7 +559,7 @@ const Payment = () => {
             </Box>
           </Box>
           <Box>
-          {error && !selectedDate && <Typography color="error">{error}</Typography>}
+            {error && !selectedDate && <Typography color="error">{error}</Typography>}
           </Box>
         </Box>
       </Box>

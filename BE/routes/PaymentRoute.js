@@ -80,23 +80,24 @@ router.get("/profit-n-price", async (req, res, next) => {
 // });
 
 router.post('/pay', authenticateToken, async (req, res, next) => { // put inside form action for submit button
+  console.log(req.body);
   try {
-    const url = paypal.createOrder().then(result => {
+    const url = paypal.createOrder(req.body).then(result => {
       res.status(200).json({ "paypal_link": result });
     })
   }
   catch (err) { next(err) };
 });
 
-router.post('/killLinkOrder', authenticateToken, async (req, res, next) => {
-  const { token } = req.body;
-  try {
-    const invalidateOrder = paypal.killOrder(token);
-    res.status(200).json(invalidateOrder);
-  } catch (err) {
-    next(err);
-  }
-});
+// router.post('/killLinkOrder', authenticateToken, async (req, res, next) => {
+//   const { token } = req.body;
+//   try {
+//     const invalidateOrder = paypal.killOrder(token);
+//     res.status(200).json(invalidateOrder);
+//   } catch (err) {
+//     next(err);
+//   }
+// });
 
 router.post('/CONTINUE-ORDER', authenticateToken, async (req, res, next) => {
   try {

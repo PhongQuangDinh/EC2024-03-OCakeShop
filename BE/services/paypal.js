@@ -15,7 +15,7 @@ async function generateAccessToken() {
     return response.data.access_token
 }
 
-async function createOrder() {
+async function createOrder(orderData) {
     const accessToken = await generateAccessToken();
     const apiUrl = getApiUrl();
     const response = await axios({
@@ -29,24 +29,18 @@ async function createOrder() {
             intent: 'CAPTURE',
             purchase_units: [
                 {
-                    items: [
-                        {
-                            name: 'THANH TOAN WORLDCUP :33',
-                            description: 'js kidding :>',
-                            quantity: 1,
-                            unit_amount: {
-                                currency_code: 'USD',
-                                value: '100.00'
-                            }
-                        }
-                    ],
+                    items: orderData.items,
                     amount: {
-                        currency_code: 'USD',
-                        value: '100.00',
+                        currency_code: orderData.amount.currency_code,
+                        value: orderData.amount.value,
                         breakdown: {
                             item_total: {
-                                currency_code: 'USD',
-                                value: '100.00'
+                                currency_code: orderData.amount.breakdown.item_total.currency_code,
+                                value: orderData.amount.breakdown.item_total.value
+                            },
+                            shipping: {
+                                currency_code: orderData.amount.breakdown.shipping.currency_code,
+                                value: orderData.amount.breakdown.shipping.value
                             }
                         }
                     }
@@ -55,15 +49,14 @@ async function createOrder() {
             application_context: {
                 return_url: apiUrl + '/payment/CONTINUE-ORDER',
                 cancel_url: apiUrl + '/payment/CANCEL-ORDER',
-                shipping_preference: 'NO_SHIPPING',
+                shipping_preference: orderData.shipping_preference,
                 user_action: 'PAY_NOW',
                 brand_name: 'Ocake-shop'
             }
         })
-    })
+    });
 
-    // console.log(response.data);
-    return response.data.links.find(link => link.rel === 'approve').href
+    return response.data.links.find(link => link.rel === 'approve').href;
 }
 
 async function killOrder(token) {
