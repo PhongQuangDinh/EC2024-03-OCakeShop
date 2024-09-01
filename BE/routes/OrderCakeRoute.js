@@ -142,8 +142,11 @@ router.get("/admin-delivered", async (req, res, next) => {
     }
   });
 
-  router.get("/cus-received", async (req, res, next) => {
+  
+
+  router.get("/cus-received", authenticateToken, async (req, res, next) => {
     try {
+      const userID = req.user.userID;
       const deliveredOrders = await model.OrderCake.findAll({
         where: {
           receiveStatus: 'Đã nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
@@ -151,7 +154,30 @@ router.get("/admin-delivered", async (req, res, next) => {
         include: [
           {
             model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
+            as: 'OrderDetails',
+            required: true,
+            include: [{
+              model: model.Cart,
+              as: "OrderCart",
+              required: true,
+              include: [{
+                model: model.Customer,
+                as: "customer",
+                required: true,
+                where: {userID}
+              },
+              {
+                model: model.CakeSize,
+                as: "cakeSize",
+                required: true
+              },
+              {
+                model: model.CakeFilling,
+                as: "cakeFilling",
+                required: true
+              }
+            ]
+            }]
           },
           {
             model: model.Payment,
@@ -205,9 +231,9 @@ router.get("/admin-delivered", async (req, res, next) => {
   });
   
 
-  router.get("/cus-not-received", async (req, res, next) => {
+  router.get("/cus-not-received", authenticateToken ,async (req, res, next) => {
     try {
-      // Tìm các đơn hàng đã được giao
+      const userID = req.user.userID;
       const deliveredOrders = await model.OrderCake.findAll({
         where: {
           receiveStatus: 'Chưa nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
@@ -215,7 +241,30 @@ router.get("/admin-delivered", async (req, res, next) => {
         include: [
           {
             model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
+            as: 'OrderDetails',
+            required: true,
+            include: [{
+              model: model.Cart,
+              as: "OrderCart",
+              required: true,
+              include: [{
+                model: model.Customer,
+                as: "customer",
+                required: true,
+                where: {userID}
+              },
+              {
+                model: model.CakeSize,
+                as: "cakeSize",
+                required: true
+              },
+              {
+                model: model.CakeFilling,
+                as: "cakeFilling",
+                required: true
+              }
+            ]
+            }]
           },
           {
             model: model.Payment,

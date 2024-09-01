@@ -12,14 +12,13 @@ const SelectCake = () => {
   const [selectedSize, setSelectedSize] = useState(''); // State for size selection
   const [selectedFilling, setSelectedFilling] = useState('');
   const [selectedFloors, setSelectedFloors] = useState(1);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [note, setNote] = useState("");
   const [error, setError] = useState(''); 
   const [size, setSize] = useState([]);
   const [filling, setFilling] = useState([]);
   const router = useRouter();
-  // const cakeID = 1;
-  const searchParams = useSearchParams();
-  const cakeID = searchParams.get('cakeID');
+  const { cakeID } = useParams();
   
   useEffect(()=>{
     const fetchCake = async () => {
@@ -85,6 +84,10 @@ const SelectCake = () => {
     setSelectedFloors(event.target.value);
   }
 
+  const handleChangeQuantity = (event) => {
+    setSelectedQuantity(event.target.value);
+  }
+
   const handleNoteChange = (event) => {
     setNote(event.target.value);
   }
@@ -103,7 +106,14 @@ const SelectCake = () => {
       console.log("Bạn hãy chọn kích thước bánh");
       setError("Bạn hãy chọn kích thước bánh");
     }
-    console.log("Size: " + selectedSize + " Nhân: " + selectedFilling + " Tầng: " + selectedFloors);
+    console.log("Size: " + selectedSize + " Nhân: " + selectedFilling + " Tầng: " + selectedFloors + " Số lượng: " + selectedQuantity);
+    try{
+
+    }
+    catch(error){
+      setError(error);
+      console.log("Error: " + error);
+    }
   }
 
   const priceCake = cake ? cake.priceCake : 0;
@@ -223,12 +233,38 @@ const SelectCake = () => {
                   fontSize: "30px",
                 }}
                 id="floor"
+                label="Số lượng bánh"
+                value={selectedQuantity}
+                onChange={handleChangeQuantity}
+              />
+            </Box>
+            
+            <Box sx={{
+              display: "flex",
+              alignContent: "center",
+              paddingTop: "40px",
+              gap: "35px"
+            }}>
+              <Typography sx={{
+                color: "#000",
+                fontSize: "30px",
+                fontWeight: "bold",
+                fontFamily: "Montserrat, sans-serif",
+              }}>
+                Số lượng bánh
+              </Typography>
+              <TextField
+                sx={{
+                  width: "20vw",
+                  fontSize: "30px",
+                }}
+                id="floor"
                 label="Số tầng"
                 value={selectedFloors}
                 onChange={handleChangeFloors}
               />
             </Box>
-            
+
             <Box sx={{
               display: "flex",
               paddingTop: "20px",
