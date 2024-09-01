@@ -99,8 +99,10 @@ const Payment = () => {
   const handleSetOrder = async() => {
     if(!selectedDate){
       setError('Chọn ngày nhận hàng');
+      return;
     }
     try {
+      localStorage.setItem('paymentInProgress', 'true');
       const data = await fetchWithAuth(router, '/payment/pay', {
         method: "POST",
         body: JSON.stringify(inforCustomer),
@@ -275,13 +277,13 @@ const Payment = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {infoCake.map((cake) => (
+                  {infoCake?.map((cake) => (
                     <TableRow key={cake.id}>
                       <TableCell
                         sx={{ paddingLeft: "3%" }}
                         align="left"
                       >
-                        {"Bánh kem nhân " + cake.cakeFilling.title + " kích thước" + cake.cakeSize.title}
+                        {"Bánh kem nhân " + cake.cakeFilling.title + " kích thước " + cake.cakeSize.title}
                       </TableCell>
                       <TableCell align="center">
                         {cake.quantity}

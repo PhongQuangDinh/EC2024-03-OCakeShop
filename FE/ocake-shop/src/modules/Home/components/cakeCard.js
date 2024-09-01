@@ -53,7 +53,7 @@ const GridCard = styled(Grid)(({ theme }) => ({
   userSelect: "none",
   borderRadius: "8px",
   transition: "all 0.3s ease-in-out",
-  padding: "0.7rem",
+  padding: "1rem",
   "&:hover": {
     boxShadow: "0px 0px 20px rgba(255, 255, 255, 0.9)",
     cursor: "pointer",

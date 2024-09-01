@@ -271,7 +271,7 @@ const HomePage = () => {
         }}
       />
 
-
+      <Box>
         <Carousel
           swipeable={false}
           draggable={false}
@@ -293,6 +293,8 @@ const HomePage = () => {
             />
           ))}
         </Carousel>
+      </Box>
+        
       </Box>
 
       <Box
