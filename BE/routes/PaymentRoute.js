@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const model = require('../models');
 const paypal = require('../services/paypal');
+const { authenticateToken } = require('../routes/authenticationRoute');
 
 const { Transaction, Op, fn, col } = require("sequelize");
 
@@ -54,8 +55,8 @@ router.get("/profit-n-price", async (req, res, next) => {
       group: ['OrderCart.Cake.priceCake'], // Group by the correct reference path
       logging: console.log // This logs the SQL query to the console for inspection
     });
-    
-    
+
+
     res.status(200).json(profit);
   } catch (err) {
     next(err);
@@ -78,17 +79,42 @@ router.get("/profit-n-price", async (req, res, next) => {
 //   res.redirect(url);
 // });
 
-router.post('/pay', (req, res) => { // put inside form action for submit button
-  const url = paypal.createOrder().then(result => {
-    res.status(200).json({"paypal_link": result});
-  })
+router.post('/pay', authenticateToken, async (req, res, next) => { // put inside form action for submit button
+  console.log(req.body);
+  try {
+    const url = paypal.createOrder(req.body).then(result => {
+      res.status(200).json({ "paypal_link": result });
+    })
+  }
+  catch (err) { next(err) };
 });
 
-router.get('/CONTINUE-ORDER', (req, res) => {
-  res.send('Bạn đã mất 100$ :33');
+// router.post('/killLinkOrder', authenticateToken, async (req, res, next) => {
+//   const { token } = req.body;
+//   try {
+//     const invalidateOrder = paypal.killOrder(token);
+//     res.status(200).json(invalidateOrder);
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
+router.post('/CONTINUE-ORDER', authenticateToken, async (req, res, next) => {
+  try {
+    // const url = paypal.createOrder().then(result => {
+    //   res.status(200).json({ "paypal_link": result });
+    // })
+  }
+  catch (err) { next(err) };
 });
-router.get('/CANCEL-ORDER', (req, res) => {
-  res.send('Bạn ko trả dc ư >:(');
+
+router.post('/CANCEL-ORDER', authenticateToken, async (req, res, next) => {
+  try {
+    // const url = paypal.createOrder().then(result => {
+    //   res.status(200).json({ "paypal_link": result });
+    // })
+  }
+  catch (err) { next(err) };
 });
 
 module.exports = router;
