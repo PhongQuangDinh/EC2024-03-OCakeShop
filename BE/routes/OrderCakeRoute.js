@@ -374,6 +374,31 @@ router.get("/chef-handled", async (req, res, next) => {
       next(err);
     }
   });
-
+  router.put("/admin-update-status/:orderCakeID", async (req, res, next) => {
+    const { orderCakeID } = req.params;
+    
+    try {
+      // Tìm đơn hàng theo ID và cập nhật tình trạng
+      const updatedOrder = await model.OrderCake.update(
+        { deliveryStatus: "Đã vận chuyển" }, // Cập nhật tình trạng
+        { 
+          where: { orderCakeID },
+          returning: true, // Để lấy thông tin đã cập nhật
+          plain: true // Để nhận đối tượng đơn hàng đã cập nhật
+        }
+      );
+  
+      if (updatedOrder[0] === 0) {
+        // Không tìm thấy đơn hàng nào để cập nhật
+        return res.status(404).json({ message: "Đơn hàng không tìm thấy" });
+      }
+  
+      // Trả về đơn hàng đã được cập nhật
+      res.status(200).json(updatedOrder[1]);
+    } catch (err) {
+      next(err);
+    }
+  });
+  
 
 module.exports = router;

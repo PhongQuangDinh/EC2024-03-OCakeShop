@@ -38,6 +38,27 @@ const Handling = () => {
     return format(date, "dd/MM/yyyy - HH:mm");
   };
 
+  const handleConfirm = async (orderCakeID) => {
+    try {
+      const response = await fetchWithAuth(router, `/ordercake/admin-update-status/${orderCakeID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response) {
+        // Cập nhật dữ liệu sau khi xác nhận thành công
+        const updatedData = inforDelivery.filter(item => item.orderCakeID !== orderCakeID);
+        setInforDelivery(updatedData);
+        alert('Cập nhật trạng thái thành công!');
+      }
+    } catch (err) {
+      setError('Lỗi khi cập nhật trạng thái: ' + err.message);
+    }
+  };
+  
+
   return (
     <Layout>
       <Box>
@@ -130,7 +151,7 @@ const Handling = () => {
                 <TableBody>
                   {inforDelivery.length > 0 ? (
                     inforDelivery.map((item, index) => (
-                      <TableRow key={item.id}>
+                      <TableRow key={item.orderCakeID}>
                         <TableCell align="center">{index + 1}</TableCell> {/* Hiển thị số thứ tự */}
                         <TableCell align="center">{item.orderCakeID}</TableCell>
                         <TableCell align="center">{item.customerName}</TableCell>
@@ -150,6 +171,7 @@ const Handling = () => {
                               fontFamily: "Montserrat, sans-serif",
                               outline: "none",
                             }}
+                            onClick={() => handleConfirm(item.orderCakeID)}
                           >
                             Xác nhận
                           </Button>
