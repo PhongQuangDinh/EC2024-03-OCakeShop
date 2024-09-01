@@ -318,9 +318,13 @@ const Payment = () => {
                   Phí vận chuyển
                 </Typography>
               </Box>
-              <Box sx={{ marginRight: "5.5%" }}>
+              <Box sx={{ 
+                marginRight: "5%",
+                fontSize: "30px",
+                fontWeight: "bold",
+               }}>
                 <Typography align="right">
-                  {costDelivery}
+                  {costDelivery.toLocaleString()}
                 </Typography>
               </Box>
             </Box>
@@ -460,7 +464,7 @@ const Payment = () => {
                   color: "#FF0000",
                 }}
               >
-                {calculateTotal()} VND
+                {calculateTotal().toLocaleString()} VND
               </Typography>
             </Box>
 

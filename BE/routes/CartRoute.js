@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const model = require('../models');
@@ -190,27 +189,49 @@ router.post('/update-cake', async (req, res, next) => {
     }
 });
 
-// router.get('/', async (req, res, next) => {
-//     try{
-//         const cart = await model.Cart.findAll();
-//         res.status(200).json(cart);
+// router.post('/add-to-cart', authenticateToken, async (req, res, next) => {
+//     try {
+//         const cartData = req.body;
+//         const customerID = req.user.userID;
+//         const {quantity, floor, additionalDetail, cakeID, cakeFillingID, cakeSizeID} = cartData;
+//         const size = await model.CakeSize.findByPk(cakeSizeID);
+//         const filling = await model.CakeFilling.findByPk(cakeFillingID);
+//         const priceCake = size.priceSize + filling.priceCakeFilling;
+//         const newCartItem = await model.Cart.create({
+//             quantity, floor, additionalDetail, cakeID, cakeFillingID, cakeSizeID, customerID, priceCake
+//         }, {status: "Chưa mua"});
+//         res.status(201).json(newCartItem);
+//     } catch (err) {
+//       next(err);
 //     }
-//     catch (err) {next(err)};
-// });
-
-// thêm bánh vào giỏ hàng
-router.post('/add-to-cart', async (req, res, next) => {
+//   });
+router.post('/add-to-cart', authenticateToken, async (req, res, next) => {
     try {
-      const cartData = req.body;
-  
-      // Tạo mục giỏ hàng mới sử dụng phương thức model
-      const newCartItem = await model.Cart.create(cartData);
-      res.status(201).json(newCartItem);
+        const cartData = req.body;
+        const customerID = req.user.userID;
+        const {quantity, floor, additionalDetail, cakeID, cakeFillingID, cakeSizeID} = cartData;
+
+        const size = await model.CakeSize.findByPk(cakeSizeID);
+        const filling = await model.CakeFilling.findByPk(cakeFillingID);
+
+        if (!size || !filling) {
+            return res.status(404).json({ message: "Size or filling not found" });
+        }
+
+        const priceCake = size.priceSize + filling.priceCakeFilling;
+
+        const newCartItem = await model.Cart.create({
+            quantity, floor, additionalDetail, cakeID, cakeFillingID, cakeSizeID, customerID, priceCake, status: "Chưa mua"
+        });
+
+        res.status(201).json(newCartItem);
     } catch (err) {
-      // Chuyển lỗi cho middleware xử lý lỗi toàn cục
-      next(err);
+        console.error("Error adding to cart:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+        next(err);
     }
-  });
-  
+});
+
+
 
 module.exports = router;
