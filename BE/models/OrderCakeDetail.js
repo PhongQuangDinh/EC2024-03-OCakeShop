@@ -32,6 +32,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         orderCakeID:{
             type: DataTypes.INTEGER,
+        },
+        arrange: {
+          type: DataTypes.INTEGER,
         }
       },
       {

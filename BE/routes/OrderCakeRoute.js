@@ -52,6 +52,74 @@ router.get("/manage", async (req, res, next) => {
   }
 });
 
+// router.post("/add-order-detail", authenticateToken, async (req, res, next) => {
+//   try {
+//     const orderCakeDetails = req.body;
+//     // console.log(orderCake);
+//     const {cartID, orderCakeID} = orderCakeDetail;
+//     const orderCakes = await model.OrderCake.findAll();
+//     const arrange = Math.max(...orderCakes.map(order => order.arrange)) + 1;
+//     // const newOrderCake = await model.OrderCake.create({orderTime, arrange, deliveryStatus: "Chưa vận chuyển", receiveStatus: "Chưa nhận hàng", handleStatus: "Chưa xử lý"})
+//     // if(!newOrderCake){
+//     //   return res.status(400).json({message: "Failed to create order"})
+//     // }
+//     // return res.status(200).json(newOrderCake);
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
+router.post("/add-order-detail", authenticateToken, async (req, res, next) => {
+  try {
+    const orderCakeDetails = req.body; // Nhận mảng các đối tượng {cartItem, orderCakeID}
+    
+    const arrange_OrderCakeDetail = await model.OrderCakeDetail.findAll();
+    // const maxArrange = Math.max(...orderCakes.map(order => order.arrange)) || 0;
+    let maxArrange = Math.max(...arrange_OrderCakeDetail.map(order => order.arrange)) || 0;
+    for (const orderCakeDetail of orderCakeDetails) {
+      const { cartItem, orderCakeID } = orderCakeDetail;
+      
+      const cartID = cartItem.cartID;
+
+      const arrange = maxArrange + 1;
+
+      const newOrderCakeDetail = await model.OrderCakeDetail.create({
+        cartID, 
+        orderCakeID, 
+        arrange,
+        handleStatus: "Chưa xử lý",
+        bakingStatus: "Chưa xử lý"
+      });
+
+      if (!newOrderCakeDetail) {
+        return res.status(400).json({ message: "Failed to create order cake detail" });
+      }
+    }
+
+    return res.status(200).json({ message: "Successfully created order cake details" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+router.post("/add-order", authenticateToken, async (req, res, next) => {
+  try {
+    const orderCake = req.body;
+    // console.log(orderCake);
+    const {pickUpTime} = orderCake;
+    const orderCakes = await model.OrderCake.findAll();
+    // const arrange = Math.max(...orderCakes.map(order => order.arrange)) + 1;
+    const newOrderCake = await model.OrderCake.create({pickUpTime, deliveryStatus: "Chưa vận chuyển", receiveStatus: "Chưa nhận hàng", handleStatus: "Chưa xử lý"})
+    if(!newOrderCake){
+      return res.status(400).json({message: "Failed to create order"})
+    }
+    return res.status(200).json(newOrderCake);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post("/manage/update", authenticateToken, async (req, res, next) => {
   try {
     const orderCakeDetails = req.body;
@@ -80,10 +148,6 @@ router.post("/manage/update", authenticateToken, async (req, res, next) => {
         console.error(`Failed to update OrderCakeDetailID ${orderCakeDetailID}:`, err);
       }
     }
-
-    // const order = await fetch(`http://localhost:8080/ordercake/manage`)
-
-
     res.status(200).json({"Message": "Success"});
   } catch (err) {
     next(err);

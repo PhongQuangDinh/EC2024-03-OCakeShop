@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import Layout from "../layout";
@@ -27,15 +28,18 @@ const Payment = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const today = dayjs();
   const minDate = today.add(2, 'day');
-  const [inforCustomer, setInforCustomer] = useState('');
+  const [infoCustomer, setInfoCustomer] = useState('');
   const [error, setError] = useState('');
+  const [infoCake, setInfoCake] = useState([]);
+  const [orderCake, setOrderCake] = useState('');
+  const costDelivery = 35000;
 
   useEffect(() => {
     const fetchProfile = async () => {
       
       try {
         const data = await fetchWithAuth(router, '/customer/myinfo');  // if method not defined it would be GET by default
-        setInforCustomer(data?.Customer || '');
+        setInfoCustomer(data?.Customer || '');
       } catch (err) {
         setError('SOS ' + err.message);
       }
@@ -61,10 +65,6 @@ const Payment = () => {
     fetchCake();
   }, []);
 
-  const [infoCake, setInfoCake] = useState([]);
-
-  const costDelivery = 35000;
-
   const calculateTotal = () => {
     return infoCake.reduce((acc, row) => {
       return acc + ((row.priceCake) * row.quantity) + costDelivery;
@@ -72,8 +72,7 @@ const Payment = () => {
   };
 
   const handleChange = () => {
-    alert("Hello");
-    // router.push('/home');
+    router.push('/profile')
   };
 
   const handleComeBack = async () => {
@@ -102,22 +101,77 @@ const Payment = () => {
       return;
     }
     try {
+      alter("click me please")
       const data = await fetchWithAuth(router, '/payment/pay', {
         method: "POST",
-        body: JSON.stringify(inforCustomer),
+        body: JSON.stringify(infoCustomer),
         headers: {
           "Content-Type": "application/json",
         },
       });
 
       if (data) {
-        // alert('Order is set successfully!');
+        console.log("Hello");
+        await handleAddOrderCake();
         window.location.href = data.paypal_link; // redirect to Paypal page
       }
     } catch (err) {
       setError('Error: ' + err.message);
     }
   };
+
+  const handleAddOrderCake = async() => {
+    try {
+      const orderTime = selectedDate;
+      const orderCake = {orderTime};
+      const data = await fetchWithAuth(router, '/ordercake/add-order', {
+        method: "POST",
+        body: JSON.stringify(orderCake),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!data) {
+        console.log("add order cake failed");
+        return;
+      }
+      setOrderCake(data);
+      await handleAddOrderCakeDetail(data);
+    } catch (err) {
+      setError('Error: ' + err.message);
+      console.log(error+ "Add order cake");
+    }
+  };
+
+  const handleAddOrderCakeDetail = async(orderCake) => {
+    try{
+      const cart = infoCake;
+      const orderCakeID = orderCake.orderCakeID;  
+      // const formData = {cart, orderCakeID}
+      const formData = cart.map(cartItem => ({
+        cartItem,
+        orderCakeID
+      }));
+      const data = await fetchWithAuth(router, '/ordercake/add-order-detail', {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!data) {
+        console.log("add order cake detail failed");
+        return;
+      }
+      alter("Successful")
+    }
+    catch(error){
+      setError('Error: ' + err.message);
+      console.log(error+ "Add order cake detail");
+    }
+  }
+
 
   return (
     <Layout>
@@ -203,7 +257,7 @@ const Payment = () => {
                       fontFamily: "Montserrat, sans-serif",
                     }}
                   >
-                    {inforCustomer?.name}
+                    {infoCustomer?.name}
                   </Typography>
                   <Typography
                     sx={{
@@ -211,7 +265,7 @@ const Payment = () => {
                       fontFamily: "Montserrat, sans-serif",
                     }}
                   >
-                    {inforCustomer?.phoneNumber}
+                    {infoCustomer?.phoneNumber}
                   </Typography>
                   <Typography
                     sx={{
@@ -219,7 +273,7 @@ const Payment = () => {
                       fontFamily: "Montserrat, sans-serif",
                     }}
                   >
-                    {inforCustomer?.address}
+                    {infoCustomer?.address}
                   </Typography>
               </Box>
               <Box sx={{ marginRight: "4%" }}>
@@ -318,11 +372,12 @@ const Payment = () => {
                 </Typography>
               </Box>
               <Box sx={{ 
-                marginRight: "5%",
-                fontSize: "30px",
-                fontWeight: "bold",
+                marginRight: "6.5%",
                }}>
-                <Typography align="right">
+                <Typography align="right" sx={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                }}>
                   {costDelivery.toLocaleString()}
                 </Typography>
               </Box>
@@ -363,7 +418,7 @@ const Payment = () => {
                   >
                     Thời gian nhận hàng
                   </Typography>
-                  <Box sx={{ marginRight: "50px" }}>
+                  {/* <Box sx={{ marginRight: "50px" }}>
                     <DatePicker
                       value={selectedDate}
                       onChange={(newValue) => setSelectedDate(newValue)}
@@ -372,7 +427,18 @@ const Payment = () => {
                       disablePast // Vô hiệu hóa các ngày trong quá khứ
                       format="DD/MM/YYYY"
                     />
+                  </Box> */}
+                  <Box sx={{ marginRight: "50px" }}>
+                    <DateTimePicker
+                      value={selectedDate}
+                      onChange={(newValue) => setSelectedDate(newValue)}
+                      minDateTime={minDate} // Đặt ngày giờ tối thiểu
+                      renderInput={(params) => <TextField {...params} />}
+                      disablePast // Vô hiệu hóa các ngày trong quá khứ
+                      format="DD/MM/YYYY HH:mm" // Định dạng ngày giờ
+                    />
                   </Box>
+
                 </Box>
               </LocalizationProvider>
             </Box>
