@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import jwt_decode, { jwtDecode } from "jwt-decode";
 
 import {
   styled,
@@ -10,7 +11,6 @@ import {
   useScrollTrigger,
   IconButton,
   Fade,
-  Switch,
   Tooltip,
   Avatar,
   Menu,
@@ -18,24 +18,42 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  ShoppingCartOutlined ,
+  ShoppingCartOutlined,
   KeyboardArrowUp,
   LogoutOutlined,
   UploadFileOutlined,
 } from "@mui/icons-material";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import logo from "./../../app/image/logo.png";
 
-const homeData = [
+const CustomerData = [
   { title: "Trang chủ", link: "/home" },
-  { title: "Đơn mua", link: "/handle-delivery" },
-  { title: "Giỏ hàng", link: "/cart"}
+  { title: "Đơn mua", link: "/purchaseorder-process" },
+  { title: "Giỏ hàng", link: "/cart" },
+];
+
+const AdminData = [
+  { title: "Trang chủ", link: "/home" },
+  { title: "Dashboard", link: "/admin" },
+  { title: "Xử lý đơn", link: "/process-order" },
+  { title: "Thông tin kho", link: "/inventory" },
+  { title: "Doanh thu", link: "/stats" },
+  { title: "Giao hàng", link: "/handle-delivery" },
+  { title: "Thêm bánh", link: "/add-cake" },
+  { title: "Thêm nguyên liệu", link: "/add-ingredient" },
+];
+
+const ChefData = [
+  { title: "Trang chủ", link: "/home" },
+  { title: "Làm bánh", link: "/chef" },
+  { title: "Thông tin kho", link: "/inventory" },
+  { title: "Thêm bánh", link: "/add-cake" },
+  { title: "Thêm nguyên liệu", link: "/add-ingredient" },
 ];
 
 const NavBar = () => {
-  const [open, setOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [prior, setPrior] = useState(false);
+  const [items, setItems] = useState([]);
   const router = useRouter();
   const trigger = useScrollTrigger({
     disableHysteresis: true,
@@ -43,16 +61,24 @@ const NavBar = () => {
   });
 
   useEffect(() => {
-    if (open) setPrior(true);
-    else
-      setTimeout(function () {
-        setPrior(false);
-      }, 500);
-  }, [open]);
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      const role = decoded.role;
 
-  const handleGetProfile = (event) => {
-    router.push('/profile');
-  }
+      if (role === "khách hàng") {
+        setItems(CustomerData);
+      } else if (role === "đầu bếp") {
+        setItems(ChefData);
+      } else {
+        setItems(AdminData);
+      }
+    }
+  }, []);
+
+  const handleGetProfile = () => {
+    router.push("/profile");
+  };
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -63,31 +89,23 @@ const NavBar = () => {
   const openUser = Boolean(anchorElUser);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setAnchorElUser(null);
     router.push("/signin");
   };
 
   return (
     <>
-      <AppBarDesktop trigger={trigger} prior={prior}>
+      <AppBarDesktop trigger={trigger}>
         <Link href="/">
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Image priority src={logo} alt="logo" width={100} href="/home"/>
+            <Image priority src={logo} alt="logo" width={100} href="/home" />
           </Box>
         </Link>
         <StyledNavContainer>
-          {homeData.map((item, i) => (
+          {items.map((item, i) => (
             <NavItem trigger={trigger} key={i} content={item}></NavItem>
           ))}
-          {/* <StyledNavItem
-            trigger={trigger}
-            sx={{ "&:before": { bottom: "-10px" } }}
-          >
-            <ShoppingCartOutlined 
-              sx={{ color: "black"}}
-            />
-          </StyledNavItem> */}
         </StyledNavContainer>
 
         <Tooltip title="Profile">
@@ -95,8 +113,7 @@ const NavBar = () => {
             src={null}
             alt="Avatar"
             onClick={handleOpenUserMenu}
-            sx={{ cursor: "pointer"}}
-            // href="/profile"
+            sx={{ cursor: "pointer" }}
           />
         </Tooltip>
 
@@ -107,7 +124,8 @@ const NavBar = () => {
           onClick={handleCloseUserMenu}
           onClose={handleCloseUserMenu}
         >
-          <MenuItem onClick={handleGetProfile}>
+          <MenuItem onClick={handleGetProfile}>Profile</MenuItem>
+          <MenuItem>
             <UploadFileOutlined />
             Upload
           </MenuItem>
@@ -118,7 +136,7 @@ const NavBar = () => {
         </StyledUserMenu>
       </AppBarDesktop>
 
-      <Fade in={trigger && !open}>
+      <Fade in={trigger && !openUser}>
         <ScrollTop size="small" onClick={() => window.scrollTo(0, 0)}>
           <KeyboardArrowUp />
         </ScrollTop>
@@ -127,6 +145,9 @@ const NavBar = () => {
   );
 };
 export default NavBar;
+
+// Styled components remain the same as your original code...
+
 
 const NavItem = ({
   content = { title: "", link: "" },
