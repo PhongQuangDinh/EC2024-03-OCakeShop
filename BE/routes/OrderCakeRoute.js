@@ -29,16 +29,19 @@ router.get("/manage", async (req, res, next) => {
             {
               model: model.Cake,
               required: true,
-            },
-            {
-              model: model.CakeSize,
-              as: "cakeSize",
-              required: true,
-            },
-            {
-              model: model.CakeFilling,
-              as: "cakeFilling",
-              required: true,
+              include: 
+              [
+                {
+                model: model.CakeSize,
+                as: "cakeSize",
+                required: true,
+                },
+                {
+                  model: model.CakeFilling,
+                  as: "cakeFilling",
+                  required: true,
+                }
+              ]
             }
           ]
         }
@@ -123,6 +126,9 @@ router.post("/manage/update", authenticateToken, async (req, res, next) => {
   try {
     const orderCakeDetails = req.body;
     console.log(orderCakeDetails);
+    // const { OrderCakeDetailID, bakingStatus, handleStatus, cartID, OrderCakeID, arrange} = OrderCakeDetail;
+    // const order = await model.OrderCakeDetail.findAll({
+    // });
     for (const orderCakeDetail of orderCakeDetails) {
       const { orderCakeDetailID, arrange } = orderCakeDetail;
     
@@ -154,146 +160,239 @@ router.post("/manage/update", authenticateToken, async (req, res, next) => {
 });
 
 router.get("/admin-delivered", async (req, res, next) => {
-    try {
-      const deliveredOrders = await model.OrderCake.findAll({
-        where: {
-          deliveryStatus: 'Đã vận chuyển'
-        },
-        include: [
-          {
-            model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
-          },
-          {
-            model: model.Payment,
-            as: 'Payment'
-          }
-        ]
-      });
-  
-      // Trả về kết quả dưới dạng JSON
-      res.status(200).json(deliveredOrders);
-    } catch (err) {
-      // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
-      next(err);
-    }
-  });
-
-  router.get("/admin-not-delivered", async (req, res, next) => {
-    try {
-      const deliveredOrders = await model.OrderCake.findAll({
-        where: {
-          deliveryStatus: 'Chưa vận chuyển' // Hoặc giá trị tương ứng với trạng thái đã giao
-        },
-        include: [
-          {
-            model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
-          },
-          {
-            model: model.Payment,
-            as: 'Payment'
-          }
-        ]
-      });
-  
-      // Trả về kết quả dưới dạng JSON
-      res.status(200).json(deliveredOrders);
-    } catch (err) {
-      // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
-      next(err);
-    }
-  });
-
-  router.get("/cus-received", async (req, res, next) => {
-    try {
-      const deliveredOrders = await model.OrderCake.findAll({
-        where: {
-          receiveStatus: 'Đã nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
-        },
-        include: [
-          {
-            model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
-          },
-          {
-            model: model.Payment,
-            as: 'Payment'
-          }
-        ]
-      });
-  
-      res.status(200).json(deliveredOrders);
-    } catch (err) {
-      next(err);
-    }
-  });
-
-  router.post("/buying", authenticateToken, async (req, res, next) => {
-    try {
-      const orderCakeDetails = req.body;
-      console.log(orderCakeDetails);
-      for (const orderCakeDetail of orderCakeDetails) {
-        const { orderCakeDetailID, arrange } = orderCakeDetail;
-      
-        try {
-          const [updateRows] = await model.OrderCakeDetail.update(
+  try {
+    const deliveredOrders = await model.OrderCake.findAll({
+      where: {
+        deliveryStatus: "Đã vận chuyển",
+      },
+      include: [
+        {
+          model: model.OrderCakeDetail,
+          as: 'OrderDetails',
+          include: [
             {
-              handleStatus: "Đã xử lý",
-              arrange: arrange
-            },
-            {
-              where: {orderCakeDetailID: orderCakeDetailID }
+              model: model.Cart,
+              as: 'OrderCart',
+              include: [
+                {
+                  model: model.Customer,
+                  as: 'customer',
+                  attributes: ['name', 'phoneNumber']
+                }
+              ],
+              attributes: ['priceCake', 'pickUpTime', 'status']
             }
-          );
-          if(updateRows === 0){
-            return res.status(400).json({message: "OrderCakeDetail not found"})
-          }
-          const updatedOrderCakeDetail = await model.OrderCakeDetail.findOne({
-            where: {orderCakeDetailID: orderCakeDetailID}
-          });
-          res.status(200).json(updatedOrderCakeDetail);
-        } catch (err) {
-          console.error(`Failed to update OrderCakeDetailID ${orderCakeDetailID}:`, err);
-        }
-      }
-  
-      // const order = await fetch(`http://localhost:8080/ordercake/manage`)
-  
-  
-      res.status(200).json({"Message": "Success"});
-    } catch (err) {
-      next(err);
-    }
-  });
-  
-
-  router.get("/cus-not-received", async (req, res, next) => {
-    try {
-      // Tìm các đơn hàng đã được giao
-      const deliveredOrders = await model.OrderCake.findAll({
-        where: {
-          receiveStatus: 'Chưa nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
+          ]
         },
-        include: [
-          {
-            model: model.OrderCakeDetail,
-            as: 'OrderCakeDetail'
-          },
-          {
-            model: model.Payment,
-            as: 'Payment'
-          }
-        ]
-      });
-  
-      // Trả về kết quả dưới dạng JSON
-      res.status(200).json(deliveredOrders);
-    } catch (err) {
-      // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
-      next(err);
-    }
-  });
+        {
+          model: model.Payment,
+          as: 'Payment',
+        }
+      ],
+    });
+
+    // Định dạng dữ liệu và lọc đơn hàng không đầy đủ thông tin
+    const formattedOrders = deliveredOrders.map(order => {
+      const customerName = order.OrderDetails[0]?.OrderCart?.customer?.name;
+      const customerPhone = order.OrderDetails[0]?.OrderCart?.customer?.phoneNumber;
+
+      // Kiểm tra nếu customerName và customerPhone đều không phải 'N/A'
+      if (customerName && customerPhone) {
+        return {
+          orderCakeID: order.orderCakeID,
+          customerName: customerName,
+          customerPhone: customerPhone,
+          pickUpTime: order.OrderDetails[0]?.OrderCart?.pickUpTime,
+          receiveStatus: order.receiveStatus,
+          orderDetails: order.OrderDetails,
+          payment: order.Payment
+        };
+      }
+
+      return null; // Trả về null nếu thông tin không đầy đủ
+    }).filter(order => order !== null); // Lọc bỏ các đơn hàng có giá trị null
+
+    res.status(200).json(formattedOrders);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/admin-not-delivered", async (req, res, next) => {
+  try {
+    const notDeliveredOrders = await model.OrderCake.findAll({
+      where: {
+        deliveryStatus: "Chưa vận chuyển", // Hoặc giá trị tương ứng với trạng thái chưa giao
+      },
+      include: [
+        {
+          model: model.OrderCakeDetail,
+          as: "OrderDetails",
+          include: [
+            {
+              model: model.Cart,
+              as: "OrderCart",
+              include: [
+                {
+                  model: model.Customer,
+                  as: "customer",
+                  attributes: ['name', 'phoneNumber']
+                }
+              ],
+              attributes: ['priceCake', 'pickUpTime', 'status']
+            }
+          ]
+        },
+        {
+          model: model.Payment,
+          as: "Payment",
+        }
+      ],
+    });
+
+    // Định dạng dữ liệu và lọc đơn hàng không đầy đủ thông tin
+    const formattedOrders = notDeliveredOrders.map(order => {
+      const customerName = order.OrderDetails[0]?.OrderCart?.customer?.name;
+      const customerPhone = order.OrderDetails[0]?.OrderCart?.customer?.phoneNumber;
+
+      // Kiểm tra nếu customerName và customerPhone đều không phải 'N/A'
+      if (customerName && customerPhone) {
+        return {
+          orderCakeID: order.orderCakeID,
+          customerName: customerName,
+          customerPhone: customerPhone,
+          pickUpTime: order.OrderDetails[0]?.OrderCart?.pickUpTime,
+          receiveStatus: order.receiveStatus,
+          orderDetails: order.OrderDetails,
+          payment: order.Payment
+        };
+      }
+
+      return null; // Trả về null nếu thông tin không đầy đủ
+    }).filter(order => order !== null); // Lọc bỏ các đơn hàng có giá trị null
+
+    res.status(200).json(formattedOrders);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+
+router.get("/cus-received", async (req, res, next) => {
+  try {
+    // Tìm các đơn hàng đã được giao
+    const receivedOrders = await model.OrderCake.findAll({
+      where: {
+        receiveStatus: 'Đã nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
+      },
+      include: [
+        {
+          model: model.OrderCakeDetail,
+          as: 'OrderDetails', // Đảm bảo tên alias khớp với tên trong định nghĩa
+          include: [
+            {
+              model: model.Cart,
+              as: 'OrderCart',
+              include: [
+                {
+                  model: model.Customer,
+                  as: 'customer',
+                  attributes: ['name', 'phoneNumber']
+                }
+              ],
+              attributes: ['priceCake', 'pickUpTime', 'status']
+            }
+          ]
+        },
+        {
+          model: model.Payment,
+          as: 'Payment'
+        }
+      ]
+    });
+
+    // Định dạng dữ liệu và lọc đơn hàng không đầy đủ thông tin
+    const formattedOrders = receivedOrders.map(order => {
+      const customerName = order.OrderDetails[0]?.OrderCart?.customer?.name;
+      const customerPhone = order.OrderDetails[0]?.OrderCart?.customer?.phoneNumber;
+
+      // Kiểm tra nếu customerName và customerPhone đều không phải 'N/A'
+      if (customerName && customerPhone) {
+        return {
+          orderCakeID: order.orderCakeID,
+          customerName: customerName,
+          customerPhone: customerPhone,
+          pickUpTime: order.OrderDetails[0]?.OrderCart?.pickUpTime,
+          receiveStatus: order.receiveStatus,
+          orderDetails: order.OrderDetails,
+          payment: order.Payment
+        };
+      }
+
+      return null; // Trả về null nếu thông tin không đầy đủ
+    }).filter(order => order !== null); // Lọc bỏ các đơn hàng có giá trị null
+
+    res.status(200).json(formattedOrders);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/cus-not-received", async (req, res, next) => {
+  try {
+    // Tìm các đơn hàng chưa nhận hàng
+    const deliveredOrders = await model.OrderCake.findAll({
+      where: {
+        receiveStatus: 'Chưa nhận hàng' // Hoặc giá trị tương ứng với trạng thái chưa nhận hàng
+      },
+      include: [
+        {
+          model: model.OrderCakeDetail,
+          as: 'OrderDetails',
+          include: [
+            {
+              model: model.Cart,
+              as: 'OrderCart',
+              include: [
+                {
+                  model: model.Cake,
+                  as: 'Cake',
+                  attributes: ['name'] // Lấy tên bánh từ model Cake
+                }
+              ],
+              attributes: ['quantity'] // Lấy số lượng từ model Cart
+            }
+          ]
+        },
+        {
+          model: model.Payment,
+          as: 'Payment'
+        }
+      ]
+    });
+
+    // Định dạng dữ liệu
+    const formattedOrders = deliveredOrders.map(order => {
+      return {
+        orderCakeID: order.orderCakeID,
+        pickUpTime: order.pickUpTime,
+        receiveStatus: order.receiveStatus,
+        orderDetails: order.OrderDetails.map(detail => ({
+          cakeName: detail.OrderCart.Cake.name, // Tên bánh
+          quantity: detail.OrderCart.quantity // Số lượng
+        })),
+        payment: order.Payment
+      };
+    });
+
+    res.status(200).json(formattedOrders);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 
 // Lấy danh sách đơn hàng đã được thanh toán
 router.get("/paid-order", async (req, res, next) => {
@@ -399,6 +498,31 @@ router.get("/chef-handled", async (req, res, next) => {
       next(err);
     }
   });
-
+  router.put("/admin-update-status/:orderCakeID", async (req, res, next) => {
+    const { orderCakeID } = req.params;
+    
+    try {
+      // Tìm đơn hàng theo ID và cập nhật tình trạng
+      const updatedOrder = await model.OrderCake.update(
+        { deliveryStatus: "Đã vận chuyển" }, // Cập nhật tình trạng
+        { 
+          where: { orderCakeID },
+          returning: true, // Để lấy thông tin đã cập nhật
+          plain: true // Để nhận đối tượng đơn hàng đã cập nhật
+        }
+      );
+  
+      if (updatedOrder[0] === 0) {
+        // Không tìm thấy đơn hàng nào để cập nhật
+        return res.status(404).json({ message: "Đơn hàng không tìm thấy" });
+      }
+  
+      // Trả về đơn hàng đã được cập nhật
+      res.status(200).json(updatedOrder[1]);
+    } catch (err) {
+      next(err);
+    }
+  });
+  
 
 module.exports = router;

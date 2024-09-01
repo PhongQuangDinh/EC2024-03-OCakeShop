@@ -1,69 +1,45 @@
-"use client"
+"use client"; // Đảm bảo đây là một component phía client
+
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Typography, Tab, Tabs } from '@mui/material';
+import { Box, Typography, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Layout from "../layout";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { getApiUrl, fetchWithAuth } from '../../../WebConfig';
-import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { fetchWithAuth } from '../../../WebConfig'; // Đảm bảo bạn đã import hàm fetchWithAuth
+import { useRouter } from 'next/navigation';
 
-function createData(name, quantity, deliveryDate) {
-  return { name, quantity, deliveryDate };
-}
-
-const handleConfirm = () => {
-  // Handle save changes
-  // console.log('Changes saved:', formData);
+// Hàm để định dạng thời gian
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return 'Chưa có thông tin';
+  const date = new Date(dateTime);
+  return date.toLocaleString(); // Định dạng ngày giờ theo định dạng người dùng
 };
 
-const initialRows = [
-  createData(
-    "Bánh kem sinh nhật hồng cho bé gái | 2 tầng | 24cm, 20cm | Chocolate",
-    1
-  ),
-  createData(
-    "Bánh kem xanh cho bé trai | 1 tầng | 24cm | Phô mai",
-    1
-  ),
-  createData("Bánh kem 8/3 | 1 tầng | 22cm | Chocolate", 1),
-  createData("Bánh kem 14/2 | 1 tầng | 20cm | Vani", 1),
-];
-
-export default function PurchaseOrderProcess() {
-  const [rows, setRows] = useState(initialRows);
-  const [value, setValue] = useState(0);
-  // const [valueHandleDelivery, setValueHandleDelivery] = useState([]);
+const PurchaseOrderProcess = () => {
   const [valueCompleteDelivery, setValueCompleteDelivery] = useState([]);
-  const [error, setError] = useState('');  
+  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
-  useEffect(()=>{
-    const fetchCompleteDelivery = async () => {
+  useEffect(() => {
+    const fetchIncompleteOrders = async () => {
       try {
-        const response = await fetchWithAuth(router, '/ordercake/cus-received');
-        if(!response){
+        const response = await fetchWithAuth(router, '/ordercake/cus-not-received');
+        if (!response) {
           setError('Error fetching data');
+        } else {
+          setValueCompleteDelivery(response);
         }
-        setValueCompleteDelivery(response);
-        console.log(response);
-      }
-      catch (error) {
-        setError(error);
-        console.log(error+" Not get handleDelivery");
+      } catch (error) {
+        setError('Error fetching data');
+        console.error("Not get handleDelivery", error);
       }
     };
-    fetchCompleteDelivery();
-  }, []);
+    fetchIncompleteOrders();
+  }, [router]);
+
+  const handleConfirm = (orderID) => {
+    // Handle save changes for a specific order
+    console.log('Order confirmed:', orderID);
+  };
 
   return (
     <Layout>
@@ -71,8 +47,7 @@ export default function PurchaseOrderProcess() {
         background: "#fff",
         gap: "20px",
         marginTop: "100px",
-      }}
-      >
+      }}>
         <Box sx={{
           display: "flex",
           alignItems: "center",
@@ -85,95 +60,106 @@ export default function PurchaseOrderProcess() {
             fontSize: "40px",
             fontWeight: "bold",
             fontFamily: "Montserrat, sans-serif",
-          }}
-          >
-            OcakeShop | Đơn mua
+          }}>
+            OcakeShop | Đơn hàng chưa nhận
           </Typography>
         </Box>
       </Box>
 
-      {/* Grey Box */}
       <Box sx={{
         background: "#E5E5E5",
-        alignItems: "center",
-        paddingLeft: "10%", paddingRight: "10%",
-        paddingTop: "1%", paddingBottom: "5%"
+        paddingTop: "50px",
+        fontFamily: "Monospace, sans-serif",
       }}>
         <Box sx={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "20px",
+        }}>
+          <Box sx={{
+            backgroundColor: "#fff",
+            height: "70px",
+            width: "45%",
             display: "flex",
             justifyContent: "center",
-            gap: "20px",
+            alignItems: "center",
           }}>
-            <Box sx={{
-              backgroundColor: "#fff",
-              height: "70px",
-              width: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
-              <Link href="/purchaseorder-process" passHref>
-                <Typography sx={{
-                  fontSize: "30px",
-                  fontWeight: "bold",
-                  // textDecoration: "underline",
-                  // color: "#EA365F"
-                }}>Đang xử lý</Typography>
-              </Link>
-            </Box>
-            <Box sx={{
-              backgroundColor: "#fff",
-              height: "70px",
-              width: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
+            <Link href="/purchaseorder-process" passHref>
               <Typography sx={{
                 fontSize: "30px",
                 fontWeight: "bold",
-                textDecoration: "underline",
-                color: "#EA365F"
-              }}>Đã hoàn thành</Typography>
-            </Box>
+                color: "#000",
+                textDecoration: "none",
+              }}>Đang xử lý</Typography>
+            </Link>
           </Box>
           <Box sx={{
+            backgroundColor: "#fff",
+            height: "70px",
+            width: "45%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+            <Typography sx={{
+              fontSize: "30px",
+              fontWeight: "bold",
+              textDecoration: "underline",
+              color: "#EA365F"
+            }}>Đã hoàn thành</Typography>
+          </Box>
+        </Box>
+
+        <Box sx={{
+          display: "flex",
+          justifyContent: "center",
           marginTop: "20px",
-          }}></Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 850 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                <TableCell align="left">Tên sản phẩm</TableCell>
-                <TableCell align="center">Số lượng</TableCell>
-                <TableCell align="center">Xác nhận giao hàng</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {valueCompleteDelivery.map((row, index) => (
-                <TableRow
-                  key={row.OrderDetails.OrderCart.cakeSize.title}
-                >
-                  <TableCell align="center"></TableCell>
-                  <TableCell component="th" scope="row">
-                    {row?.OrderDetails?.OrderCart?.cakeSize?.title}
-                  </TableCell>
-                  <TableCell align="center">{row.OrderDetails.OrderCart.quantity}</TableCell>
-                  <TableCell align="center">
-                    <Button sx={{
-                      width: "150px",
-                      background: "#FFDFE7",
-                      color: "black",
-                    }}
-                      variant="contained" color="primary" onClick={handleConfirm}> Xác nhận </Button>
-                  </TableCell>
+        }}>
+          <TableContainer component={Paper} sx={{ width: '91%', backgroundColor: "#fff" }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">STT</TableCell>
+                  <TableCell align="center">Đơn hàng</TableCell>
+                  <TableCell align="center">Tên khách hàng</TableCell>
+                  <TableCell align="center">Số điện thoại</TableCell>
+                  <TableCell align="center">Thời gian nhận hàng</TableCell>
+                  <TableCell align="center">Xác nhận giao hàng</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {valueCompleteDelivery.length > 0 ? (
+                  valueCompleteDelivery.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell align="center">{index + 1}</TableCell> {/* Số thứ tự */}
+                      <TableCell align="center">{item.orderCakeID}</TableCell>
+                      <TableCell align="center">{item.customerName}</TableCell>
+                      <TableCell align="center">{item.customerPhone}</TableCell>
+                      <TableCell align="center">{formatDateTime(item.pickUpTime)}</TableCell>
+                      <TableCell align="center">
+                        <Button sx={{
+                          width: "150px",
+                          background: "#FFDFE7",
+                          color: "black",
+                        }}
+                          variant="contained" color="primary" onClick={() => handleConfirm(item.orderCakeID)}> Xác nhận </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell align="center" colSpan={6}>
+                      {error ? error : "Không có dữ liệu"}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Box>
-    </Layout >
+    </Layout>
   );
 };
+
+export default PurchaseOrderProcess;
