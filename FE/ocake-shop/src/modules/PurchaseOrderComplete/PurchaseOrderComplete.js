@@ -6,39 +6,50 @@ import Layout from "../layout";
 import Link from "next/link";
 import { fetchWithAuth } from '../../../WebConfig'; // Đảm bảo bạn đã import hàm fetchWithAuth
 import { useRouter } from 'next/navigation';
+import { format, isValid } from 'date-fns'; // Import thêm hàm isValid
 
 // Hàm để định dạng thời gian
 const formatDateTime = (dateTime) => {
-  if (!dateTime) return 'Chưa có thông tin';
   const date = new Date(dateTime);
-  return date.toLocaleString(); // Định dạng ngày giờ theo định dạng người dùng
+  if (isValid(date)) {
+    return format(date, "dd/MM/yyyy - HH:mm");
+  } else {
+    return "Ngày giờ không hợp lệ";
+  }
 };
 
-const PurchaseOrderProcess = () => {
+const PurchaseOrderComplete = () => {
   const [valueCompleteDelivery, setValueCompleteDelivery] = useState([]);
   const [error, setError] = useState('');
   const router = useRouter();
 
   useEffect(() => {
-    const fetchIncompleteOrders = async () => {
+    const fetchCompleteOrders = async () => {
       try {
-        const response = await fetchWithAuth(router, '/ordercake/cus-not-received');
-        if (!response) {
-          setError('Error fetching data');
-        } else {
-          setValueCompleteDelivery(response);
-        }
-      } catch (error) {
-        setError('Error fetching data');
-        console.error("Not get handleDelivery", error);
+        const data = await fetchWithAuth(router, '/ordercake/cus-received');
+        setValueCompleteDelivery(data || []);
+      } catch (err) {
+        setError('Lỗi khi tải dữ liệu: ' + err.message);
       }
     };
-    fetchIncompleteOrders();
+  
+    fetchCompleteOrders();
   }, [router]);
 
-  const handleConfirm = (orderID) => {
-    // Handle save changes for a specific order
-    console.log('Order confirmed:', orderID);
+  const handleConfirm = async (orderID) => {
+    try {
+      // Handle save changes for a specific order
+      console.log('Order confirmed:', orderID);
+      // Example of a confirmation request
+      await fetchWithAuth(router, `/ordercake/confirm/${orderID}`, {
+        method: 'POST',
+      });
+      // Refresh data after confirmation
+      const data = await fetchWithAuth(router, '/ordercake/cus-received');
+      setValueCompleteDelivery(data || []);
+    } catch (err) {
+      setError('Lỗi khi xác nhận đơn hàng: ' + err.message);
+    }
   };
 
   return (
@@ -61,7 +72,7 @@ const PurchaseOrderProcess = () => {
             fontWeight: "bold",
             fontFamily: "Montserrat, sans-serif",
           }}>
-            OcakeShop | Đơn hàng chưa nhận
+            OcakeShop | Đơn hàng đã nhận
           </Typography>
         </Box>
       </Box>
@@ -121,10 +132,12 @@ const PurchaseOrderProcess = () => {
                 <TableRow>
                   <TableCell align="center">STT</TableCell>
                   <TableCell align="center">Đơn hàng</TableCell>
-                  <TableCell align="center">Tên khách hàng</TableCell>
-                  <TableCell align="center">Số điện thoại</TableCell>
-                  <TableCell align="center">Thời gian nhận hàng</TableCell>
-                  <TableCell align="center">Xác nhận giao hàng</TableCell>
+                  <TableCell align="center">Tên bánh</TableCell>
+                  <TableCell align="center">Kích thước bánh</TableCell>
+                  <TableCell align="center">Nhân bánh</TableCell>
+                  <TableCell align="center">Số lượng</TableCell>
+                  <TableCell align="center">Ngày giao</TableCell>
+                  <TableCell align="center">Trạng thái nhận hàng</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -133,22 +146,27 @@ const PurchaseOrderProcess = () => {
                     <TableRow key={index}>
                       <TableCell align="center">{index + 1}</TableCell> {/* Số thứ tự */}
                       <TableCell align="center">{item.orderCakeID}</TableCell>
-                      <TableCell align="center">{item.customerName}</TableCell>
-                      <TableCell align="center">{item.customerPhone}</TableCell>
+                      <TableCell align="center">{item.cakeName}</TableCell>
+                      <TableCell align="center">{item.cakeSize}</TableCell>
+                      <TableCell align="center">{item.cakeFilling}</TableCell>
+                      <TableCell align="center">{item.quantity}</TableCell>
                       <TableCell align="center">{formatDateTime(item.pickUpTime)}</TableCell>
                       <TableCell align="center">
-                        <Button sx={{
-                          width: "150px",
-                          background: "#FFDFE7",
-                          color: "black",
-                        }}
-                          variant="contained" color="primary" onClick={() => handleConfirm(item.orderCakeID)}> Xác nhận </Button>
-                      </TableCell>
+                          <Typography
+                            sx={{
+                              fontFamily: "Montserrat, sans-serif",
+                              color: "#EA365F",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {item.receiveStatus}
+                          </Typography>
+                        </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell align="center" colSpan={6}>
+                    <TableCell align="center" colSpan={9}>
                       {error ? error : "Không có dữ liệu"}
                     </TableCell>
                   </TableRow>
@@ -158,8 +176,9 @@ const PurchaseOrderProcess = () => {
           </TableContainer>
         </Box>
       </Box>
+      <Box sx={{ paddingTop: "20px", background: "#E5E5E5" }}></Box>
     </Layout>
   );
 };
 
-export default PurchaseOrderProcess;
+export default PurchaseOrderComplete;

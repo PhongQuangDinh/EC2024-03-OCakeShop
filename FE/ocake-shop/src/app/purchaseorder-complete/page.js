@@ -1,8 +1,8 @@
-import PurchaseOrderProcess from "@/modules/PurchaseOrderProcess/PurchaseOrderProcess";
+import PurchaseOrderComplete from "@/modules/PurchaseOrderComplete/PurchaseOrderComplete";
 import Head from "next/head";
 
 export const metadata = {
-  title: "PurchaseOrderProcess",
+  title: "PurchaseOrderComplete",
 };
 
 export default function Home() {
@@ -14,7 +14,7 @@ export default function Home() {
       </Head>
 
       <main>
-        <PurchaseOrderProcess />
+        <PurchaseOrderComplete />
       </main>
     </div>
   );
