@@ -15,22 +15,23 @@ import "react-multi-carousel/lib/styles.css";
 import CakeCard from "./components/cakeCard";
 import Image from "next/image";
 import arrow from "../../assets/arrow.png";
-import { getApiUrl } from '../../../WebConfig';
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
+import { getApiUrl } from "../../../WebConfig";
+import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
 import { useRouter } from "next/navigation";
 import SelectCake from "./cake";
+import Link from "next/link";
 
 const HomePage = () => {
   const [category, setCategory] = useState(["Tất cả"]);
   const [cake, setCake] = useState([]);
   const [allCake, setAllCake] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [value, setValue] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const apiUrl = getApiUrl();
   const router = useRouter();
-  const [selectCake, setSelectCake] = useState('');
+  const [selectCake, setSelectCake] = useState("");
 
   useEffect(() => {
     GetCategory();
@@ -48,22 +49,25 @@ const HomePage = () => {
       if (selectedCategory) {
         const getCakesByCategory = async () => {
           try {
-            const response = await fetch(`${apiUrl}/cake/purpose/${selectedCategory.purposeID}`, {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-            if(!response.ok) {
+            const response = await fetch(
+              `${apiUrl}/cake/purpose/${selectedCategory.purposeID}`,
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            if (!response.ok) {
               const errorData = await response.json();
-              setError(errorData.message || 'Get cake by purpose is failed');
+              setError(errorData.message || "Get cake by purpose is failed");
               return;
             }
             const data = await response.json();
             setCake(Array.isArray(data) ? data : []);
-          } catch(err) {
-            console.error('An error occurred:', err);
-            setError('An error occurred while get cake');
+          } catch (err) {
+            console.error("An error occurred:", err);
+            setError("An error occurred while get cake");
           }
         };
         getCakesByCategory();
@@ -75,7 +79,7 @@ const HomePage = () => {
     if (searchTerm === "") {
       setCake(allCake);
     } else {
-      const filteredCakes = allCake.filter(cakeItem =>
+      const filteredCakes = allCake.filter((cakeItem) =>
         cakeItem.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setCake(filteredCakes);
@@ -90,18 +94,18 @@ const HomePage = () => {
           "Content-Type": "application/json",
         },
       });
-      if(!response.ok) {
+      if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.message || 'Load dữ liệu thất bại');
+        setError(errorData.message || "Load dữ liệu thất bại");
         return;
       }
       const data = await response.json();
       const allCategory = { purposeID: 0, title: "Tất cả" };
       const updatedData = [allCategory, ...data];
       setCategory(Array.isArray(updatedData) ? updatedData : []);
-    } catch(err) {
+    } catch (err) {
       console.error(err);
-      setError('Có lỗi khi lấy danh mục sản phẩm');
+      setError("Có lỗi khi lấy danh mục sản phẩm");
     }
   };
 
@@ -113,17 +117,17 @@ const HomePage = () => {
           "Content-Type": "application/json",
         },
       });
-      if(!response.ok) {
+      if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.message || 'Get cake failed');
+        setError(errorData.message || "Get cake failed");
         return;
       }
       const data = await response.json();
       setAllCake(Array.isArray(data) ? data : []);
       setCake(Array.isArray(data) ? data : []);
-    } catch(err) {
-      console.error('An error occurred:', err);
-      setError('An error occurred while get cake');
+    } catch (err) {
+      console.error("An error occurred:", err);
+      setError("An error occurred while get cake");
     }
   };
 
@@ -134,7 +138,7 @@ const HomePage = () => {
   const handleChangeCake = (id) => {
     // console.log("Cake: " + newValue);
     // setSelectCake(newValue);
-    router.push(`home/${id}`)
+    router.push(`home/${id}`);
     // event.onClick()
   };
 
@@ -211,6 +215,90 @@ const HomePage = () => {
 
   return (
     <Layout>
+      <Container>
+        <Grid container spacing={2}>
+          <Grid item md={12} lg={6}>
+            <Box sx={{ padding: "7% 20%" }}>
+              <StyledName>OCake Shop</StyledName>
+              <StyledTypoQuote
+                variant="h1"
+                textAlign="start"
+                fontWeight="bold"
+                gutterBottom
+              >
+                <span
+                  style={{
+                    background:
+                      "linear-gradient(-45deg, #e250e5, #4b50e6, #e250e5, #4b50e6)",
+                    backgroundSize: "100% 100%,0",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    fontSize: "4rem",
+                  }}
+                >
+                  Những Chiếc Bánh Hoàn Hảo Dành Riêng Cho Bạn
+                </span>{" "}
+              </StyledTypoQuote>
+              <StyledParagraph sx={{ display: "block" }} mb="1rem">
+                Tại đây bạn có thể chọn được chiếc bánh phù hợp với bất kỳ người
+                nào, bất kỳ hương vị và màu sắc nào và cho bất kỳ ai. Đặt bánh
+                ngay!
+              </StyledParagraph>
+              <StyledTypography>
+                <StyledLink href={"/signin"}>Sign Up</StyledLink>
+              </StyledTypography>
+            </Box>
+          </Grid>
+          <ImgContainer
+            item
+            md={12}
+            lg={6}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "500px",
+                height: "600px",
+                borderRadius: "30px",
+                background: "linear-gradient(135deg, #FFDAA4, #FFC2E2)",
+              }}
+            >
+              <Box
+                sx={{
+                  position: "relative",
+                  width: "400px",
+                  height: "500px",
+                  backgroundColor: "#FFD3E3",
+                  borderRadius: "30px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+                }}
+              >
+                <img
+                  src="https://png.pngtree.com/png-vector/20240320/ourmid/pngtree-3d-birthday-cake-vanilla-illustration-png-image_12179399.png"
+                  alt="Cake"
+                  width={500}
+                  style={{ borderRadius: "10px" }}
+                />
+              </Box>
+            </Box>
+            <Ellipse>
+              <Pink>Blur</Pink>
+              <Orange>Blur</Orange>
+            </Ellipse>
+          </ImgContainer>
+        </Grid>
+      </Container>
       <Box
         sx={{
           background: "linear-gradient(30deg, #EF8F6E 0%, #f6e187 100%)",
@@ -221,10 +309,12 @@ const HomePage = () => {
           gap: "1rem",
         }}
       >
-        <Box sx = {{
-          display: "flex",
-          justifyContent: "center",
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
           <Typography
             sx={{
               fontFamily: "'Monsterat', sans-serif",
@@ -241,60 +331,65 @@ const HomePage = () => {
             <Tab key={category.purposeID} label={category.title} />
           ))}
         </MyTabs>
-        
-        <TextField
-        sx={{
-          margin: "1rem 0",
-          backgroundColor: "#FFFFFF", // Màu nền trắng
-          width: "calc(100% - 40px)", // Giảm độ rộng của trường nhập liệu đi 50px
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: "#FFC0CB", // Màu hồng của viền ngoài
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: "#FF1493", // Màu hồng đậm hơn khi trường được chọn
-            },
-          },
-        }}
-        label={!isFocused ? "Tìm kiếm bánh" : ""}
-        variant="outlined"
-        value={searchTerm}
-        onChange={handleSearchChange}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <SearchIcon sx={{ color: "#FF1493" }} /> {/* Màu hồng đậm của biểu tượng */}
-            </InputAdornment>
-          ),
-        }}
-      />
 
-      <Box>
-        <Carousel
-          swipeable={false}
-          draggable={false}
-          keyBoardControl={true}
-          customTransition="all .5 ease-in-out"
-          transitionDuration={500}
-          containerClass="carousel-container"
-          removeArrowOnDeviceType={["tablet", "mobile", "pc"]}
-          responsive={responsive}
-          itemClass="carousel-item-padding-40-px"
-        >
-          {Array.isArray(cake) && cake.map((cakeItem) => (
-            <CakeCard 
-              key={cakeItem.cakeID}
-              title={cakeItem.description}
-              img={cakeItem.cakeImages.length > 0 ? cakeItem.cakeImages[0].imageDetail.imagePath : ""}
-              // selectCake={cakeItem.cakeID} onClick={handleChangeCake}
-              onClick={() => handleChangeCake(cakeItem.cakeID)}
-            />
-          ))}
-        </Carousel>
-      </Box>
-        
+        <TextField
+          sx={{
+            margin: "1rem 0",
+            backgroundColor: "#FFFFFF", // Màu nền trắng
+            width: "calc(100% - 40px)", // Giảm độ rộng của trường nhập liệu đi 50px
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#FFC0CB", // Màu hồng của viền ngoài
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#FF1493", // Màu hồng đậm hơn khi trường được chọn
+              },
+            },
+          }}
+          label={!isFocused ? "Tìm kiếm bánh" : ""}
+          variant="outlined"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon sx={{ color: "#FF1493" }} />{" "}
+                {/* Màu hồng đậm của biểu tượng */}
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <Box>
+          <Carousel
+            swipeable={false}
+            draggable={false}
+            keyBoardControl={true}
+            customTransition="all .5 ease-in-out"
+            transitionDuration={500}
+            containerClass="carousel-container"
+            removeArrowOnDeviceType={["tablet", "mobile", "pc"]}
+            responsive={responsive}
+            itemClass="carousel-item-padding-40-px"
+          >
+            {Array.isArray(cake) &&
+              cake.map((cakeItem) => (
+                <CakeCard
+                  key={cakeItem.cakeID}
+                  title={cakeItem.description}
+                  img={
+                    cakeItem.cakeImages.length > 0
+                      ? cakeItem.cakeImages[0].imageDetail.imagePath
+                      : ""
+                  }
+                  // selectCake={cakeItem.cakeID} onClick={handleChangeCake}
+                  onClick={() => handleChangeCake(cakeItem.cakeID)}
+                />
+              ))}
+          </Carousel>
+        </Box>
       </Box>
 
       <Box
@@ -368,3 +463,77 @@ const MyTabs = styled(MuiTabs)(() => ({
   },
 }));
 
+const StyledLink = styled(Link)({
+  color: "inherit",
+  textDecoration: "none",
+});
+const StyledTypography = styled(Typography)({
+  transition: "400ms all ease-in-out",
+  backgroundColor: "inherit",
+  color: "inherit",
+  width: "fit-content",
+  padding: "1rem 2rem",
+  fontWeight: "bold",
+  border: "4px solid",
+  borderImage:
+    "linear-gradient(101deg, var(--pink--color), var(--orange--color)) 1",
+  cursor: "pointer",
+  boxSizing: "border-box",
+  "&:hover": {
+    backgroundColor: "inherit",
+    color: "var(--main--color)",
+    padding: "1rem 3rem",
+  },
+});
+const Container = styled(Box)(({ theme }) => ({
+  marginTop: "8rem",
+  padding: "0 6rem",
+  [theme.breakpoints.down("sm")]: {
+    marginTop: "3rem",
+    padding: 0,
+  },
+}));
+const StyledTypoQuote = styled(Typography)(({ theme }) => ({
+  [theme.breakpoints.down("md")]: {
+    display: "block",
+    fontSize: "2rem",
+  },
+}));
+const Ellipse = styled("div")({
+  zIndex: "-1",
+  position: "absolute",
+  top: "15%",
+  right: "35%",
+  filter: "blur(100px)",
+});
+const Orange = styled("div")({
+  height: "15rem",
+  width: "15rem",
+  backgroundColor: "var(--orange--color)",
+});
+const Pink = styled("div")({
+  height: "15rem",
+  width: "15rem",
+  backgroundColor: "var(--pink--color)",
+});
+const ImgContainer = styled(Grid)(({ theme }) => ({
+  textAlign: "center",
+  position: "relative",
+  zIndex: "10",
+  [theme.breakpoints.down("md")]: {
+    display: "none",
+  },
+}));
+const StyledName = styled(Typography)({
+  background: "linear-gradient(to right bottom, #F53844, #42378F)",
+  backgroundSize: "100% 100%,0",
+  backgroundClip: "text",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  fontSize: "2rem",
+  fontWeight: "bold",
+});
+const StyledParagraph = styled(Typography)({
+  fontStyle: "italic",
+  fontSize: "1.5rem",
+});

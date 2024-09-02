@@ -148,7 +148,6 @@ export default NavBar;
 
 // Styled components remain the same as your original code...
 
-
 const NavItem = ({
   content = { title: "", link: "" },
   sx = {},
