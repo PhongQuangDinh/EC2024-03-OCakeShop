@@ -179,7 +179,7 @@ export default function ProcessOrder() {
                   <TableCell align="center">{row.OrderCart?.quantity}</TableCell>
                   <TableCell align="center">{row.handleStatus}</TableCell>
                   <TableCell align="center">{row.bakingStatus ? row.bakingStatus: "Chưa xử lý"}</TableCell>
-                  <TableCell align="center">{new Date(row.Order?.pickUpTime).toLocaleDateString('vi-VN')}</TableCell>
+                  <TableCell align="center">{new Date(row.OrderDetails?.pickUpTime).toLocaleDateString('vi-VN')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
