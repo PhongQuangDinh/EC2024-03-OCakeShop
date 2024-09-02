@@ -46,7 +46,7 @@ const Handling = () => {
           'Content-Type': 'application/json',
         },
       });
-  
+
       if (response) {
         // Cập nhật dữ liệu sau khi xác nhận thành công
         const updatedData = inforDelivery.filter(item => item.orderCakeID !== orderCakeID);
@@ -57,7 +57,7 @@ const Handling = () => {
       setError('Lỗi khi cập nhật trạng thái: ' + err.message);
     }
   };
-  
+
 
   return (
     <Layout>
@@ -172,6 +172,7 @@ const Handling = () => {
                               outline: "none",
                             }}
                             onClick={() => handleConfirm(item.orderCakeID)}
+                            disabled={item.orderDetails.some(detail => detail.bakingStatus !== 'Đã xử lý')}
                           >
                             Xác nhận
                           </Button>

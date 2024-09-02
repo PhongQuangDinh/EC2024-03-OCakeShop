@@ -162,23 +162,28 @@ const PurchaseOrderProcess = () => {
                       <TableCell align="center">{item.quantity}</TableCell>
                       <TableCell align="center">{formatDateTime(item.pickUpTime)}</TableCell>
                       <TableCell align="center">
-                          <Typography
-                            sx={{
-                              fontFamily: "Montserrat, sans-serif",
-                              color: "#EA365F",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            {item.receiveStatus}
-                          </Typography>
-                        </TableCell>
+                        <Typography
+                          sx={{
+                            fontFamily: "Montserrat, sans-serif",
+                            color: "#EA365F",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {item.receiveStatus}
+                        </Typography>
+                      </TableCell>
                       <TableCell align="center">
                         <Button sx={{
                           width: "150px",
                           background: "#FFDFE7",
                           color: "black",
                         }}
-                          variant="contained" color="primary" onClick={() => handleConfirm(item.orderCakeID)}> Xác nhận </Button>
+                          variant="contained" color="primary"
+                          onClick={() => handleConfirm(item.orderCakeID)}
+                          disabled={item.deliveryStatus !== 'Đã vận chuyển' || item.bakingStatus !== 'Đã xử lý'}
+                        >
+                          Xác nhận
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))

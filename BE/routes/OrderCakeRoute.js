@@ -409,7 +409,9 @@ router.get("/cus-not-received", authenticateToken, async (req, res, next) => {
           pickUpTime: cart.pickUpTime || '', // Thời gian lấy hàng
           receiveStatus: order.receiveStatus || '', // Trạng thái nhận hàng
           customerID: cart.customer?.customerID || '', // ID khách hàng
-          customerName: cart.customer?.name || '' // Tên khách hàng
+          customerName: cart.customer?.name || '', // Tên khách hàng
+          deliveryStatus: order.deliveryStatus || '', // Delivery status from OrderCake
+          bakingStatus: detail.bakingStatus || '' // Baking status from OrderCakeDetail
         };
       });
     }).flat();
