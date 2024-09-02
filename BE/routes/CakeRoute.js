@@ -78,57 +78,189 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+// router.get("/purpose/all", async (req, res, next) => {
+//   try {
+//     const purpose = await model.Purpose.findAll({
+//       where: {
+//         purposeID_ref: {
+//           [Op.is]: null // This should translate to IS NULL in SQL
+//         }
+//       }
+//     });
+
+//     if (!purpose || purpose.length === 0) {
+//       return res.status(404).json({ message: "No purpose found" });
+//     }
+//     return res.status(200).json(purpose);
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
 router.get("/purpose/all", async (req, res, next) => {
   try {
-    const purpose = await model.Purpose.findAll({
+    // Lấy tất cả các purpose gốc (purposeID_ref = null)
+    const purposes = await model.Purpose.findAll({
       where: {
         purposeID_ref: {
-          [Op.is]: null // This should translate to IS NULL in SQL
+          [Op.is]: null
         }
-      }
+      },
+      include: [{
+        model: model.Purpose,
+        as: 'children', // Bao gồm các con
+        include: [{
+          model: model.Purpose,
+          as: 'children' // Đệ quy để lấy các con của con nếu có
+        }]
+      }]
     });
 
-    if (!purpose || purpose.length === 0) {
+    if (!purposes || purposes.length === 0) {
       return res.status(404).json({ message: "No purpose found" });
     }
-    return res.status(200).json(purpose);
+
+    return res.status(200).json(purposes);
   } catch (err) {
     next(err);
   }
 });
 
+// router.get("/purpose/all", async (req, res, next) => {
+//   try {
+//         // Lấy tất cả các purpose gốc (purposeID_ref = null)
+//         const purposes = await model.Purpose.findAll({
+//           where: {
+//             purposeID_ref: {
+//               [Op.is]: null
+//             }
+//           },
+//           include: [{
+//             model: model.Purpose,
+//             as: 'children', // Bao gồm các con
+//             include: [{
+//               model: model.Purpose,
+//               as: 'children' // Đệ quy để lấy các con của con nếu có
+//             }]
+//           }]
+//         });
+    
+
+//     // Hàm để "phẳng" danh sách các mục đích
+//     const flattenPurposes = (purposes, result = []) => {
+//       purposes.forEach(purpose => {
+//         // Push từng mục đích vào danh sách kết quả
+//         result.push({
+//           purposeID: purpose.purposeID,
+//           title: purpose.title,
+//           purposeID_ref: purpose.purposeID_ref
+//         });
+        
+//         // Nếu có con, đệ quy để thêm con vào danh sách
+//         if (purpose.children && purpose.children.length > 0) {
+//           flattenPurposes(purpose.children, result);
+//         }
+//       });
+//       return result;
+//     };
+
+//     // Phẳng danh sách
+//     const flatResult = flattenPurposes(purposes);
+
+//     if (!flatResult || flatResult.length === 0) {
+//       return res.status(404).json({ message: "No purpose found" });
+//     }
+
+//     return res.status(200).json(flatResult);
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
+// router.get("/purpose/:purposeID", async (req, res, next) => {
+//   try {
+//       const purposeID = req.params.purposeID;
+//       const cake = await model.Cake.findAll({
+//         include:
+//         [
+//           {
+//               model: model.CakeImage,
+//               as: "cakeImages",
+//               required: true,
+//               include: 
+//               {
+//                 model: model.ImageDetail,
+//                 as: "imageDetail",
+//                 required: true,
+//               }
+//           },
+//           {
+//             model: model.Purpose,
+//             as: "purpose",
+//             required: true,
+//             where: {
+//               purposeID: purposeID
+//             }
+//           }
+//         ]
+//       });
+          
+//       res.status(200).json(cake);
+//       // );
+//   }
+//   catch (err) { next(err); }
+// });
 router.get("/purpose/:purposeID", async (req, res, next) => {
   try {
-      const purposeID = req.params.purposeID;
-      const cake = await model.Cake.findAll({
-        include:
-        [
-          {
-              model: model.CakeImage,
-              as: "cakeImages",
-              required: true,
-              include: 
-              {
-                model: model.ImageDetail,
-                as: "imageDetail",
-                required: true,
-              }
-          },
-          {
-            model: model.Purpose,
-            as: "purpose",
-            required: true,
-            where: {
-              purposeID: purposeID
-            }
-          }
+    const purposeID = req.params.purposeID;
+
+    // Lấy mục đích hiện tại
+    const purpose = await model.Purpose.findByPk(purposeID);
+
+    if (!purpose) {
+      return res.status(404).json({ message: "Purpose not found" });
+    }
+
+    // Lấy tất cả các purpose con (nếu có)
+    const purposes = await model.Purpose.findAll({
+      where: {
+        [Op.or]: [
+          { purposeID: purposeID },
+          { purposeID_ref: purposeID }
         ]
-      });
-          
-      res.status(200).json(cake);
-      // );
+      }
+    });
+
+    const purposeIDs = purposes.map(p => p.purposeID);
+
+    // Tìm tất cả các Cake có liên quan đến các purpose này
+    const cakes = await model.Cake.findAll({
+      include: [
+        {
+          model: model.CakeImage,
+          as: "cakeImages",
+          required: true,
+          include: {
+            model: model.ImageDetail,
+            as: "imageDetail",
+            required: true,
+          }
+        },
+        {
+          model: model.Purpose,
+          as: "purpose",
+          required: true,
+          where: {
+            purposeID: purposeIDs
+          }
+        }
+      ]
+    });
+
+    res.status(200).json(cakes);
+  } catch (err) {
+    next(err);
   }
-  catch (err) { next(err); }
 });
 
 // lấy kích thước bánh
