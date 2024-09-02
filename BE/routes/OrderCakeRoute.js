@@ -12,7 +12,7 @@ router.get("/manage", async (req, res, next) => {
       include: [
         {
           model: model.OrderCake,
-          as: "Order",
+          as: "OrderDetails",
           required: true,
           where: {pickUpTime:
             {
@@ -29,19 +29,16 @@ router.get("/manage", async (req, res, next) => {
             {
               model: model.Cake,
               required: true,
-              include: 
-              [
-                {
-                model: model.CakeSize,
-                as: "cakeSize",
-                required: true,
-                },
-                {
-                  model: model.CakeFilling,
-                  as: "cakeFilling",
-                  required: true,
-                }
-              ]
+            },
+            {
+              model: model.CakeSize,
+              as: "cakeSize",
+              required: true,
+            },
+            {
+              model: model.CakeFilling,
+              as: "cakeFilling",
+              required: true,
             }
           ]
         }
