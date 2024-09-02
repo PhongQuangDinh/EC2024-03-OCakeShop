@@ -21,7 +21,7 @@ import Layout from "../layout";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { fetchWithAuth } from '../../../WebConfig';
+import { fetchWithAuth, getApiUrl } from '../../../WebConfig';
 
 const Payment = () => {
   const router = useRouter();
@@ -36,9 +36,9 @@ const Payment = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-
       try {
         const data = await fetchWithAuth(router, '/customer/myinfo');  // if method not defined it would be GET by default
+        console.log(data);
         setInfoCustomer(data?.Customer || '');
       } catch (err) {
         setError('SOS ' + err.message);
@@ -50,18 +50,110 @@ const Payment = () => {
 
   useEffect(() => {
     const fetchCake = async () => {
-      try {
-        const data = await fetchWithAuth(router, '/cart/buying');  // if method not defined it would be GET by default
-        if (!data) {
-          router.push('/cart');
-        }
-        setInfoCake(data);
-      } catch (err) {
-        setError('SOS ' + err.message);
+      const token = localStorage.getItem('token');
+      const apiUrl = getApiUrl();
+     
+      if (!token) {
+          console.log('No token found');
+          router.push('/signin');
+          return;
       }
+  
+      try {
+          const response = await fetch(`${apiUrl}/cart/buying`, {
+            method: "GET",  
+            headers: {
+              "authorization": `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+          console.log(`${apiUrl}/cart/buying`);
+  
+          if (!response.ok) {
+              if (response.status === 403) {
+                  console.log('Session expired. Redirecting to signin.');
+                  localStorage.removeItem('token');
+                  router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+                  return;
+              } else {
+                  // router.push('/cart');
+                  // alert("???????????")
+                  window.location.href = '/cart';
+                  return;
+              }
+          }
+  
+          const data = await response.json();
+          if(data){
+            console.log(data.cart);
+            setInfoCake(data);
+            
+            return;
+          }
+          window.location.href = '/cart';
+        } catch (err) {
+          setError('SOS ' + err.message);
+        }
     };
     fetchCake();
-  }, []);
+  }, []); // Add dependencies if required
+  
+
+  // useEffect(() => {
+  //   const fetchCake = async () => {
+  //     const token = localStorage.getItem('token');
+  //     const apiUrl = getApiUrl();
+
+  //   if (!token) {
+  //       console.log('No token found');
+  //       router.push('/signin');
+  //       return;
+  //   }
+
+  //   try {
+  //       const response = await fetch(`${apiUrl}/cart/buying`, {
+  //         method: "GET",  
+  //         headers: {
+  //           "authorization": `Bearer ${token}`,
+  //           "Content-Type": "application/json",
+  //           },
+  //       });
+
+  //       if (!response.ok) {
+  //           if (response.status === 403) {
+  //               console.log('Session expired. Redirecting to signin.');
+  //               localStorage.removeItem('token');
+  //               router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+  //               return null;
+  //           } else {
+  //             router.push('/cart');
+  //             return;
+  //               // const contentType = response.headers.get("content-type");
+  //               // if (contentType && contentType.includes("application/json")) {
+  //               //     const errorData = await response.json();
+  //               //     throw new Error(errorData.message || 'Request failed');
+  //               // } else {
+  //               //     const errorText = await response.text();
+  //               //     throw new Error(errorText || 'An error occurred');
+  //               // }
+  //           }
+  //       }
+
+  //       const data = await response.json();
+
+
+  //     // try {
+  //     //   const data = await fetchWithAuth(router, '/cart/buying');  // if method not defined it would be GET by default
+  //     //   if (!data) {
+  //     //     router.push('/cart');
+  //     //   }
+  //       setInfoCake(data);
+  //     } catch (err) {
+  //       setError('SOS ' + err.message);
+  //     }
+  //   };
+  //   fetchCake();
+  // }, []);
 
   const calculateTotal = () => {
     return infoCake.reduce((acc, row) => {

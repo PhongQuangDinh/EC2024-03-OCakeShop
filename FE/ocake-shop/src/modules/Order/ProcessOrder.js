@@ -75,7 +75,7 @@ export default function ProcessOrder() {
   const fetchOrder = async() => {
     try {
       const data = await fetchWithAuth(router, '/ordercake/manage');
-            console.log(data);
+      console.log(data);
       setRows(data || '');
 
     } catch (err) {

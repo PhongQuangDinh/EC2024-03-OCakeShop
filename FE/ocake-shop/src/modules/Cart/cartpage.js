@@ -20,14 +20,56 @@ const CartPage = () => {
   }, []);
 
   const fetchCart = async () => {
+    const token = localStorage.getItem('token');
+    // const apiUrl = getApiUrl();
+    
+    if (!token) {
+        console.log('No token found');
+        router.push('/signin');
+        return;
+    }
+
     try {
-      const response = await fetchWithAuth(router, '/cart/');
-      // const data = await response.json();
-      if(!response){
+        const response = await fetch(`${apiUrl}/cart/`, {
+          method: "GET",  
+          headers: {
+            "authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(`${apiUrl}/cart/`);
+
+        if (!response.ok) {
+            if (response.status === 403) {
+                console.log('Session expired. Redirecting to signin.');
+                localStorage.removeItem('token');
+                router.push(`/signin?message=${encodeURIComponent('Your session has expired')}`);
+                return;
+            } else {
+                router.push('/home');
+                // alert("!!!!!!!!");
+                console.log(response.json());
+                // window.location.href = '/home';
+                return;
+            }
+        }
+
+        const data = await response.json();
+        if(data){
+          console.log(data.cart);
+          setRows(data);
+          return;
+        }
+        alert("??????????")
         router.push('/home');
-      }
-      console.log(response);
-      setRows(response);
+
+    // try {
+    //   const response = await fetchWithAuth(router, '/cart/');
+    //   if(!response){
+    //     router.push('/home');
+    //   }
+    //   console.log(response);
+    //   setRows(response);
     }
     catch(err){
       console.error(err);
@@ -92,6 +134,8 @@ const CartPage = () => {
       setSelectedItems(selectedItems.filter(id => id !== itemToDelete));
       setOpenDialog(false);
       setItemToDelete(null);
+      window.location.reload();
+      // router.refresh();
     } catch (error) {
       console.error('Failed to delete item:', error);
       setError('Failed to delete item. Please try again.');

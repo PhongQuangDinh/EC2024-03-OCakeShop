@@ -45,7 +45,9 @@ router.get("/manage", async (req, res, next) => {
       ],
       order: [["arrange", "ASC"]],
     });
-
+    if(order.length()<=0){
+      res.status(403).json({message: "order cake not found"});
+    }
     res.status(200).json(order);
   } catch (err) {
     next(err);
