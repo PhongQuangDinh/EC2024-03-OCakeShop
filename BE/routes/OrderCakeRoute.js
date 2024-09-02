@@ -9,6 +9,9 @@ const {authenticateToken} = require('../routes/authenticationRoute')
 router.get("/manage", async (req, res, next) => {
   try {
     const order = await model.OrderCakeDetail.findAll({
+      where: {
+        bakingStatus: 'Chưa xử lý',
+      },
       include: [
         {
           model: model.OrderCake,

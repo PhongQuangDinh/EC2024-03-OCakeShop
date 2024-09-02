@@ -32,6 +32,7 @@ const HomePage = () => {
   const apiUrl = getApiUrl();
   const router = useRouter();
   const [selectCake, setSelectCake] = useState("");
+  const [tokenUse, setTokenUser] = useState('');
 
   useEffect(() => {
     GetCategory();
@@ -111,6 +112,11 @@ const HomePage = () => {
 
   const GetInforCake = async () => {
     try {
+      if (typeof window !== "undefined") {
+        // Code này chỉ chạy trên client-side
+        setTokenUser(localStorage.getItem('token'));
+      }
+      
       const response = await fetch(`${apiUrl}/cake/`, {
         method: "GET",
         headers: {
@@ -245,9 +251,11 @@ const HomePage = () => {
                 nào, bất kỳ hương vị và màu sắc nào và cho bất kỳ ai. Đặt bánh
                 ngay!
               </StyledParagraph>
-              <StyledTypography>
-                <StyledLink href={"/signin"}>Sign Up</StyledLink>
-              </StyledTypography>
+              {!tokenUse &&
+                <StyledTypography>
+                  <StyledLink href={"/signin"}>Sign Up</StyledLink>
+                </StyledTypography>
+              }
             </Box>
           </Grid>
           <ImgContainer

@@ -88,6 +88,7 @@ function CakeProcess() {
       try {
         const data = await fetchWithAuth(router, "/recipe");
         setData(data || "");
+        console.log(data);
       } catch (err) {
         setError("SOS " + err.message);
       }
@@ -263,6 +264,7 @@ function CakeProcess() {
           message={snackbarMessage}
         />
       </Box>
+      <Box sx={{ paddingTop: "20px", background: "#E5E5E5" }}></Box>
     </Layout>
   );
 }

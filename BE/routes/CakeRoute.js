@@ -274,29 +274,6 @@ router.get('/cake-sizes', async (req, res) => {
   }
 });
 
-// router.get("/:id", async (req, res, next) => {
-//     try {
-//         const cake = await model.Cake.findByPk(req.params.id, {
-//             include:
-//                 {
-//                     model: model.CakeImage,
-//                     as: "cakeImages",
-//                     required: true,
-//                     include: 
-//                     {
-//                       model: model.ImageDetail,
-//                       as: "imageDetail",
-//                       required: true,
-//                     }
-//                 }
-//         });
-            
-//         res.status(200).json(cake.cakeImages);
-//         // );
-//     }
-//     catch (err) { next(err); }
-// });
-
 router.post('/add-cake', async (req, res, next) => {
   try {
     const cakeData = req.body;
