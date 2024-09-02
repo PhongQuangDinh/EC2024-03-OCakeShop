@@ -35,7 +35,7 @@ export function LatestOrders({ orders = [], sx }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order) => {
+            {orders.slice(0, 6).map((order) => {
               const { label, color } = statusMap[order.handleStatus] ?? {
                 label: "Unknown",
                 color: "default",
