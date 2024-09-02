@@ -421,26 +421,6 @@ router.get("/cus-not-received", authenticateToken, async (req, res, next) => {
         });
       })
       .flat();
-    const formattedOrders = deliveredOrders
-      .map((order) => {
-        return order.OrderDetails.map((detail) => {
-          const cart = detail.OrderCart;
-          return {
-            orderCakeID: order.orderCakeID || "", // Thêm trường orderCakeID
-            cakeName: cart.Cake?.description || "", // Bánh
-            cakeSize: cart.cakeSize?.title || "", // Kích thước bánh
-            cakeFilling: cart.cakeFilling?.title || "", // Nhân bánh
-            quantity: cart.quantity || "", // Số lượng
-            pickUpTime: cart.pickUpTime || "", // Thời gian lấy hàng
-            receiveStatus: order.receiveStatus || "", // Trạng thái nhận hàng
-            customerID: cart.customer?.customerID || "", // ID khách hàng
-            customerName: cart.customer?.name || "", // Tên khách hàng
-            deliveryStatus: order.deliveryStatus || "", // Delivery status from OrderCake
-            bakingStatus: detail.bakingStatus || "", // Baking status from OrderCakeDetail
-          };
-        });
-      })
-      .flat();
 
     res.json(formattedOrders);
   } catch (error) {
