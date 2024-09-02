@@ -15,9 +15,8 @@ import { ArrowRight as ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/Arr
 import dayjs from "dayjs";
 
 const statusMap = {
-  pending: { label: "Pending", color: "warning" },
-  delivered: { label: "Delivered", color: "success" },
-  refunded: { label: "Refunded", color: "error" },
+  "Chưa xử lý": { label: "Chưa xử lý", color: "warning" },
+  "Đã xử lý": { label: "Đã xử lý", color: "success" },
 };
 
 export function LatestOrders({ orders = [], sx }) {
@@ -36,18 +35,20 @@ export function LatestOrders({ orders = [], sx }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order) => {
-              const { label, color } = statusMap[order.status] ?? {
+            {orders.slice(0, 6).map((order) => {
+              const { label, color } = statusMap[order.handleStatus] ?? {
                 label: "Unknown",
                 color: "default",
               };
 
               return (
-                <TableRow hover key={order.id}>
-                  <TableCell>{order.id}</TableCell>
-                  <TableCell>{order.customer.name}</TableCell>
+                <TableRow hover key={order.orderCakeID}>
+                  <TableCell>{order.orderCakeID}</TableCell>
+                  <TableCell>{order.OrderCart.customer.name}</TableCell>
                   <TableCell>
-                    {dayjs(order.createdAt).format("MMM D, YYYY")}
+                    {new Date(order.OrderDetails.orderTime).toLocaleDateString(
+                      "vi-VN"
+                    )}
                   </TableCell>
                   <TableCell>
                     <Chip color={color} label={label} size="small" />
