@@ -38,12 +38,24 @@ const PurchaseOrderProcess = () => {
 
   const handleConfirm = async (orderID) => {
     try {
-      console.log('Order confirmed:', orderID);
-      await fetchWithAuth(router, `/ordercake/confirm/${orderID}`, {
-        method: 'POST',
+      console.log('Confirming receipt for order:', orderID);
+
+      // Gửi yêu cầu PUT để cập nhật trạng thái nhận hàng
+      const response = await fetchWithAuth(router, `/ordercake/admin-update-status/${orderID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-      const data = await fetchWithAuth(router, '/ordercake/cus-not-received');
-      setValueHandleDelivery(data || []);
+
+      if (response.ok) {
+        // Làm mới danh sách đơn hàng sau khi xác nhận thành công
+        const data = await fetchWithAuth(router, '/ordercake/cus-not-received');
+        setValueHandleDelivery(data || []);
+        alert('Cập nhật trạng thái thành công!');
+      } else {
+        setError('Lỗi khi cập nhật trạng thái. Vui lòng thử lại.');
+      }
     } catch (err) {
       setError('Lỗi khi xác nhận đơn hàng: ' + err.message);
     }
@@ -150,29 +162,34 @@ const PurchaseOrderProcess = () => {
                       <TableCell align="center">{item.quantity}</TableCell>
                       <TableCell align="center">{formatDateTime(item.pickUpTime)}</TableCell>
                       <TableCell align="center">
-                          <Typography
-                            sx={{
-                              fontFamily: "Montserrat, sans-serif",
-                              color: "#EA365F",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            {item.receiveStatus}
-                          </Typography>
-                        </TableCell>
+                        <Typography
+                          sx={{
+                            fontFamily: "Montserrat, sans-serif",
+                            color: "#EA365F",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {item.receiveStatus}
+                        </Typography>
+                      </TableCell>
                       <TableCell align="center">
                         <Button sx={{
                           width: "150px",
                           background: "#FFDFE7",
                           color: "black",
                         }}
-                          variant="contained" color="primary" onClick={() => handleConfirm(item.orderCakeID)}> Xác nhận </Button>
+                          variant="contained" color="primary"
+                          onClick={() => handleConfirm(item.orderCakeID)}
+                          disabled={item.deliveryStatus !== 'Đã vận chuyển' || item.bakingStatus !== 'Đã xử lý'}
+                        >
+                          Xác nhận
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell align="center" colSpan={8}>
+                    <TableCell align="center" colSpan={9}>
                       {error ? error : "Không có dữ liệu"}
                     </TableCell>
                   </TableRow>
@@ -184,7 +201,6 @@ const PurchaseOrderProcess = () => {
       </Box>
       <Box sx={{ paddingTop: "20px", background: "#E5E5E5" }}></Box>
     </Layout>
-
   );
 };
 

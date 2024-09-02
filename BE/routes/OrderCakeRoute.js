@@ -50,29 +50,14 @@ router.get("/manage", async (req, res, next) => {
       ],
       order: [["arrange", "ASC"]],
     });
-
+    if (order.length() <= 0) {
+      res.status(403).json({ message: "order cake not found" });
+    }
     res.status(200).json(order);
   } catch (err) {
     next(err);
   }
 });
-
-// router.post("/add-order-detail", authenticateToken, async (req, res, next) => {
-//   try {
-//     const orderCakeDetails = req.body;
-//     // console.log(orderCake);
-//     const {cartID, orderCakeID} = orderCakeDetail;
-//     const orderCakes = await model.OrderCake.findAll();
-//     const arrange = Math.max(...orderCakes.map(order => order.arrange)) + 1;
-//     // const newOrderCake = await model.OrderCake.create({orderTime, arrange, deliveryStatus: "Chưa vận chuyển", receiveStatus: "Chưa nhận hàng", handleStatus: "Chưa xử lý"})
-//     // if(!newOrderCake){
-//     //   return res.status(400).json({message: "Failed to create order"})
-//     // }
-//     // return res.status(200).json(newOrderCake);
-//   } catch (err) {
-//     next(err);
-//   }
-// });
 
 router.post("/add-order-detail", authenticateToken, async (req, res, next) => {
   try {
@@ -297,225 +282,6 @@ router.get("/admin-not-delivered", async (req, res, next) => {
   }
 });
 
-// router.get("/cus-received", async (req, res, next) => {
-//   try {
-//       // Tìm các đơn hàng đã được giao
-//       const receivedOrders = await model.OrderCake.findAll({
-//           where: {
-//               receiveStatus: 'Đã nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
-//           },
-//           include: [
-//               {
-//                   model: model.OrderCakeDetail,
-//                   as: 'OrderDetails',
-//                   include: [
-//                       {
-//                           model: model.Cart,
-//                           as: 'OrderCart',
-//                           include: [
-//                               {
-//                                   model: model.Cake, // Liên kết với Cake model
-//                                   attributes: ['description'] // Giả sử 'description' là tên của bánh
-//                               },
-//                               {
-//                                   model: model.CakeSize, // Liên kết với CakeSize model
-//                                   as: 'cakeSize',
-//                                   attributes: ['title'] // Giả sử 'title' là thuộc tính chứa kích thước
-//                               },
-//                               {
-//                                   model: model.CakeFilling, // Liên kết với CakeFilling model
-//                                   as: 'cakeFilling',
-//                                   attributes: ['title'] // Giả sử 'title' là thuộc tính chứa nhân bánh
-//                               },
-//                               {
-//                                   model: model.Customer, // Thêm liên kết với Customer model
-//                                   as: 'customer',
-//                                   attributes: ['customerID', 'name'] // Lấy customerID và tên khách hàng
-//                               }
-//                           ],
-//                           attributes: ['cartID', 'pickUpTime', 'quantity'], // Chỉ cần các thuộc tính cần thiết
-//                       }
-//                   ]
-//               }
-//           ]
-//       });
-
-//       // Định dạng dữ liệu để trả về tên bánh, số lượng, ngày giao, trạng thái nhận hàng, ID khách hàng và tên khách hàng
-//       const formattedOrders = receivedOrders
-//           .map(order => {
-//               const orderDetail = order.OrderDetails[0];
-//               const cart = orderDetail?.OrderCart;
-
-//               if (!cart) return null; // Nếu không có thông tin về cart, bỏ qua đơn hàng này
-
-//               const cakeName = cart.Cake?.description || '';
-//               const cakeSize = cart.cakeSize?.title || '';
-//               const cakeFilling = cart.cakeFilling?.title || '';
-//               const quantity = cart.quantity || '';
-//               const pickUpTime = cart.pickUpTime || '';
-//               const receiveStatus = order.receiveStatus || '';
-//               const customerID = cart.customer?.customerID || '';
-//               const customerName = cart.customer?.name || '';
-
-//               return {
-//                   cartID: cart.cartID,
-//                   cakeName,
-//                   cakeSize,
-//                   cakeFilling,
-//                   quantity,
-//                   pickUpTime,
-//                   receiveStatus,
-//                   customerID,
-//                   customerName
-//               };
-//           })
-//           .filter(order => order !== null) // Lọc bỏ các đơn hàng có cart là null
-//           .sort((a, b) => b.cartID - a.cartID); // Sắp xếp theo cartID giảm dần
-
-//       res.status(200).json(formattedOrders);
-//   } catch (err) {
-//       next(err);
-//   }
-// });
-
-// router.get('/cus-received', authenticateToken, async (req, res, next) => {
-//     try {
-//         const userID = req.user.userID; // Lấy ID khách hàng từ token
-
-//         // Tìm các đơn hàng đã được giao cho khách hàng hiện tại
-//         const receivedOrders = await model.OrderCake.findAll({
-//             where: {
-//                 receiveStatus: 'Đã nhận hàng', // Hoặc giá trị tương ứng với trạng thái đã giao
-//                 customerID: userID // Lọc đơn hàng theo ID khách hàng từ token
-//             },
-//             include: [
-//                 {
-//                     model: model.OrderCakeDetail,
-//                     as: 'OrderDetails',
-//                     include: [
-//                         {
-//                             model: model.Cart,
-//                             as: 'OrderCart',
-//                             include: [
-//                                 {
-//                                     model: model.Cake, // Liên kết với Cake model
-//                                     attributes: ['description'] // Giả sử 'description' là tên của bánh
-//                                 },
-//                                 {
-//                                     model: model.CakeSize, // Liên kết với CakeSize model
-//                                     as: 'cakeSize',
-//                                     attributes: ['title'] // Giả sử 'title' là thuộc tính chứa kích thước
-//                                 },
-//                                 {
-//                                     model: model.CakeFilling, // Liên kết với CakeFilling model
-//                                     as: 'cakeFilling',
-//                                     attributes: ['title'] // Giả sử 'title' là thuộc tính chứa nhân bánh
-//                                 },
-//                                 {
-//                                     model: model.Customer, // Thêm liên kết với Customer model
-//                                     as: 'customer',
-//                                     attributes: ['customerID', 'name'] // Lấy customerID và tên khách hàng
-//                                 }
-//                             ],
-//                             attributes: ['cartID', 'pickUpTime', 'quantity'], // Chỉ cần các thuộc tính cần thiết
-//                         }
-//                     ]
-//                 }
-//             ]
-//         });
-
-//         // Định dạng dữ liệu để trả về tên bánh, số lượng, ngày giao, trạng thái nhận hàng, ID khách hàng và tên khách hàng
-//         const formattedOrders = receivedOrders
-//             .map(order => {
-//                 const orderDetail = order.OrderDetails[0];
-//                 const cart = orderDetail?.OrderCart;
-
-//                 if (!cart) return null; // Nếu không có thông tin về cart, bỏ qua đơn hàng này
-
-//                 const cakeName = cart.Cake?.description || '';
-//                 const cakeSize = cart.cakeSize?.title || '';
-//                 const cakeFilling = cart.cakeFilling?.title || '';
-//                 const quantity = cart.quantity || '';
-//                 const pickUpTime = cart.pickUpTime || '';
-//                 const receiveStatus = order.receiveStatus || '';
-//                 const customerID = cart.customer?.customerID || '';
-//                 const customerName = cart.customer?.name || '';
-
-//                 return {
-//                     cartID: cart.cartID,
-//                     cakeName,
-//                     cakeSize,
-//                     cakeFilling,
-//                     quantity,
-//                     pickUpTime,
-//                     receiveStatus,
-//                     customerID,
-//                     customerName
-//                 };
-//             })
-//             .filter(order => order !== null) // Lọc bỏ các đơn hàng có cart là null
-//             .sort((a, b) => b.cartID - a.cartID); // Sắp xếp theo cartID giảm dần
-
-//         res.status(200).json(formattedOrders);
-//     } catch (err) {
-//         next(err);
-//     }
-// });
-
-// router.get("/cus-received", authenticateToken, async (req, res, next) => {
-//   try {
-//     const userID = req.user.userID;
-//     const deliveredOrders = await model.OrderCake.findAll({
-//       where: {
-//         receiveStatus: 'Đã nhận hàng' // Hoặc giá trị tương ứng với trạng thái đã giao
-//       },
-//       include: [
-//         {
-//           model: model.OrderCakeDetail,
-//           as: 'OrderDetails',
-//           required: true,
-//           include: [
-//             {
-//               model: model.Cart,
-//               as: "OrderCart",
-//               required: true,
-//               include: [
-//                 {
-//                   model: model.Customer,
-//                   as: "customer",
-//                   required: true,
-//                   where: { userID }
-//                 },
-//                 {
-//                   model: model.CakeSize,
-//                   as: "cakeSize",
-//                   required: true
-//                 },
-//                 {
-//                   model: model.CakeFilling,
-//                   as: "cakeFilling",
-//                   required: true
-//                 },
-//                 {
-//                    model: model.Cake, // Liên kết với Cake model
-//                    attributes: ['description'] // Giả sử 'description' là tên của bánh
-//                   }
-//               ]
-//             }
-//           ]
-//         },
-//         {
-//           model: model.Payment,
-//           // Thêm các tùy chọn cần thiết cho Payment nếu có
-//         }
-//       ]
-//     });
-
-//     res.json(deliveredOrders);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 router.get("/cus-received", authenticateToken, async (req, res, next) => {
   try {
     const userID = req.user.userID;
@@ -589,64 +355,6 @@ router.get("/cus-received", authenticateToken, async (req, res, next) => {
   }
 });
 
-// Khách chưa nhận hàng
-// router.get("/cus-not-received", authenticateToken, async (req, res, next) => {
-//   try {
-//     const userID = req.user.userID;
-//     const notReceivedOrders = await model.OrderCake.findAll({
-//       where: {
-//         receiveStatus: 'Chưa nhận hàng' // Hoặc giá trị tương ứng với trạng thái chưa nhận hàng
-//       },
-//       include: [
-//         {
-//           model: model.OrderCakeDetail,
-//           as: 'OrderDetails',
-//           required: true,
-//           include: [
-//             {
-//               model: model.Cart,
-//               as: "OrderCart",
-//               required: true,
-//               include: [
-//                 {
-//                   model: model.Customer,
-//                   as: "customer",
-//                   required: true,
-//                   where: { userID }
-//                 },
-//                 {
-//                   model: model.CakeSize,
-//                   as: "cakeSize",
-//                   required: true
-//                 },
-//                 {
-//                   model: model.CakeFilling,
-//                   as: "cakeFilling",
-//                   required: true
-//                 },
-//                 {
-//                   model: model.Cake, // Liên kết với Cake model
-//                   attributes: ['description'] // Giả sử 'description' là tên của bánh
-//                  }
-//               ]
-//             }
-//           ]
-//         },
-//         {
-//           model: model.Payment,
-//           // Thêm các tùy chọn cần thiết cho Payment nếu có
-//         }
-//       ]
-//     });
-
-//     // Trả về kết quả dưới dạng JSON
-//     res.status(200).json(notReceivedOrders);
-//   } catch (err) {
-//     // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
-//     next(err);
-//   }
-// });
-
 router.get("/cus-not-received", authenticateToken, async (req, res, next) => {
   try {
     const userID = req.user.userID;
@@ -709,6 +417,26 @@ router.get("/cus-not-received", authenticateToken, async (req, res, next) => {
             receiveStatus: order.receiveStatus || "", // Trạng thái nhận hàng
             customerID: cart.customer?.customerID || "", // ID khách hàng
             customerName: cart.customer?.name || "", // Tên khách hàng
+          };
+        });
+      })
+      .flat();
+    const formattedOrders = deliveredOrders
+      .map((order) => {
+        return order.OrderDetails.map((detail) => {
+          const cart = detail.OrderCart;
+          return {
+            orderCakeID: order.orderCakeID || "", // Thêm trường orderCakeID
+            cakeName: cart.Cake?.description || "", // Bánh
+            cakeSize: cart.cakeSize?.title || "", // Kích thước bánh
+            cakeFilling: cart.cakeFilling?.title || "", // Nhân bánh
+            quantity: cart.quantity || "", // Số lượng
+            pickUpTime: cart.pickUpTime || "", // Thời gian lấy hàng
+            receiveStatus: order.receiveStatus || "", // Trạng thái nhận hàng
+            customerID: cart.customer?.customerID || "", // ID khách hàng
+            customerName: cart.customer?.name || "", // Tên khách hàng
+            deliveryStatus: order.deliveryStatus || "", // Delivery status from OrderCake
+            bakingStatus: detail.bakingStatus || "", // Baking status from OrderCakeDetail
           };
         });
       })
@@ -844,6 +572,82 @@ router.put("/admin-update-status/:orderCakeID", async (req, res, next) => {
 
     // Trả về đơn hàng đã được cập nhật
     res.status(200).json(updatedOrder[1]);
+  } catch (err) {
+    next(err);
+  }
+});
+router.get("/chef-not-handled", async (req, res, next) => {
+  try {
+    // Tìm các đơn hàng đã được giao
+    const deliveredOrders = await model.OrderCake.findAll({
+      where: {
+        handleStatus: "Chưa xử lý", // Hoặc giá trị tương ứng với trạng thái đã giao
+      },
+      include: [
+        {
+          model: model.OrderCakeDetail,
+          as: "OrderCakeDetail",
+        },
+        {
+          model: model.Payment,
+          as: "Payment",
+        },
+      ],
+    });
+
+    // Trả về kết quả dưới dạng JSON
+    res.status(200).json(deliveredOrders);
+  } catch (err) {
+    // Xử lý lỗi và chuyển đến middleware lỗi tiếp theo
+    next(err);
+  }
+});
+router.put("/admin-update-status/:orderCakeID", async (req, res, next) => {
+  const { orderCakeID } = req.params;
+
+  try {
+    // Tìm đơn hàng theo ID và cập nhật tình trạng
+    const updatedOrder = await model.OrderCake.update(
+      { deliveryStatus: "Đã vận chuyển" }, // Cập nhật tình trạng
+      {
+        where: { orderCakeID },
+        returning: true, // Để lấy thông tin đã cập nhật
+        plain: true, // Để nhận đối tượng đơn hàng đã cập nhật
+      }
+    );
+
+    if (updatedOrder[0] === 0) {
+      // Không tìm thấy đơn hàng nào để cập nhật
+      return res.status(404).json({ message: "Đơn hàng không tìm thấy" });
+    }
+
+    // Trả về đơn hàng đã được cập nhật
+    res.status(200).json(updatedOrder[1]);
+  } catch (err) {
+    next(err);
+  }
+});
+router.put("/update-receive-status/:orderCakeID", async (req, res, next) => {
+  const { orderCakeID } = req.params;
+
+  try {
+    // Tìm đơn hàng theo ID và cập nhật tình trạng nhận hàng
+    const [updatedCount, [updatedOrder]] = await model.OrderCake.update(
+      { receiveStatus: "Đã nhận hàng" }, // Cập nhật tình trạng nhận hàng
+      {
+        where: { orderCakeID },
+        returning: true, // Để lấy thông tin đã cập nhật
+        plain: true, // Để nhận đối tượng đơn hàng đã cập nhật
+      }
+    );
+
+    if (updatedCount === 0) {
+      // Không tìm thấy đơn hàng nào để cập nhật
+      return res.status(404).json({ message: "Đơn hàng không tìm thấy" });
+    }
+
+    // Trả về đơn hàng đã được cập nhật
+    res.status(200).json(updatedOrder);
   } catch (err) {
     next(err);
   }

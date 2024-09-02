@@ -33,13 +33,51 @@ router.get('/', authenticateToken, async (req, res, next) => {
             ]
         });
 
-        if(!cart){
+        const cartOrdered = await model.Cart.findAll({
+            where: {status: "Chưa mua"},
+            include: [
+                {
+                    model: model.Customer,
+                    as: "customer",
+                    required: true,
+                    where: {userID: userID}
+                },
+                {
+                    model: model.Cake,
+                    required: true,
+                },
+                {
+                    model: model.CakeSize,
+                    as: "cakeSize",
+                    required: true,
+                },
+                {
+                    model: model.CakeFilling,
+                    as: "cakeFilling",
+                    required: true,
+                },
+                {
+                    model: model.OrderCakeDetail,
+                    as: "OrderDetails",
+                    required: false,
+                }
+            ],
+            // having: model.sequelize.where(model.sequelize.fn('COUNT', model.sequelize.col('OrderDetails.orderCakeDetailID')), '=', 0),
+            // group: ['Cart.cartID']
+        });
+
+        const cartsWithoutOrderDetails = cartOrdered.filter(cart => !cart.OrderDetails.length);
+
+
+        if (cartsWithoutOrderDetails.length === 0) {
             return res.status(404).json({
-                message: "Cart is not exist"
+                message: "Cart is empty"
             });
         }
+        
+        // if(cartOrdered)
         else{
-            return res.status(200).json(cart)
+            return res.status(200).json(cartsWithoutOrderDetails)
         }
     }
     catch (err) {next(err)};
@@ -135,9 +173,9 @@ router.get('/buying', authenticateToken, async (req, res, next) => {
             ]
         });
 
-        if(!cart){
+        if(cart.length === 0){
             return res.status(404).json({
-                message: "User is not exist"
+                message: "Cart is not exist"
             });
         }
         else{

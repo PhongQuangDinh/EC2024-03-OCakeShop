@@ -300,10 +300,106 @@ router.post('/CONTINUE-ORDER', authenticateToken, async (req, res, next) => {
 });
 
 
+// router.post('/CANCEL-ORDER', authenticateToken, async (req, res, next) => {
+//   try {
+//     const userID = req.user.userID;
+//     let amount = 0;
+//     const carts = await model.Cart.findAll({
+//       where: { status: "Đang mua" },
+//       include: [
+//         {
+//           model: model.Customer,
+//           as: "customer",
+//           required: true,
+//           where: { userID: userID }
+//         },
+//         {
+//           model: model.Cake,
+//           required: true,
+//         },
+//         {
+//           model: model.CakeSize,
+//           as: "cakeSize",
+//           required: true,
+//         },
+//         {
+//           model: model.CakeFilling,
+//           as: "cakeFilling",
+//           required: true,
+//         }
+//       ]
+//     });
+
+//     if (carts.length === 0) {
+//       return res.status(404).json({ message: "Không có đơn hàng nào đang mua!" });
+//     }
+//     let cartIDs = [];
+//     for (const cart of carts) {
+//       const { cartID, priceCake, quantity } = cart;
+//       // res.status(200).json(cartID);
+//       amount += priceCake * quantity;
+//       cartIDs.push(cartID);
+
+//       const [updateRows] = await model.Cart.update(
+//         {
+//           status: "Chưa mua",
+//         },
+//         {
+//           where: { cartID: cartID }
+//         }
+//       );
+//       if (updateRows === 0) {
+//         return res.status(404).json({ message: "Cart not found or no changes were made." });
+//       }
+//     }
+
+//     // Tìm `OrderCake` dựa trên danh sách `cartIDs` đã cập nhật
+//     const orderCake = await model.OrderCake.findAll({
+//       include: [{
+//         model: model.OrderCakeDetail,
+//         as: 'OrderDetails',
+//         required: true,
+//         where: {
+//           cartID: cartIDs
+//         }
+//       }]
+//     });
+//     const orderCakeDetail = await model.orderCakeDetail.findAll({
+//         where: {
+//           cartID: cartIDs
+//         }
+//     });
+
+//     if (!orderCake) {
+//       return res.status(404).json({ message: "Order not found for the given carts." });
+//     }
+
+//     if (!orderCakeDetail) {
+//       return res.status(404).json({ message: "Order detail not found for the given carts." });
+//     }
+
+
+
+//     // const orderCakeID = orderCake.OrderDetails[0].orderCakeID;
+//     // const creditCard = await model.CreditCard.findOne({
+//     //   include: [{
+//     //     model: model.Customer,
+//     //     required: true,
+//     //     where: { userID }
+//     //   }]
+//     // });
+
+//     // if (!creditCard) {
+//     //   return res.status(404).json({ message: "Credit card not found." });
+//     // }
+
+//   }
+//   catch (err) { next(err) };
+// });
+
 router.post('/CANCEL-ORDER', authenticateToken, async (req, res, next) => {
   try {
     const userID = req.user.userID;
-    let amount = 0;
     const carts = await model.Cart.findAll({
       where: { status: "Đang mua" },
       include: [
@@ -333,28 +429,24 @@ router.post('/CANCEL-ORDER', authenticateToken, async (req, res, next) => {
     if (carts.length === 0) {
       return res.status(404).json({ message: "Không có đơn hàng nào đang mua!" });
     }
-    let cartIDs = [];
-    for (const cart of carts) {
-      const { cartID, priceCake, quantity } = cart;
-      // res.status(200).json(cartID);
-      amount += priceCake * quantity;
-      cartIDs.push(cartID);
 
-      const [updateRows] = await model.Cart.update(
-        {
-          status: "Chưa mua",
-        },
-        {
-          where: { cartID: cartID }
-        }
-      );
-      if (updateRows === 0) {
-        return res.status(404).json({ message: "Cart not found or no changes were made." });
+    let cartIDs = carts.map(cart => cart.cartID);
+
+    // Update all relevant carts to 'Chưa mua'
+    const updateRows = await model.Cart.update(
+      {
+        status: "Chưa mua",
+      },
+      {
+        where: { cartID: cartIDs }
       }
+    );
+
+    if (updateRows === 0) {
+      return res.status(404).json({ message: "No carts were updated." });
     }
 
-    // Tìm `OrderCake` dựa trên danh sách `cartIDs` đã cập nhật
-    const orderCake = await model.OrderCake.findAll({
+    const orderCakes = await model.OrderCake.findAll({
       include: [{
         model: model.OrderCakeDetail,
         as: 'OrderDetails',
@@ -364,35 +456,44 @@ router.post('/CANCEL-ORDER', authenticateToken, async (req, res, next) => {
         }
       }]
     });
-    const orderCakeDetail = await model.orderCakeDetail.findAll({
-        where: {
-          cartID: cartIDs
-        }
+
+    if (orderCakes.length === 0) {
+      return res.status(404).json({ message: "No orders found for the given carts." });
+    }
+
+    // Extract all the orderCakeDetailIDs to delete
+    const orderCakeDetailIDs = orderCakes.flatMap(orderCake =>
+      orderCake.OrderDetails.map(detail => detail.orderCakeDetailID)
+    );
+
+    // Delete all relevant OrderCakeDetail entries
+    const deleteOrderCakeDetails = await model.OrderCakeDetail.destroy({
+      where: {
+        orderCakeDetailID: orderCakeDetailIDs
+      }
     });
 
-    if (!orderCake) {
-      return res.status(404).json({ message: "Order not found for the given carts." });
+    if (deleteOrderCakeDetails === 0) {
+      return res.status(404).json({ message: "Failed to delete OrderCakeDetail records." });
     }
 
-    if (!orderCakeDetail) {
-      return res.status(404).json({ message: "Order detail not found for the given carts." });
-    }
+    const orderCakeIDs = orderCakes.map(orderCake => orderCake.orderCakeID);
 
-    const orderCakeID = orderCake.OrderDetails[0].orderCakeID;
-    const creditCard = await model.CreditCard.findOne({
-      include: [{
-        model: model.Customer,
-        required: true,
-        where: { userID }
-      }]
+    const deleteOrderCakes = await model.OrderCake.destroy({
+      where: {
+        orderCakeID: orderCakeIDs
+      }
     });
 
-    if (!creditCard) {
-      return res.status(404).json({ message: "Credit card not found." });
+    if (deleteOrderCakes === 0) {
+      return res.status(404).json({ message: "Failed to delete OrderCake records." });
     }
 
+    return res.status(200).json({ message: "Order and associated details have been successfully canceled." });
+  } catch (err) {
+    next(err);
   }
-  catch (err) { next(err) };
 });
+
 
 module.exports = router;

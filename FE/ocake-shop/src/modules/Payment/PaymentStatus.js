@@ -50,6 +50,24 @@ const PaymentStatus = () => {
     makeAction();
   }, []);
 
+  useEffect(() => {
+    if (status === "CONTINUE-ORDER" && token && PayerID) {
+      setTimeout(() => {
+        router.push('/home'); // Redirect to home after 30 seconds
+      }, 7000); // 30 seconds delay
+    } else if (status === "CANCEL-ORDER") {
+      setTimeout(() => {
+        router.push('/cart'); // Redirect to cart after 30 seconds
+      }, 7000); // 30 seconds delay
+    }
+    else {
+      setTimeout(() => {
+        router.push('/home'); // Redirect to home after 30 seconds
+      }, 7000);
+    }
+  }, [status, token, PayerID, router]);
+
+
   const renderStatusMessage = () => {
     if (status === "CONTINUE-ORDER" && token && PayerID) {
       return (
@@ -161,11 +179,11 @@ const PaymentStatus = () => {
             {/* Additional content can go here */}
           </Box>
         </Box>
-        {error && (
+        {/* {error && (
           <Box sx={{ marginTop: "20px", color: "red" }}>
             {error}
           </Box>
-        )}
+        )} */}
       </Box>
     </Layout>
   );
