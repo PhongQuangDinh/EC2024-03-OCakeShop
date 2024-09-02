@@ -37,7 +37,6 @@ const AdminData = [
   { title: "Dashboard", link: "/admin" },
   { title: "Xử lý đơn", link: "/process-order" },
   { title: "Thông tin kho", link: "/inventory" },
-  { title: "Doanh thu", link: "/stats" },
   { title: "Giao hàng", link: "/handle-delivery" },
   { title: "Thêm bánh", link: "/add-cake" },
   { title: "Thêm nguyên liệu", link: "/add-ingredient" },

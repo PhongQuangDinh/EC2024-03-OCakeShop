@@ -20,13 +20,13 @@ export function LatestProducts({ products = [], sx }) {
       <CardHeader title="Sản phẩm được thêm gần đây" />
       <Divider />
       <List>
-        {products.map((product, index) => (
-          <ListItem divider={index < products.length - 1} key={product.id}>
+        {products.slice(0, 5).map((product, index) => (
+          <ListItem divider={index < products.length - 1} key={product.cakeID}>
             <ListItemAvatar>
-              {product.image ? (
+              {product.cakeImages[0].imageDetail.imagePath ? (
                 <Box
                   component="img"
-                  src={product.image}
+                  src={product.cakeImages[0].imageDetail.imagePath}
                   sx={{ borderRadius: 1, height: "48px", width: "48px" }}
                 />
               ) : (
@@ -41,11 +41,9 @@ export function LatestProducts({ products = [], sx }) {
               )}
             </ListItemAvatar>
             <ListItemText
-              primary={product.name}
+              primary={product.description}
               primaryTypographyProps={{ variant: "subtitle1" }}
-              secondary={`Updated ${dayjs(product.updatedAt).format(
-                "MMM D, YYYY"
-              )}`}
+              secondary={product.purpose.title}
               secondaryTypographyProps={{ variant: "body2" }}
             />
             <IconButton edge="end">
