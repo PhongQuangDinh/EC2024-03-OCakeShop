@@ -102,6 +102,9 @@ function CakeProcess() {
   const [currentItemId, setCurrentItemId] = useState(null);
   const [machineToStart, setMachineToStart] = useState('');
   const [selectedMachine, setSelectedMachine] = useState('');
+  const [cake, setCake] = useState([]);
+  const [machine, setMachine] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCakeRecipe = async () => {
@@ -144,6 +147,7 @@ function CakeProcess() {
           console.log("Dont have cake");
           return;
         }
+        console.log(data);
         setMachine(data || "");
       }
       catch(error){
@@ -286,133 +290,142 @@ function CakeProcess() {
         >
           Ocake Shop | Bếp làm bánh
         </Typography>
-        <Grid container spacing={2} sx={{ marginTop: "30px" }}>
-          <Grid item xs={3}>
-            <TableContainer component={Paper} sx={{ marginLeft: "20px" }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                      Máy nướng
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Trạng thái
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Số lượng
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {initialMachines.map((machine) => (
-                    <TableRow key={machine.bakingMachineID}>
-                      <TableCell align="left">{machine.title}</TableCell>
-                      <TableCell
-                        align="center"
-                        sx={{
-                          color: machine.status === "Bận" ? "red" : "green",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {machine.status}
+        {/* <Grid container spacing={2} sx={{ marginTop: "30px" }}> */}
+          <Box sx={{ padding: "0px 400px" }}>
+            <Grid item xs={3}>
+              <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="left" sx={{ fontWeight: "bold" }}>
+                        Máy nướng
                       </TableCell>
-                      <TableCell align="center">{machine.quantityCake}</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Trạng thái
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Số lượng
+                      </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-          <Grid item xs={9}>
-            <TableContainer component={Paper} sx={{ marginRight: "20px" }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Tên bánh
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Kích thước
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Số lượng
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Máy
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Trạng thái
-                    </TableCell>
-                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                      Hành động
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell align="center">{item.name}</TableCell>
-                      <TableCell align="center">{item.size} cm</TableCell>
-                      <TableCell align="center">{item.quantity}</TableCell>
-                      <TableCell align="center">
-                        <Select
-                          value={item.machine || ""}
-                          onChange={(event) => handleMachineChange(event, item.id)}
-                          disabled={machinesInUse.has(item.machine)}
-                          sx={{ width: "100%" }}
+                  </TableHead>
+                  <TableBody>
+                    {machine.map((machine) => (
+                      <TableRow key={machine.bakingMachineID}>
+                        <TableCell align="left">{machine.title}</TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{
+                            color: machine.status === "Bận" ? "red" : "green",
+                            fontWeight: "bold",
+                          }}
                         >
-                          {initialMachines.map((machine) => (
-                            <MenuItem
-                              key={machine.bakingMachineID}
-                              value={machine.title}
-                              disabled={
-                                machine.status === "Bận" && machine.title !== item.machine
-                              }
-                            >
-                              {machine.title}
-                            </MenuItem>
-                          ))}
-                        </Select>
+                          {machine.status}
+                        </TableCell>
+                        <TableCell align="center">{machine.quantityCake}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Box>
+
+          <Box sx={{padding: "50px"}}>
+            <Grid item xs={9}>
+              <TableContainer component={Paper} sx={{ marginRight: "20px" }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Tên bánh
                       </TableCell>
-                      <TableCell align="center">{item.status}</TableCell>
-                      <TableCell align="center">
-                        {item.status === "Chưa xử lý" ? (
-                          <Button
-                            variant="contained"
-                            onClick={() => handleStartProcessing(item.machine)}
-                            sx={{
-                              backgroundColor: "#E82552",
-                              color: "#FFFFFF",
-                              "&:hover": {
-                                backgroundColor: "#C41C47",
-                              },
-                            }}
-                          >
-                            Bắt đầu
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="contained"
-                            onClick={() => handleOpenConfirmDialog(item.id)}
-                            sx={{
-                              backgroundColor: "#E82552",
-                              color: "#FFFFFF",
-                              "&:hover": {
-                                backgroundColor: "#C41C47",
-                              },
-                            }}
-                          >
-                            Kết thúc
-                          </Button>
-                        )}
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Kích thước
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Nhân
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Số lượng
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Máy
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Trạng thái
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Hành động
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-        </Grid>
+                  </TableHead>
+                  <TableBody>
+                    {cake.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell align="center">{"Bánh kem"}</TableCell>
+                        <TableCell align="center">{item?.OrderCart?.cakeSize?.title} cm</TableCell>
+                        <TableCell align="center">{item?.OrderCart?.cakeFilling?.title}</TableCell>
+                        <TableCell align="center">{item?.OrderCart?.quantity * item?.OrderCart?.floor}</TableCell>
+                        <TableCell align="center">
+                          <Select
+                            value={item.machine || ""}
+                            onChange={(event) => handleMachineChange(event, item.id)}
+                            disabled={machinesInUse.has(item.machine)}
+                            sx={{ width: "100%" }}
+                          >
+                            {machine.map((machine) => (
+                              <MenuItem
+                                key={machine.bakingMachineID}
+                                value={machine.title}
+                                disabled={
+                                  machine.status === "Bận" && machine.title !== item.machine
+                                }
+                              >
+                                {machine.title}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </TableCell>
+                        <TableCell align="center">{item.bakingStatus}</TableCell>
+                        <TableCell align="center">
+                          {item.bakingStatus === "Chưa xử lý" ? (
+                            <Button
+                              variant="contained"
+                              onClick={() => handleStartProcessing(item.machine)}
+                              sx={{
+                                backgroundColor: "#E82552",
+                                color: "#FFFFFF",
+                                "&:hover": {
+                                  backgroundColor: "#C41C47",
+                                },
+                              }}
+                            >
+                              Bắt đầu
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="contained"
+                              onClick={() => handleOpenConfirmDialog(item.orderCakeDetailID)}
+                              sx={{
+                                backgroundColor: "#E82552",
+                                color: "#FFFFFF",
+                                "&:hover": {
+                                  backgroundColor: "#C41C47",
+                                },
+                              }}
+                            >
+                              Kết thúc
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Box>
+        {/* </Grid> */}
       </Box>
       <Snackbar
         open={openSnackbar}
