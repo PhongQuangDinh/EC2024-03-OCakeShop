@@ -80,6 +80,14 @@ const initialData = [
     status: "Chưa xử lý",
   },
 ];
+
+const initialMachines = [
+  { bakingMachineID: 1, title: "Máy 1", status: "Bận", quantityCake: 3 },
+  { bakingMachineID: 2, title: "Máy 2", status: "Bận", quantityCake: 3 },
+  { bakingMachineID: 3, title: "Máy 3", status: "Rảnh", quantityCake: 3 },
+  { bakingMachineID: 4, title: "Máy 4", status: "Rảnh", quantityCake: 3 },
+  { bakingMachineID: 5, title: "Máy 5", status: "Rảnh", quantityCake: 3 },
+];
 function CakeProcess() {
   const [data, setData] = useState(initialData);
   const [error, setError] = useState(null);
@@ -139,25 +147,39 @@ function CakeProcess() {
     setData(newData);
   };
 
-  const handleStartProcessing = (machine) => {
-    const itemsToStart = data.filter(
-      (item) => item.machine === machine && item.status === "Chưa xử lý"
-    );
+  
+const handleStartProcessing = (machine) => {
+  const itemsToStart = data.filter(
+    (item) => item.machine === machine && item.status === "Chưa xử lý"
+  );
 
-    if (!machine) {
-      setSnackbarMessage("Bạn phải chọn máy trước khi bắt đầu.");
-      setOpenSnackbar(true);
-      return;
-    }
+  const machineData = initialMachines.find((m) => m.title === machine);
 
-    if (itemsToStart.length < 5) {
-      setMachineToStart(machine);
-      setOpenNotEnoughCakeDialog(true);
-    } else {
-      setMachineToStart(machine);
-      setOpenMachineConfirmDialog(true);
-    }
-  };
+  if (!machineData) {
+    setSnackbarMessage(`Máy ${machine} không tồn tại.`);
+    setOpenSnackbar(true);
+    return;
+  }
+
+  const totalQuantity = itemsToStart.reduce((sum, item) => sum + item.quantity, 0);
+
+  if (!machine) {
+    setSnackbarMessage("Bạn phải chọn máy trước khi bắt đầu.");
+    setOpenSnackbar(true);
+    return;
+  }
+
+  if (totalQuantity < machineData.quantityCake) {
+    setMachineToStart(machine);
+    setOpenNotEnoughCakeDialog(true);
+  } else if (totalQuantity > machineData.quantityCake) {
+    setSnackbarMessage(`${machineData.title} không đủ chỗ cho ${totalQuantity} bánh. Vui lòng bỏ bớt bánh.`);
+    setOpenSnackbar(true);
+  } else {
+    setMachineToStart(machine);
+    setOpenMachineConfirmDialog(true);
+  }
+};
 
   const handleOpenConfirmDialog = (id) => {
     setCurrentItemId(id);
