@@ -235,7 +235,7 @@ const HomePage = () => {
                 <span
                   style={{
                     background:
-                      "linear-gradient(-45deg, #e250e5, #4b50e6, #e250e5, #4b50e6)",
+                      "linear-gradient(-45deg, #FF1493, #FFA500, #FF1493, #FFA500)",
                     backgroundSize: "100% 100%,0",
                     backgroundClip: "text",
                     WebkitBackgroundClip: "text",
@@ -251,11 +251,18 @@ const HomePage = () => {
                 nào, bất kỳ hương vị và màu sắc nào và cho bất kỳ ai. Đặt bánh
                 ngay!
               </StyledParagraph>
-              {!tokenUse &&
+                <div style={{ display: 'flex', gap: '50px' }}>
+              {!tokenUse && (
                 <StyledTypography>
-                  <StyledLink href={"/signin"}>Sign Up</StyledLink>
+                  <StyledLink href={"/signin"}>Sign In</StyledLink>
                 </StyledTypography>
-              }
+              )}
+              {!tokenUse && (
+                <StyledTypography>
+                  <StyledLink href={"/signup"}>Sign Up</StyledLink>
+                </StyledTypography>
+              )}
+            </div>
             </Box>
           </Grid>
           <ImgContainer

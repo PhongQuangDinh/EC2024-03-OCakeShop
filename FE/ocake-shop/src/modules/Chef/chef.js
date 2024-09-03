@@ -14,6 +14,11 @@ import {
   MenuItem,
   Button,
   Snackbar,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
 } from "@mui/material";
 import Layout from "../layout";
 import { fetchWithAuth } from "../../../WebConfig";
@@ -78,14 +83,25 @@ const initialData = [
   },
 ];
 
+const initialMachines = [
+  { bakingMachineID: 1, title: "Máy 1", status: "Bận", quantityCake: 3 },
+  { bakingMachineID: 2, title: "Máy 2", status: "Bận", quantityCake: 3 },
+  { bakingMachineID: 3, title: "Máy 3", status: "Rảnh", quantityCake: 3 },
+  { bakingMachineID: 4, title: "Máy 4", status: "Rảnh", quantityCake: 3 },
+  { bakingMachineID: 5, title: "Máy 5", status: "Rảnh", quantityCake: 3 },
+];
+
 function CakeProcess() {
   const [data, setData] = useState(initialData);
   const [error, setError] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [cake, setCake] = useState([]);
-  const [machine, setMachine] = useState([]);
-  const router = useRouter();
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [openMachineConfirmDialog, setOpenMachineConfirmDialog] = useState(false);
+  const [openNotEnoughCakeDialog, setOpenNotEnoughCakeDialog] = useState(false);
+  const [currentItemId, setCurrentItemId] = useState(null);
+  const [machineToStart, setMachineToStart] = useState('');
+  const [selectedMachine, setSelectedMachine] = useState('');
 
   useEffect(() => {
     const fetchCakeRecipe = async () => {
@@ -156,20 +172,91 @@ function CakeProcess() {
       item.id === id ? { ...item, machine: selectedMachine } : item
     );
     setData(newData);
+    setSelectedMachine(selectedMachine); // Update selectedMachine state
   };
 
   const handleStatusChange = (id, newStatus) => {
+    const item = data.find((item) => item.id === id);
+    if (!item) return;
+
     const newData = data.map((item) =>
-      item.id === id ? { ...item, status: newStatus } : item
+      item.machine === item.machine && item.status === "Đang xử lý"
+        ? { ...item, status: newStatus }
+        : item
     );
     setData(newData);
   };
 
-  const handleStartProcessing = (id) => {
-    const newData = data.map((item) =>
-      item.id === id ? { ...item, status: "Đang xử lý" } : item
+  const handleStartProcessing = (machine) => {
+    const itemsToStart = data.filter(
+      (item) => item.machine === machine && item.status === "Chưa xử lý"
     );
-    setData(newData);
+
+    const machineData = initialMachines.find((m) => m.title === machine);
+
+    if (!machineData) {
+      setSnackbarMessage(`Máy ${machine} không tồn tại.`);
+      setOpenSnackbar(true);
+      return;
+    }
+
+    const totalQuantity = itemsToStart.reduce((sum, item) => sum + item.quantity, 0);
+
+    if (!machine) {
+      setSnackbarMessage("Bạn phải chọn máy trước khi bắt đầu.");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    if (totalQuantity < machineData.quantityCake) {
+      setMachineToStart(machine);
+      setOpenNotEnoughCakeDialog(true);
+    } else if (totalQuantity > machineData.quantityCake) {
+      setSnackbarMessage(`${machineData.title} không đủ chỗ cho ${totalQuantity} bánh. Vui lòng bỏ bớt bánh.`);
+      setOpenSnackbar(true);
+    } else {
+      setMachineToStart(machine);
+      setOpenMachineConfirmDialog(true);
+    }
+  };
+
+  const handleOpenConfirmDialog = (id) => {
+    setCurrentItemId(id);
+    setOpenConfirmDialog(true);
+  };
+
+  const handleCloseConfirmDialog = (confirm) => {
+    if (confirm && currentItemId !== null) {
+      const currentItem = data.find((item) => item.id === currentItemId);
+      if (currentItem) {
+        const newData = data.map((item) =>
+          item.machine === currentItem.machine && item.status === "Đang xử lý"
+            ? { ...item, status: "Kết thúc" }
+            : item
+        );
+        setData(newData);
+      }
+    }
+    setOpenConfirmDialog(false);
+  };
+
+  const handleCloseMachineConfirmDialog = (confirm) => {
+    if (confirm && machineToStart) {
+      const newData = data.map((item) =>
+        item.machine === machineToStart && item.status === "Chưa xử lý"
+          ? { ...item, status: "Đang xử lý" }
+          : item
+      );
+      setData(newData);
+    }
+    setOpenMachineConfirmDialog(false);
+  };
+
+  const handleCloseNotEnoughCakeDialog = (confirm) => {
+    if (confirm) {
+      handleCloseMachineConfirmDialog(true); // Automatically confirm machine start
+    }
+    setOpenNotEnoughCakeDialog(false);
   };
 
   const handleCloseSnackbar = () => {
@@ -185,8 +272,7 @@ function CakeProcess() {
   return (
     <Layout>
       <Box sx={{ background: "#E5E5E5", minHeight: "100vh", padding: "0px" }}>
-        <Box sx={{ height: "90px", backgroundColor: "#FBF0D4" }} />{" "}
-        {/* Viền màu vàng trên đầu */}
+        <Box sx={{ height: "90px", backgroundColor: "#FBF0D4" }} />
         <Typography
           variant="h4"
           align="left"
@@ -200,112 +286,185 @@ function CakeProcess() {
         >
           Ocake Shop | Bếp làm bánh
         </Typography>
-        <TableContainer
-          component={Paper}
-          sx={{ margin: "auto", maxWidth: "1200px", marginTop: "30px" }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell align="left" sx={{ fontWeight: "bold" }}>
-                  Tên sản phẩm
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                  Kích thước
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                  Số lượng
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                  Máy nướng bánh
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                  Trạng thái làm bánh
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                  Thao tác
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {cake.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell align="left">{"Bánh kem nhân " + row.OrderCart?.cakeFilling.title + " kích thước " + row.OrderCart?.cakeSize.title}</TableCell>
-                  <TableCell align="center">{row.OrderCart?.cakeSize.title}</TableCell>
-                  <TableCell align="center">{row.OrderCart?.quantity * row.OrderCart?.floor}</TableCell>
-                  <TableCell align="center">
-                    <Select
-                      value={row.machine}
-                      onChange={(e) => handleMachineChange(e, row.id)}
-                      displayEmpty
-                      sx={{ minWidth: 120 }}
-                      disabled={row.status === "Đang xử lý"}
-                    >
-                      <MenuItem value="">Chưa xử lý</MenuItem>
-                      {["Máy 1", "Máy 2", "Máy 3", "Máy 4", "Máy 5"].map(
-                        (machine) => (
-                          <MenuItem
-                            key={machine}
-                            value={machine}
-                            disabled={machinesInUse.has(machine)}
+        <Grid container spacing={2} sx={{ marginTop: "30px" }}>
+          <Grid item xs={3}>
+            <TableContainer component={Paper} sx={{ marginLeft: "20px" }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="left" sx={{ fontWeight: "bold" }}>
+                      Máy nướng
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Trạng thái
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Số lượng
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {initialMachines.map((machine) => (
+                    <TableRow key={machine.bakingMachineID}>
+                      <TableCell align="left">{machine.title}</TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          color: machine.status === "Bận" ? "red" : "green",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {machine.status}
+                      </TableCell>
+                      <TableCell align="center">{machine.quantityCake}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+          <Grid item xs={9}>
+            <TableContainer component={Paper} sx={{ marginRight: "20px" }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Tên bánh
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Kích thước
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Số lượng
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Máy
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Trạng thái
+                    </TableCell>
+                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                      Hành động
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell align="center">{item.name}</TableCell>
+                      <TableCell align="center">{item.size} cm</TableCell>
+                      <TableCell align="center">{item.quantity}</TableCell>
+                      <TableCell align="center">
+                        <Select
+                          value={item.machine || ""}
+                          onChange={(event) => handleMachineChange(event, item.id)}
+                          disabled={machinesInUse.has(item.machine)}
+                          sx={{ width: "100%" }}
+                        >
+                          {initialMachines.map((machine) => (
+                            <MenuItem
+                              key={machine.bakingMachineID}
+                              value={machine.title}
+                              disabled={
+                                machine.status === "Bận" && machine.title !== item.machine
+                              }
+                            >
+                              {machine.title}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </TableCell>
+                      <TableCell align="center">{item.status}</TableCell>
+                      <TableCell align="center">
+                        {item.status === "Chưa xử lý" ? (
+                          <Button
+                            variant="contained"
+                            onClick={() => handleStartProcessing(item.machine)}
+                            sx={{
+                              backgroundColor: "#E82552",
+                              color: "#FFFFFF",
+                              "&:hover": {
+                                backgroundColor: "#C41C47",
+                              },
+                            }}
                           >
-                            {machine}
-                          </MenuItem>
-                        )
-                      )}
-                    </Select>
-                  </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{
-                      color:
-                        row.bakingStatus === "Đang xử lý"
-                          ? "blue"
-                          : row.bakingStatus === "Đã xử lý"
-                          ? "red"
-                          : "black",
-                    }}
-                  >
-                    {row.bakingStatus}
-                  </TableCell>
-                  <TableCell align="center">
-                    {row.bakingStatus === "Chưa xử lý" && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleStartProcessing(row.orderCakeDetailID)}
-                      >
-                        Bắt đầu
-                      </Button>
-                    )}
-                    {row.bakingStatus === "Đang xử lý" && (
-                      <Button
-                        variant="text"
-                        color="error"
-                        onClick={() => handleStatusChange(row.orderCakeDetailID, "Kết thúc")}
-                      >
-                        Kết thúc
-                      </Button>
-                    )}
-                    {row.bakingStatus === "Đã xử lý" && (
-                      <Button variant="text" color="secondary" disabled>
-                        Hoàn thành
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          message={snackbarMessage}
-        />
+                            Bắt đầu
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            onClick={() => handleOpenConfirmDialog(item.id)}
+                            sx={{
+                              backgroundColor: "#E82552",
+                              color: "#FFFFFF",
+                              "&:hover": {
+                                backgroundColor: "#C41C47",
+                              },
+                            }}
+                          >
+                            Kết thúc
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
+        </Grid>
       </Box>
-      <Box sx={{ paddingTop: "20px", background: "#E5E5E5" }}></Box>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />
+      <Dialog
+        open={openConfirmDialog}
+        onClose={() => handleCloseConfirmDialog(false)}
+      >
+        <DialogTitle>Xác nhận</DialogTitle>
+        <DialogContent>Bạn có chắc chắn muốn kết thúc quá trình?</DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleCloseConfirmDialog(false)}>Hủy</Button>
+          <Button onClick={() => handleCloseConfirmDialog(true)} autoFocus>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openMachineConfirmDialog}
+        onClose={() => handleCloseMachineConfirmDialog(false)}
+      >
+        <DialogTitle>Xác nhận</DialogTitle>
+        <DialogContent>Bạn có chắc chắn muốn bắt đầu quá trình?</DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleCloseMachineConfirmDialog(false)}>
+            Hủy
+          </Button>
+          <Button onClick={() => handleCloseMachineConfirmDialog(true)} autoFocus>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openNotEnoughCakeDialog}
+        onClose={() => handleCloseNotEnoughCakeDialog(false)}
+      >
+        <DialogTitle>Xác nhận</DialogTitle>
+        <DialogContent>
+          Số lượng bánh chưa đủ. Bạn có chắc chắn muốn bắt đầu quá trình không?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleCloseNotEnoughCakeDialog(false)}>
+            Hủy
+          </Button>
+          <Button onClick={() => handleCloseNotEnoughCakeDialog(true)} autoFocus>
+            Xác nhận
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Layout>
   );
 }
