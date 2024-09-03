@@ -14,6 +14,10 @@ import {
   MenuItem,
   Button,
   Snackbar,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import Layout from "../layout";
 import { fetchWithAuth } from "../../../WebConfig";
@@ -76,12 +80,17 @@ const initialData = [
     status: "Chưa xử lý",
   },
 ];
-
 function CakeProcess() {
   const [data, setData] = useState(initialData);
   const [error, setError] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [openMachineConfirmDialog, setOpenMachineConfirmDialog] = useState(false);
+  const [openNotEnoughCakeDialog, setOpenNotEnoughCakeDialog] = useState(false);
+  const [currentItemId, setCurrentItemId] = useState(null);
+  const [machineToStart, setMachineToStart] = useState('');
+  const [selectedMachine, setSelectedMachine] = useState('');
 
   useEffect(() => {
     const fetchCakeRecipe = async () => {
@@ -115,20 +124,78 @@ function CakeProcess() {
       item.id === id ? { ...item, machine: selectedMachine } : item
     );
     setData(newData);
+    setSelectedMachine(selectedMachine); // Update selectedMachine state
   };
 
   const handleStatusChange = (id, newStatus) => {
+    const item = data.find((item) => item.id === id);
+    if (!item) return;
+
     const newData = data.map((item) =>
-      item.id === id ? { ...item, status: newStatus } : item
+      item.machine === item.machine && item.status === "Đang xử lý"
+        ? { ...item, status: newStatus }
+        : item
     );
     setData(newData);
   };
 
-  const handleStartProcessing = (id) => {
-    const newData = data.map((item) =>
-      item.id === id ? { ...item, status: "Đang xử lý" } : item
+  const handleStartProcessing = (machine) => {
+    const itemsToStart = data.filter(
+      (item) => item.machine === machine && item.status === "Chưa xử lý"
     );
-    setData(newData);
+
+    if (!machine) {
+      setSnackbarMessage("Bạn phải chọn máy trước khi bắt đầu.");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    if (itemsToStart.length < 5) {
+      setMachineToStart(machine);
+      setOpenNotEnoughCakeDialog(true);
+    } else {
+      setMachineToStart(machine);
+      setOpenMachineConfirmDialog(true);
+    }
+  };
+
+  const handleOpenConfirmDialog = (id) => {
+    setCurrentItemId(id);
+    setOpenConfirmDialog(true);
+  };
+
+  const handleCloseConfirmDialog = (confirm) => {
+    if (confirm && currentItemId !== null) {
+      const currentItem = data.find((item) => item.id === currentItemId);
+      if (currentItem) {
+        const newData = data.map((item) =>
+          item.machine === currentItem.machine && item.status === "Đang xử lý"
+            ? { ...item, status: "Kết thúc" }
+            : item
+        );
+        setData(newData);
+      }
+    }
+    setOpenConfirmDialog(false);
+  };
+
+  const handleCloseMachineConfirmDialog = (confirm) => {
+    if (confirm && machineToStart) {
+      const newData = data.map((item) =>
+        item.machine === machineToStart && item.status === "Chưa xử lý"
+          ? { ...item, status: "Đang xử lý" }
+          : item
+      );
+      setData(newData);
+    }
+    setOpenMachineConfirmDialog(false);
+  };
+
+  const handleCloseNotEnoughCakeDialog = (confirm) => {
+    if (confirm) {
+      handleCloseMachineConfirmDialog(true); // Automatically confirm machine start
+    }
+    setOpenNotEnoughCakeDialog(false);
   };
 
   const handleCloseSnackbar = () => {
@@ -144,8 +211,7 @@ function CakeProcess() {
   return (
     <Layout>
       <Box sx={{ background: "#E5E5E5", minHeight: "100vh", padding: "0px" }}>
-        <Box sx={{ height: "90px", backgroundColor: "#FBF0D4" }} />{" "}
-        {/* Viền màu vàng trên đầu */}
+        <Box sx={{ height: "90px", backgroundColor: "#FBF0D4" }} />
         <Typography
           variant="h4"
           align="left"
@@ -221,34 +287,36 @@ function CakeProcess() {
                         row.status === "Đang xử lý"
                           ? "blue"
                           : row.status === "Kết thúc"
-                          ? "red"
-                          : "black",
+                          ? "green"
+                          : "red",
+                      fontWeight: "bold",
                     }}
                   >
                     {row.status}
                   </TableCell>
                   <TableCell align="center">
-                    {row.status === "Chưa xử lý" && (
+                    {row.status === "Chưa xử lý" && row.machine && (
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => handleStartProcessing(row.id)}
+                        onClick={() => handleStartProcessing(row.machine)}
+                        disabled={!row.machine}
                       >
                         Bắt đầu
                       </Button>
                     )}
                     {row.status === "Đang xử lý" && (
                       <Button
-                        variant="text"
+                        variant="contained"
                         color="error"
-                        onClick={() => handleStatusChange(row.id, "Kết thúc")}
+                        onClick={() => handleOpenConfirmDialog(row.id)}
                       >
                         Kết thúc
                       </Button>
                     )}
                     {row.status === "Kết thúc" && (
                       <Button variant="text" color="secondary" disabled>
-                        Hoàn thành
+                        Đã hoàn thành
                       </Button>
                     )}
                   </TableCell>
@@ -257,6 +325,86 @@ function CakeProcess() {
             </TableBody>
           </Table>
         </TableContainer>
+
+        <Dialog
+          open={openMachineConfirmDialog}
+          onClose={() => handleCloseMachineConfirmDialog(false)}
+        >
+          <DialogTitle>Xác nhận bắt đầu làm bánh</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Bạn có chắc chắn muốn bắt đầu làm bánh với máy {machineToStart}?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => handleCloseMachineConfirmDialog(false)}
+              color="primary"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={() => handleCloseMachineConfirmDialog(true)}
+              color="secondary"
+            >
+              Xác nhận
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={openNotEnoughCakeDialog}
+          onClose={() => handleCloseNotEnoughCakeDialog(false)}
+        >
+          <DialogTitle>Số lượng bánh chưa đủ</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Số lượng bánh chưa đủ để bắt đầu làm bánh với máy {machineToStart}.
+              Bạn có muốn quay lại chọn thêm bánh hoặc tiếp tục làm bánh không?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => handleCloseNotEnoughCakeDialog(false)}
+              color="primary"
+            >
+              Quay lại chọn thêm
+            </Button>
+            <Button
+              onClick={() => handleCloseNotEnoughCakeDialog(true)}
+              color="secondary"
+            >
+              Xác nhận làm bánh
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={openConfirmDialog}
+          onClose={() => handleCloseConfirmDialog(false)}
+        >
+          <DialogTitle>Xác nhận kết thúc</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Bạn có chắc chắn muốn kết thúc làm bánh cho sản phẩm này?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => handleCloseConfirmDialog(false)}
+              color="primary"
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={() => handleCloseConfirmDialog(true)}
+              color="secondary"
+            >
+              Xác nhận
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
@@ -264,7 +412,6 @@ function CakeProcess() {
           message={snackbarMessage}
         />
       </Box>
-      <Box sx={{ paddingTop: "20px", background: "#E5E5E5" }}></Box>
     </Layout>
   );
 }
