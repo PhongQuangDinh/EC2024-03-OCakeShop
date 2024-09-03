@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import Layout from "../layout";
 import { fetchWithAuth } from "../../../WebConfig";
+import { useRouter } from "next/navigation";
 
 const initialData = [
   {
@@ -82,6 +83,9 @@ function CakeProcess() {
   const [error, setError] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [cake, setCake] = useState([]);
+  const [machine, setMachine] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCakeRecipe = async () => {
@@ -95,6 +99,43 @@ function CakeProcess() {
     };
 
     fetchCakeRecipe();
+  }, []);
+
+  useEffect(() => {
+    const fetchCake =async () => {
+      try{
+        const data = await fetchWithAuth(router, "/recipe/cake");
+        if(!data){
+          console.log("Dont have cake");
+          return;
+        }
+        console.log(data);
+        setCake(data || "");
+      }
+      catch(error){
+        setError(error.message);
+        console.log(error+ " SOSSSSSS");
+      }
+    };
+    fetchCake();
+  }, []);
+
+  useEffect(() => {
+    const fetchMachine =async () => {
+      try{
+        const data = await fetchWithAuth(router, "/recipe/machine");
+        if(!data){
+          console.log("Dont have cake");
+          return;
+        }
+        setMachine(data || "");
+      }
+      catch(error){
+        setError(error.message);
+        console.log(error+ " SOSSSSSS");
+      }
+    };
+    fetchMachine();
   }, []);
 
   const handleMachineChange = (event, id) => {
@@ -187,11 +228,11 @@ function CakeProcess() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((row) => (
+              {cake.map((row) => (
                 <TableRow key={row.id}>
-                  <TableCell align="left">{row.name}</TableCell>
-                  <TableCell align="center">{row.size}</TableCell>
-                  <TableCell align="center">{row.quantity}</TableCell>
+                  <TableCell align="left">{"Bánh kem nhân " + row.OrderCart?.cakeFilling.title + " kích thước " + row.OrderCart?.cakeSize.title}</TableCell>
+                  <TableCell align="center">{row.OrderCart?.cakeSize.title}</TableCell>
+                  <TableCell align="center">{row.OrderCart?.quantity * row.OrderCart?.floor}</TableCell>
                   <TableCell align="center">
                     <Select
                       value={row.machine}
@@ -218,35 +259,35 @@ function CakeProcess() {
                     align="center"
                     sx={{
                       color:
-                        row.status === "Đang xử lý"
+                        row.bakingStatus === "Đang xử lý"
                           ? "blue"
-                          : row.status === "Kết thúc"
+                          : row.bakingStatus === "Đã xử lý"
                           ? "red"
                           : "black",
                     }}
                   >
-                    {row.status}
+                    {row.bakingStatus}
                   </TableCell>
                   <TableCell align="center">
-                    {row.status === "Chưa xử lý" && (
+                    {row.bakingStatus === "Chưa xử lý" && (
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => handleStartProcessing(row.id)}
+                        onClick={() => handleStartProcessing(row.orderCakeDetailID)}
                       >
                         Bắt đầu
                       </Button>
                     )}
-                    {row.status === "Đang xử lý" && (
+                    {row.bakingStatus === "Đang xử lý" && (
                       <Button
                         variant="text"
                         color="error"
-                        onClick={() => handleStatusChange(row.id, "Kết thúc")}
+                        onClick={() => handleStatusChange(row.orderCakeDetailID, "Kết thúc")}
                       >
                         Kết thúc
                       </Button>
                     )}
-                    {row.status === "Kết thúc" && (
+                    {row.bakingStatus === "Đã xử lý" && (
                       <Button variant="text" color="secondary" disabled>
                         Hoàn thành
                       </Button>
