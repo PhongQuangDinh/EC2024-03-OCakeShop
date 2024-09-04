@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "orderCakeID",
         as: "OrderDetails",
       });
+      OrderCakeDetail.belongsTo(models.BakingMachine, {
+        foreignKey: "bakingMachineID",
+        as: "Machine",
+      });
     }
   }
 
@@ -45,6 +49,9 @@ module.exports = (sequelize, DataTypes) => {
       arrange: {
         type: DataTypes.INTEGER,
       },
+      bakingMachineID: {
+        type: DataTypes.INTEGER,
+      }
     },
     {
       sequelize,

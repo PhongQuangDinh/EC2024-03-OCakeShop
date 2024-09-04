@@ -29,6 +29,10 @@ export default function ProcessOrder() {
 
   const handleUpdate = async () => {
     try {
+      // console.log("Update "+ );
+      for( const row of rows){
+        console.log(row);
+      }
       const data = await fetchWithAuth(router, "/ordercake/manage/update", {
         method: "POST",
         body: JSON.stringify(rows),
@@ -90,6 +94,12 @@ export default function ProcessOrder() {
   const moveRow = (index, direction) => {
     const newRows = [...rows];
     const targetIndex = direction === "up" ? index - 1 : index + 1;
+
+    if (targetIndex >= 0 && targetIndex < newRows.length) {
+      const temp = newRows[targetIndex].arrange;
+      newRows[targetIndex].arrange = newRows[index].arrange;
+      newRows[index].arrange = temp;
+    }
 
     if (targetIndex >= 0 && targetIndex < newRows.length) {
       const temp = newRows[targetIndex];
@@ -170,7 +180,7 @@ export default function ProcessOrder() {
                     {"Bánh kem nhân " +
                       row.OrderCart?.cakeFilling.title +
                       " kích thước " +
-                      row.OrderCart?.cakeSize.title}
+                      row.OrderCart?.cakeSize.title + " " + row.orderCakeDetailID}
                   </TableCell>
                   <TableCell align="center">
                     {row.OrderCart?.quantity}
@@ -180,7 +190,7 @@ export default function ProcessOrder() {
                     {row.bakingStatus ? row.bakingStatus : "Chưa xử lý"}
                   </TableCell>
                   <TableCell align="center">
-                    {new Date(row.Order?.pickUpTime).toLocaleDateString(
+                    {new Date(row.OrderDetails?.pickUpTime).toLocaleDateString(
                       "vi-VN"
                     )}
                   </TableCell>

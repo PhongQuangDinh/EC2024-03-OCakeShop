@@ -105,20 +105,21 @@ function CakeProcess() {
   const [cake, setCake] = useState([]);
   const [machine, setMachine] = useState([]);
   const router = useRouter();
+  const [cakeCook, setCakeCook] = useState([]);
 
-  useEffect(() => {
-    const fetchCakeRecipe = async () => {
-      try {
-        const data = await fetchWithAuth(router, "/recipe");
-        setData(data || "");
-        console.log(data);
-      } catch (err) {
-        setError("SOS " + err.message);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCakeRecipe = async () => {
+  //     try {
+  //       const data = await fetchWithAuth(router, "/recipe");
+  //       setData(data || "");
+  //       console.log(data);
+  //     } catch (err) {
+  //       setError("SOS " + err.message);
+  //     }
+  //   };
 
-    fetchCakeRecipe();
-  }, []);
+  //   fetchCakeRecipe();
+  // }, []);
 
   useEffect(() => {
     const fetchCake =async () => {
@@ -139,12 +140,38 @@ function CakeProcess() {
     fetchCake();
   }, []);
 
+  // useEffect(() => {
+  //   const fetchCake = async () => {
+  //     try {
+  //       const data = await fetchWithAuth(router, "/recipe/cake");
+  //       if (!data) {
+  //         console.log("Don't have cake");
+  //         return;
+  //       }
+        
+  //       // Add a 'machine' property to each cake item
+  //       const updatedData = data.map(cakeItem => ({
+  //         ...cakeItem,
+  //         machine: '' // You can initialize this with an empty string or a default value
+  //       }));
+  
+  //       console.log(updatedData);
+  //       setCake(updatedData || []);
+  //     } catch (error) {
+  //       setError(error.message);
+  //       console.log(error + " SOSSSSSS");
+  //     }
+  //   };
+  
+  //   fetchCake();
+  // }, []);
+
   useEffect(() => {
-    const fetchMachine =async () => {
+    const fetchMachine = async () => {
       try{
         const data = await fetchWithAuth(router, "/recipe/machine");
         if(!data){
-          console.log("Dont have cake");
+          console.log("Dont have machine");
           return;
         }
         console.log(data);
@@ -160,10 +187,21 @@ function CakeProcess() {
 
   const handleMachineChange = (event, id) => {
     const selectedMachine = event.target.value;
-    const isMachineInUse = data.some(
+  
+    if (selectedMachine == "Chưa xử lý") {
+      // Handle logic for "Chưa xử lý" if needed
+      const newData = cake.map((item) =>
+        item.orderCakeDetailID === id ? { ...item, bakingMachineID: "" } : item
+      );
+      setCake(newData);
+      return;
+    }
+  
+    // Check if the selected machine is in use by another item
+    const isMachineInUse = cake.some(
       (item) => item.machine === selectedMachine && item.status === "Đang xử lý"
     );
-
+  
     if (isMachineInUse) {
       setSnackbarMessage(
         `Máy ${selectedMachine} đang được sử dụng. Vui lòng chọn máy khác.`
@@ -171,13 +209,14 @@ function CakeProcess() {
       setOpenSnackbar(true);
       return;
     }
-
-    const newData = data.map((item) =>
-      item.id === id ? { ...item, machine: selectedMachine } : item
+  
+    // Update the selected machine for the specific item
+    const newData = cake.map((item) =>
+      item.orderCakeDetailID === id ? { ...item, bakingMachineID: selectedMachine } : item
     );
-    setData(newData);
-    setSelectedMachine(selectedMachine); // Update selectedMachine state
+    setCake(newData);
   };
+  
 
   const handleStatusChange = (id, newStatus) => {
     const item = data.find((item) => item.id === id);
@@ -191,35 +230,39 @@ function CakeProcess() {
     setData(newData);
   };
 
-  const handleStartProcessing = (machine) => {
-    const itemsToStart = data.filter(
-      (item) => item.machine === machine && item.status === "Chưa xử lý"
+  const handleStartProcessing = (bakingMachineID) => {
+    console.log("Machine " + bakingMachineID);
+    const itemsToStart = cake.filter(
+      (item) => item.bakingMachineID === bakingMachineID && item.bakingStatus === "Chưa xử lý"
     );
 
-    const machineData = initialMachines.find((m) => m.title === machine);
+    const machineData = machine.find((m) => m.bakingMachineID === bakingMachineID);
+    // console.log("Machine Data Found:", machineData);
 
-    if (!machineData) {
-      setSnackbarMessage(`Máy ${machine} không tồn tại.`);
-      setOpenSnackbar(true);
-      return;
-    }
-
-    const totalQuantity = itemsToStart.reduce((sum, item) => sum + item.quantity, 0);
-
-    if (!machine) {
+    if (!bakingMachineID) {
       setSnackbarMessage("Bạn phải chọn máy trước khi bắt đầu.");
       setOpenSnackbar(true);
       return;
     }
 
+    if (!machineData) {
+      setSnackbarMessage(`Máy ${machineData.title} không tồn tại.`);
+      setOpenSnackbar(true);
+      return;
+    }
+
+    const totalQuantity = itemsToStart.reduce((sum, item) => sum + (item?.OrderCart?.quantity * item?.OrderCart?.floor), 0);
+
+    console.log(`${totalQuantity}`);
+
     if (totalQuantity < machineData.quantityCake) {
-      setMachineToStart(machine);
+      setMachineToStart(bakingMachineID);
       setOpenNotEnoughCakeDialog(true);
     } else if (totalQuantity > machineData.quantityCake) {
       setSnackbarMessage(`${machineData.title} không đủ chỗ cho ${totalQuantity} bánh. Vui lòng bỏ bớt bánh.`);
       setOpenSnackbar(true);
     } else {
-      setMachineToStart(machine);
+      setMachineToStart(bakingMachineID);
       setOpenMachineConfirmDialog(true);
     }
   };
@@ -231,27 +274,150 @@ function CakeProcess() {
 
   const handleCloseConfirmDialog = (confirm) => {
     if (confirm && currentItemId !== null) {
-      const currentItem = data.find((item) => item.id === currentItemId);
+      const currentItem = cake.find((item) => item.orderCakeDetailID === currentItemId);
+      
       if (currentItem) {
-        const newData = data.map((item) =>
-          item.machine === currentItem.machine && item.status === "Đang xử lý"
-            ? { ...item, status: "Kết thúc" }
+        // Lấy ID máy nướng của bánh hiện tại
+        const machineId = currentItem.bakingMachineID;
+  
+        // Cập nhật trạng thái của các bánh cùng máy
+        const newDataCake = cake.map((item) =>
+          item.bakingMachineID === machineId && item.bakingStatus === "Đang xử lý"
+            ? { ...item, bakingStatus: "Đã xử lý" }
             : item
         );
-        setData(newData);
+        console.log(newDataCake);
+        completeCookCake(newDataCake);
+        setCake(newDataCake);  
+  
+        const newDataMachine = machine.map((m) =>
+          m.bakingMachineID === machineId
+            ? { ...m, status: "Rảnh" }
+            : m
+        );
+        notActiveMachine(newDataMachine);
+        setMachine(newDataMachine);
       }
     }
     setOpenConfirmDialog(false);
   };
+  
+  const activeMachine = async (machine) => {
+    try{
+      const data = await fetchWithAuth(router, "/recipe/machine/active",{
+        method: "POST",
+        body: JSON.stringify(machine),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if(!data){
+        console.log("Dont update machine");
+        return;
+      }
+      console.log(data);
+      // setMachine(data || "");
+    }
+    catch(error){
+      setError(error.message);
+      console.log(error+ " SOSSSSSS");
+    }
+  };
+
+  const activeCake = async (cakes) => {
+    try{
+      const data = await fetchWithAuth(router, "/recipe/cake/active",{
+        method: "POST",
+        body: JSON.stringify(cakes),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if(!data){
+        console.log("Dont update cake");
+        return;
+      }
+      console.log(data);
+      // setMachine(data || "");
+    }
+    catch(error){
+      setError(error.message);
+      console.log(error+ " SOSSSSSS");
+    }
+  };
+
+  const completeCookCake = async (cakes) => {
+    try{
+      const data = await fetchWithAuth(router, "/recipe/cake/complete",{
+        method: "POST",
+        body: JSON.stringify(cakes),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if(!data){
+        console.log("Dont update cake");
+        return;
+      }
+      console.log(data);
+      // setMachine(data || "");
+    }
+    catch(error){
+      setError(error.message);
+      console.log(error+ " SOSSSSSS");
+    }
+  };
+
+
+  const notActiveMachine = async (machine) => {
+    try{
+      const data = await fetchWithAuth(router, "/recipe/machine/not-active",{
+        method: "POST",
+        body: JSON.stringify(machine),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if(!data){
+        console.log("Dont update machine");
+        return;
+      }
+      console.log(data);
+      // setMachine(data || "");
+    }
+    catch(error){
+      setError(error.message);
+      console.log(error+ " SOSSSSSS");
+    }
+  };
 
   const handleCloseMachineConfirmDialog = (confirm) => {
+    // console.log("handleCloseMachineConfirmDialog");
+    const previousCakeData = [...cake];
     if (confirm && machineToStart) {
-      const newData = data.map((item) =>
-        item.machine === machineToStart && item.status === "Chưa xử lý"
-          ? { ...item, status: "Đang xử lý" }
+      // let bakingMachineID;
+      // console.log("handleCloseMachineConfirmDialog START");
+      const newData = cake.map((item) =>
+        item.bakingMachineID === machineToStart && item.bakingStatus === "Chưa xử lý"
+          ? { ...item, bakingStatus: "Đang xử lý" }
           : item
       );
-      setData(newData);
+      console.log(newData);
+      setCake(newData);
+      activeCake(newData);
+      console.log(newData);
+      const newDataMachine = machine.map((item) =>
+        item.bakingMachineID === machineToStart && item.status === "Rảnh"
+          ? { ...item, status: "Bận" }
+          : item
+      );
+      setMachine(newDataMachine);
+      activeMachine(newDataMachine);
+      const changedCakes = newData.filter((item, index) => 
+        item.bakingStatus !== previousCakeData[index].bakingStatus
+      );
+      // console.log(changedCakes);
+      setCakeCook(changedCakes);
     }
     setOpenMachineConfirmDialog(false);
   };
@@ -337,7 +503,7 @@ function CakeProcess() {
                   <TableHead>
                     <TableRow>
                       <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        Tên bánh
+                        Số thứ tự
                       </TableCell>
                       <TableCell align="center" sx={{ fontWeight: "bold" }}>
                         Kích thước
@@ -360,38 +526,40 @@ function CakeProcess() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {cake.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell align="center">{"Bánh kem"}</TableCell>
+                    {cake.map((item, index) => (
+                      <TableRow key={item?.orderCakeDetailID}>
+                        <TableCell align="center">{index+1}</TableCell>
                         <TableCell align="center">{item?.OrderCart?.cakeSize?.title} cm</TableCell>
                         <TableCell align="center">{item?.OrderCart?.cakeFilling?.title}</TableCell>
                         <TableCell align="center">{item?.OrderCart?.quantity * item?.OrderCart?.floor}</TableCell>
                         <TableCell align="center">
-                          <Select
-                            value={item.machine || ""}
-                            onChange={(event) => handleMachineChange(event, item.id)}
-                            disabled={machinesInUse.has(item.machine)}
-                            sx={{ width: "100%" }}
-                          >
-                            {machine.map((machine) => (
-                              <MenuItem
-                                key={machine.bakingMachineID}
-                                value={machine.title}
-                                disabled={
-                                  machine.status === "Bận" && machine.title !== item.machine
-                                }
-                              >
-                                {machine.title}
-                              </MenuItem>
-                            ))}
-                          </Select>
+                        <Select
+                          value={item.bakingMachineID || "Chưa xử lý"} // Ensure default value is empty string
+                          onChange={(event) => handleMachineChange(event, item.orderCakeDetailID)}
+                          disabled={machinesInUse.has(item.machine)}
+                          sx={{ width: "100%" }}
+                        >
+                          <MenuItem value="">Chưa xử lý</MenuItem>
+                          {machine.map((m) => (
+                            <MenuItem
+                              key={m.bakingMachineID}
+                              value={m.bakingMachineID}
+                              disabled={
+                                m.status === "Bận" && m.bakingMachineID !== item.bakingMachineID
+                              }
+                            >
+                              {m.title}
+                            </MenuItem>
+                          ))}
+                        </Select>
+
                         </TableCell>
                         <TableCell align="center">{item.bakingStatus}</TableCell>
                         <TableCell align="center">
                           {item.bakingStatus === "Chưa xử lý" ? (
                             <Button
                               variant="contained"
-                              onClick={() => handleStartProcessing(item.machine)}
+                              onClick={() => handleStartProcessing(item.bakingMachineID)}
                               sx={{
                                 backgroundColor: "#E82552",
                                 color: "#FFFFFF",
