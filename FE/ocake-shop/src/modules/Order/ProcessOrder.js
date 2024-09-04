@@ -180,7 +180,7 @@ export default function ProcessOrder() {
                     {"Bánh kem nhân " +
                       row.OrderCart?.cakeFilling.title +
                       " kích thước " +
-                      row.OrderCart?.cakeSize.title + " " + row.orderCakeDetailID}
+                      row.OrderCart?.cakeSize.title}
                   </TableCell>
                   <TableCell align="center">
                     {row.OrderCart?.quantity}
