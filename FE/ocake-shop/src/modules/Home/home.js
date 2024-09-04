@@ -32,6 +32,7 @@ const HomePage = () => {
   const apiUrl = getApiUrl();
   const router = useRouter();
   const [selectCake, setSelectCake] = useState("");
+  const [tokenUse, setTokenUser] = useState('');
 
   useEffect(() => {
     GetCategory();
@@ -111,6 +112,11 @@ const HomePage = () => {
 
   const GetInforCake = async () => {
     try {
+      if (typeof window !== "undefined") {
+        // Code này chỉ chạy trên client-side
+        setTokenUser(localStorage.getItem('token'));
+      }
+      
       const response = await fetch(`${apiUrl}/cake/`, {
         method: "GET",
         headers: {
@@ -229,7 +235,7 @@ const HomePage = () => {
                 <span
                   style={{
                     background:
-                      "linear-gradient(-45deg, #e250e5, #4b50e6, #e250e5, #4b50e6)",
+                      "linear-gradient(-45deg, #FF1493, #FFA500, #FF1493, #FFA500)",
                     backgroundSize: "100% 100%,0",
                     backgroundClip: "text",
                     WebkitBackgroundClip: "text",
@@ -245,9 +251,18 @@ const HomePage = () => {
                 nào, bất kỳ hương vị và màu sắc nào và cho bất kỳ ai. Đặt bánh
                 ngay!
               </StyledParagraph>
-              <StyledTypography>
-                <StyledLink href={"/signin"}>Sign Up</StyledLink>
-              </StyledTypography>
+                <div style={{ display: 'flex', gap: '50px' }}>
+              {!tokenUse && (
+                <StyledTypography>
+                  <StyledLink href={"/signin"}>Sign In</StyledLink>
+                </StyledTypography>
+              )}
+              {!tokenUse && (
+                <StyledTypography>
+                  <StyledLink href={"/signup"}>Sign Up</StyledLink>
+                </StyledTypography>
+              )}
+            </div>
             </Box>
           </Grid>
           <ImgContainer

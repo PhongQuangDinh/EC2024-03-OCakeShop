@@ -123,10 +123,10 @@ const NavBar = () => {
           onClick={handleCloseUserMenu}
           onClose={handleCloseUserMenu}
         >
-          <MenuItem onClick={handleGetProfile}>Profile</MenuItem>
-          <MenuItem>
+          {/* <MenuItem onClick={handleGetProfile}>Profile</MenuItem> */}
+          <MenuItem onClick={handleGetProfile}>
             <UploadFileOutlined />
-            Upload
+            Profile
           </MenuItem>
           <MenuItem onClick={handleLogout}>
             <LogoutOutlined />
