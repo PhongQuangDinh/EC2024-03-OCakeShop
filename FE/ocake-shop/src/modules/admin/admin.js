@@ -19,6 +19,8 @@ export default function Admin() {
   const [error, setError] = React.useState(null);
   const [CakeData, setCakeData] = React.useState([]);
   const [OrderData, setOrderData] = React.useState([]);
+  const [UserData, setUserData] = React.useState([]);
+  const [PaymentData, setPaymentData] = React.useState([]);
   const router = useRouter();
 
   React.useEffect(() => {
@@ -47,25 +49,49 @@ export default function Admin() {
     fetchOrder();
   }, []);
 
-  console.log(OrderData);
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await fetchWithAuth(router, "/user");
+        setUserData(data.length || "");
+      } catch (err) {
+        setError("SOS " + err.message);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  React.useEffect(() => {
+    const fetchPayment = async () => {
+      try {
+        const data = await fetchWithAuth(router, "/payment");
+        setPaymentData(data.reduce((sum, item) => sum + item.amount, 0) || "");
+      } catch (err) {
+        setError("SOS " + err.message);
+      }
+    };
+
+    fetchPayment();
+  }, []);
+
+  console.log(PaymentData);
 
   return (
     <Layout>
       <Box sx={{ margin: "5%" }}>
         <Grid container spacing={3}>
           <Grid lg={4} sm={6} xs={12}>
-            <Budget diff={12} trend="up" sx={{ height: "100%" }} value="$24k" />
+            <Budget sx={{ height: "100%" }} value={`${PaymentData} VND`} />
           </Grid>
           <Grid lg={4} sm={6} xs={12}>
-            <TotalCustomers
-              diff={16}
-              trend="up"
+            <TotalCustomers sx={{ height: "100%" }} value={UserData} />
+          </Grid>
+          <Grid lg={4} sm={6} xs={12}>
+            <TotalProfit
               sx={{ height: "100%" }}
-              value="1.6k"
+              value={`${Math.floor(PaymentData * 0.4)} VND`}
             />
-          </Grid>
-          <Grid lg={4} sm={6} xs={12}>
-            <TotalProfit sx={{ height: "100%" }} value="$15k" />
           </Grid>
           <Grid lg={8} xs={12}>
             <Sales
