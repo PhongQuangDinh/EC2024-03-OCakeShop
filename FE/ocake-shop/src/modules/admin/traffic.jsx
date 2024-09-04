@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
@@ -17,8 +18,27 @@ const iconMapping = {
   Phone: Phone,
 };
 
-export function Traffic({ chartSeries, labels, sx }) {
+export function Traffic({ sx }) {
+  const [chartSeries, setChartSeries] = useState([15, 2, 6]);
+  const [labels] = useState(["Desktop", "Tablet", "Phone"]);
+
   const chartOptions = useChartOptions(labels);
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent;
+
+    let updatedSeries = [...chartSeries];
+
+    if (/mobile/i.test(userAgent)) {
+      updatedSeries[2] += 1; // Phone
+    } else if (/tablet|ipad|android(?!.*mobile)/i.test(userAgent)) {
+      updatedSeries[1] += 1; // Tablet
+    } else {
+      updatedSeries[0] += 1; // Desktop
+    }
+
+    setChartSeries(updatedSeries);
+  }, []);
 
   return (
     <Card sx={sx}>
@@ -46,7 +66,7 @@ export function Traffic({ chartSeries, labels, sx }) {
                   {Icon ? <Icon fontSize="var(--icon-fontSize-lg)" /> : null}
                   <Typography variant="h6">{label}</Typography>
                   <Typography color="text.secondary" variant="subtitle2">
-                    {item}%
+                    {item} lượt truy cập
                   </Typography>
                 </Stack>
               );
